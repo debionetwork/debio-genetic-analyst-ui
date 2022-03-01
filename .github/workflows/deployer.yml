@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   compute-build-info:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     outputs:
       sha_short: ${{ steps.build-info.outputs.sha_short }}
       date: ${{ steps.build-info.outputs.date }}
@@ -40,7 +40,7 @@ jobs:
 
   deploy-dev:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: [compute-build-info]
     environment: development
     env:
@@ -68,11 +68,8 @@ jobs:
               --set-string image.repository=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ github.repository }} \
               --set-string image.tag=${{ needs.compute-build-info.outputs.sha_short }} \
               --set-string imagePullSecrets[0].name=gcr-auth \
-              --set ingress.podSecurityContext.1001=1001 \
-              --set ingress.securityContext.runAsNonRoot=true \
-              --set ingress.securityContext.runAsUser=1001 \
               --set ingress.enabled=true \
-              --set-string ingress.annotations."kubernetes\.io/ingress\.class"=nginx \
+              --set-string ingress.className=nginx \
               --set-string ingress.annotations."cert-manager\.io/cluster-issuer"=letsencrypt \
               --set-string ingress.annotations."nginx\.ingress\.kubernetes\.io/limit-rps"="100" \
               --set-string ingress.hosts[0].host=${{ secrets.INGRESS_HOST }} \
@@ -93,7 +90,7 @@ jobs:
 
   deploy-alpha-release:
     if: "github.event.release.prerelease && contains(needs.compute-build-info.outputs.latest_tag, 'alpha')"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: [compute-build-info]
     environment: staging
     env:
@@ -121,11 +118,8 @@ jobs:
               --set-string image.repository=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ github.repository }} \
               --set-string image.tag=${{ needs.compute-build-info.outputs.latest_tag }} \
               --set-string imagePullSecrets[0].name=gcr-auth \
-              --set ingress.podSecurityContext.1001=1001 \
-              --set ingress.securityContext.runAsNonRoot=true \
-              --set ingress.securityContext.runAsUser=1001 \
               --set ingress.enabled=true \
-              --set-string ingress.annotations."kubernetes\.io/ingress\.class"=nginx \
+              --set-string ingress.className=nginx \
               --set-string ingress.annotations."cert-manager\.io/cluster-issuer"=letsencrypt \
               --set-string ingress.annotations."nginx\.ingress\.kubernetes\.io/limit-rps"="100" \
               --set-string ingress.hosts[0].host=${{ secrets.INGRESS_HOST }} \
@@ -146,7 +140,7 @@ jobs:
 
   deploy-beta-release:
     if: "github.event.release.prerelease && contains(needs.compute-build-info.outputs.latest_tag, 'beta')"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: [compute-build-info]
     environment: testnet
     env:
@@ -174,11 +168,8 @@ jobs:
               --set-string image.repository=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ github.repository }} \
               --set-string image.tag=${{ needs.compute-build-info.outputs.latest_tag }} \
               --set-string imagePullSecrets[0].name=gcr-auth \
-              --set ingress.podSecurityContext.1001=1001 \
-              --set ingress.securityContext.runAsNonRoot=true \
-              --set ingress.securityContext.runAsUser=1001 \
               --set ingress.enabled=true \
-              --set-string ingress.annotations."kubernetes\.io/ingress\.class"=nginx \
+              --set-string ingress.className=nginx \
               --set-string ingress.annotations."cert-manager\.io/cluster-issuer"=letsencrypt \
               --set-string ingress.annotations."nginx\.ingress\.kubernetes\.io/limit-rps"="100" \
               --set-string ingress.hosts[0].host=${{ secrets.INGRESS_HOST }} \
@@ -199,7 +190,7 @@ jobs:
 
   deploy-pre-release:
     if: "github.event.release.prerelease && contains(needs.compute-build-info.outputs.latest_tag, 'rc')"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: [compute-build-info]
     environment: mainnet
     env:
@@ -227,11 +218,8 @@ jobs:
               --set-string image.repository=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ github.repository }} \
               --set-string image.tag=${{ needs.compute-build-info.outputs.latest_tag }} \
               --set-string imagePullSecrets[0].name=gcr-auth \
-              --set ingress.podSecurityContext.1001=1001 \
-              --set ingress.securityContext.runAsNonRoot=true \
-              --set ingress.securityContext.runAsUser=1001 \
               --set ingress.enabled=true \
-              --set-string ingress.annotations."kubernetes\.io/ingress\.class"=nginx \
+              --set-string ingress.className=nginx \
               --set-string ingress.annotations."cert-manager\.io/cluster-issuer"=letsencrypt \
               --set-string ingress.annotations."nginx\.ingress\.kubernetes\.io/limit-rps"="100" \
               --set-string ingress.hosts[0].host=${{ secrets.INGRESS_HOST }} \
@@ -252,7 +240,7 @@ jobs:
 
   deploy-release:
     if: "startsWith(github.ref, 'refs/tags/') && !github.event.release.prerelease"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: [compute-build-info]
     environment: mainnet
     env:
@@ -280,11 +268,8 @@ jobs:
               --set-string image.repository=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ github.repository }} \
               --set-string image.tag=${{ needs.compute-build-info.outputs.latest_tag }} \
               --set-string imagePullSecrets[0].name=gcr-auth \
-              --set ingress.podSecurityContext.1001=1001 \
-              --set ingress.securityContext.runAsNonRoot=true \
-              --set ingress.securityContext.runAsUser=1001 \
               --set ingress.enabled=true \
-              --set-string ingress.annotations."kubernetes\.io/ingress\.class"=nginx \
+              --set-string ingress.className=nginx \
               --set-string ingress.annotations."cert-manager\.io/cluster-issuer"=letsencrypt \
               --set-string ingress.annotations."nginx\.ingress\.kubernetes\.io/limit-rps"="10" \
               --set-string ingress.hosts[0].host=${{ secrets.INGRESS_HOST }} \
