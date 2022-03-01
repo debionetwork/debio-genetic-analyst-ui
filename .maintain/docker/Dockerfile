@@ -22,7 +22,7 @@ RUN chmod -R 777 /var/log/nginx /var/cache/nginx /var/run \
 COPY ./.maintain/docker/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf
 
 # Copy from builder stage
-COPY --from=build-stage /app/dist /usr/share/nginx/html
+COPY --from=build-stage --chown=debio /app/dist /usr/share/nginx/html
 
 # Set to a non-root built-in user
 USER debio
