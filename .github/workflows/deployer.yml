@@ -68,6 +68,9 @@ jobs:
               --set-string image.repository=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ github.repository }} \
               --set-string image.tag=${{ needs.compute-build-info.outputs.sha_short }} \
               --set-string imagePullSecrets[0].name=gcr-auth \
+              --set ingress.podSecurityContext.1001=1001 \
+              --set ingress.securityContext.runAsNonRoot=true \
+              --set ingress.securityContext.runAsUser=1001 \
               --set ingress.enabled=true \
               --set-string ingress.annotations."kubernetes\.io/ingress\.class"=nginx \
               --set-string ingress.annotations."cert-manager\.io/cluster-issuer"=letsencrypt \
@@ -118,6 +121,9 @@ jobs:
               --set-string image.repository=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ github.repository }} \
               --set-string image.tag=${{ needs.compute-build-info.outputs.latest_tag }} \
               --set-string imagePullSecrets[0].name=gcr-auth \
+              --set ingress.podSecurityContext.1001=1001 \
+              --set ingress.securityContext.runAsNonRoot=true \
+              --set ingress.securityContext.runAsUser=1001 \
               --set ingress.enabled=true \
               --set-string ingress.annotations."kubernetes\.io/ingress\.class"=nginx \
               --set-string ingress.annotations."cert-manager\.io/cluster-issuer"=letsencrypt \
@@ -168,6 +174,9 @@ jobs:
               --set-string image.repository=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ github.repository }} \
               --set-string image.tag=${{ needs.compute-build-info.outputs.latest_tag }} \
               --set-string imagePullSecrets[0].name=gcr-auth \
+              --set ingress.podSecurityContext.1001=1001 \
+              --set ingress.securityContext.runAsNonRoot=true \
+              --set ingress.securityContext.runAsUser=1001 \
               --set ingress.enabled=true \
               --set-string ingress.annotations."kubernetes\.io/ingress\.class"=nginx \
               --set-string ingress.annotations."cert-manager\.io/cluster-issuer"=letsencrypt \
@@ -218,6 +227,9 @@ jobs:
               --set-string image.repository=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ github.repository }} \
               --set-string image.tag=${{ needs.compute-build-info.outputs.latest_tag }} \
               --set-string imagePullSecrets[0].name=gcr-auth \
+              --set ingress.podSecurityContext.1001=1001 \
+              --set ingress.securityContext.runAsNonRoot=true \
+              --set ingress.securityContext.runAsUser=1001 \
               --set ingress.enabled=true \
               --set-string ingress.annotations."kubernetes\.io/ingress\.class"=nginx \
               --set-string ingress.annotations."cert-manager\.io/cluster-issuer"=letsencrypt \
@@ -268,6 +280,9 @@ jobs:
               --set-string image.repository=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ github.repository }} \
               --set-string image.tag=${{ needs.compute-build-info.outputs.latest_tag }} \
               --set-string imagePullSecrets[0].name=gcr-auth \
+              --set ingress.podSecurityContext.1001=1001 \
+              --set ingress.securityContext.runAsNonRoot=true \
+              --set ingress.securityContext.runAsUser=1001 \
               --set ingress.enabled=true \
               --set-string ingress.annotations."kubernetes\.io/ingress\.class"=nginx \
               --set-string ingress.annotations."cert-manager\.io/cluster-issuer"=letsencrypt \
