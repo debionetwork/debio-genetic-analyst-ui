@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import { heartBeatIcon } from "@/common/icons"
+import { heartBeatIcon } from "@debionetwork/ui-icons"
 
 export default {
   name: "LoadingScreen",

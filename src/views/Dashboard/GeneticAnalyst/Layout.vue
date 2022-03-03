@@ -35,14 +35,14 @@
 
       .modal-password__cta.d-flex.flex-column(slot="cta")
         .modal-password__cta.d-flex.align-center.justify-between
-          Button.router-link.modal-password__cta-submit(
+          ui-debio-button.router-link.modal-password__cta-submit(
             color="secondary"
             width="130"
             :to="{ name: 'forgot-password' }"
             outlined
           ) Forgot Password
 
-          Button.modal-password__cta-submit(
+          ui-debio-button.modal-password__cta-submit(
             color="secondary"
             width="130"
             @click="handleSubmitPassword"
@@ -79,11 +79,10 @@ import {
   checkCircleIcon,
   userIcon,
   fileTextIcon
-} from "@/common/icons"
+} from "@debionetwork/ui-icons"
 
 import NavigationDrawer from "@/common/components/NavigationDrawer"
 import Navbar from "@/common/components/Navbar.vue"
-import Button from "@/common/components/Button"
 import maintenancePageLayout from "@/views/Dashboard/maintenancePageLayout"
 import errorMessage from "@/common/constants/error-messages"
 import localStorage from "@/common/lib/local-storage"
@@ -93,7 +92,7 @@ export default {
 
   mixins: [validateForms],
 
-  components: { NavigationDrawer, Navbar, Button, maintenancePageLayout },
+  components: { NavigationDrawer, Navbar, maintenancePageLayout },
 
   data: () => ({
     checkCircleIcon,
@@ -135,7 +134,7 @@ export default {
     },
 
     computeButtonActive() {
-      return !/(\/genetic-analyst\/request-test)/.test(this.$route.path)
+      return !/(\/customer\/request-test)/.test(this.$route.path)
     }
   },
 
@@ -150,7 +149,7 @@ export default {
         this.$store.dispatch("substrate/addListNotification", {
           address: this.wallet.address,
           event: event,
-          role: "genetic-analyst"
+          role: "customer"
         });
       }
     }
@@ -182,16 +181,16 @@ export default {
     async getListNotification() {
       await this.$store.dispatch("substrate/getListNotification", {
         address: this.wallet.address,
-        role: "genetic-analyst"
+        role: "customer"
       })
     },
 
     goToRequestTestPage() {
-      this.$router.push({ name: "genetic-analyst-request-test" })
+      this.$router.push({ name: "customer-request-test" })
     },
 
     goToUploadEMR() {
-      this.$router.push({ name: "genetic-analyst-emr-create" })
+      this.$router.push({ name: "customer-emr-create" })
     },
 
     handleShowPassword() {

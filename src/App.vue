@@ -19,7 +19,7 @@
 </template>
   
 <script>
-import { cableErrorIcon } from "@/common/icons"
+import { cableErrorIcon } from "@debionetwork/ui-icons"
 import { mapState, mapActions } from "vuex"
 import { generalDebounce } from "@/common/lib/utils"
 import NoAccessMobile from "@/views/NoAccessMobile"

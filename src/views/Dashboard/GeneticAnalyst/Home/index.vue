@@ -3,7 +3,7 @@
     .ga-dashboard__wrapper
       ui-debio-banner.ga-dashboard__banner(
         title="Genetic Analyst"
-        subtitle="Povide service for genetic-analyst who have been tested in previous years can get interpretation that leads to improved maintenance."
+        subtitle="Povide service for customer who have been tested in previous years can get interpretation that leads to improved maintenance."
         gradient-color="tertiary"
         with-decoration
       )
@@ -15,11 +15,11 @@
             fill
           )
 
-      DataTable(:headers="headers" :items="orderLists")
+      ui-debio-data-table(:headers="headers" :items="orderLists")
         template(slot="prepend")
           .ga-dashboard__text
             h2.ga-dashboard__table-title Order Lists
-            p.ga-dashboard__table-subtitle.mb-0 List of all services ordered by Genetic Analysts
+            p.ga-dashboard__table-subtitle.mb-0 List of all services ordered by Customers
 
         template(v-slot:[`item.id`]="{ item }")
           span {{ `${item.id.substr(0, 4)}...${item.id.substr(item.id.length - 3)}` }}
@@ -40,15 +40,13 @@
 import { GAGetOrders } from "@/common/lib/api"
 import { analysisDetails } from "@/common/lib/polkadot-provider/query/genetic-analyst/analysis"
 import { generalDebounce } from "@/common/lib/utils"
-import { geneticAnalystIllustration, eyeIcon } from "@/common/icons"
+import { geneticAnalystIllustration, eyeIcon } from "@debionetwork/ui-icons"
 
-import DataTable from "@/common/components/DataTable"
 import { mapState } from "vuex"
 
 
 export default {
   name: "GADashboard",
-  components: { DataTable },
 
   data: () => ({
     geneticAnalystIllustration,
@@ -109,8 +107,8 @@ export default {
     }
   },
 
-  created() {
-    this.getOrdersData()
+  async created() {
+    await this.getOrdersData()
   },
 
   mounted() {

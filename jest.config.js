@@ -33,6 +33,6 @@ module.exports = {
     ".*\\.(vue)$": "vue-jest"
   },
   transformIgnorePatterns: [
-    "<rootDir>/node_modules/(?!(vuetify)/)"
+    "<rootDir>/node_modules/(?!(vuetify|@debionetwork)/)"
   ]
 }

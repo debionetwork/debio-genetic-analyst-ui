@@ -4,7 +4,7 @@
       ui-debio-icon(:icon="Illustration404" view-box="-23 116 390 80" width="350" height="190" fill)
       h1.not-found__title Page not found
       p.not-found__subtitle Sorry, we can’t find the page you’re looking for.
-      Button.not-found__button(
+      ui-debio-button.not-found__button(
         color="primary"
         width="150"
         height="35"
@@ -13,13 +13,10 @@
 </template>
 
 <script>
-import { Illustration404 } from "@/common/icons"
-import Button from "@/common/components/Button"
+import { Illustration404 } from "@debionetwork/ui-icons"
 
 export default {
   name: "NotFound",
-
-  components: { Button },
 
   data: () => ({
     Illustration404
@@ -27,7 +24,7 @@ export default {
   
   methods: {
     handleToDashboard() {
-      this.$router.push({ name: "genetic-analyst-dashboard" })
+      this.$router.push({ name: "customer-dashboard" })
     }
   }
 }

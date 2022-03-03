@@ -1,6 +1,6 @@
-export async function createGeneticAnalysisOrder(api, pair, geneticDataId, serviceId, priceIndex, cusomerPublicKey, cb = () => {}) {
+export async function createGeneticAnalysisOrder(api, pair, geneticDataId, serviceId, priceIndex, cusomerPublicKey, geneticLink, cb = () => {}) {
   const unsub = await api.tx.geneticAnalysisOrders
-    .createGeneticAnalysisOrder(geneticDataId, serviceId, priceIndex, cusomerPublicKey)
+    .createGeneticAnalysisOrder(geneticDataId, serviceId, priceIndex, cusomerPublicKey, geneticLink)
     .signAndSend(pair, { nonce: -1 }, async ({ events = [], status }) => {
       if (status.isFinalized) {
         const eventList = events.filter(({ event }) =>
@@ -21,9 +21,9 @@ export async function cancelGeneticAnalysisOrder(api, pair, orderId) {
   return result.toHuman()
 }
 
-export async function getCreateGeneticAnalysisOrderFee(api, pair, geneticDataId, serviceId, priceIndex, cusomerPublicKey) {
+export async function getCreateGeneticAnalysisOrderFee(api, pair, geneticDataId, serviceId, priceIndex, cusomerPublicKey, geneticLink) {
   return api.tx.geneticAnalysisOrders
-    .createGeneticAnalysisOrder(geneticDataId, serviceId, priceIndex, cusomerPublicKey)
+    .createGeneticAnalysisOrder(geneticDataId, serviceId, priceIndex, cusomerPublicKey, geneticLink)
     .paymentInfo(pair)
 }
 

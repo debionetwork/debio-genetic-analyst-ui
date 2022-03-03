@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { constructIllustration } from "@/common/icons"
+import { constructIllustration } from "@debionetwork/ui-icons"
 
 export default {
   name: "maintenancePageLayout",

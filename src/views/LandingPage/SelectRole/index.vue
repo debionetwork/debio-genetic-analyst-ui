@@ -14,7 +14,7 @@
 
 <script>
 import LandingPagePopUp from "@/views/LandingPage/LandingPagePopUp.vue"
-import { usersIcon, userIcon } from "@/common/icons"
+import { usersIcon, userIcon } from "@debionetwork/ui-icons"
 
 export default {
   name: "InputPassword",
@@ -26,7 +26,7 @@ export default {
     userIcon,
 
     roles: [
-      { title: "Genetic Analyst", route: "genetic-analyst-dashboard", icon: usersIcon },
+      { title: "Customer", route: "customer-dashboard", icon: usersIcon },
       { title: "Genetic Analyst", route: "genetic-analyst", icon: userIcon }
     ]
   }),

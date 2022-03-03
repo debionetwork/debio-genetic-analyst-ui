@@ -15,7 +15,7 @@
             p.mt-5.pl-12.pr-12(class="text-h6" ) Your request test process will be cancelled
 
           div(class="d-flex justify-space-between align-center pa-10")
-            Button(
+            ui-debio-button(
               color="secondary" 
               width="120px"
               height="35"
@@ -24,7 +24,7 @@
               outlined 
             ) No
 
-            Button(
+            ui-debio-button(
               color="secondary" 
               width="120px"
               height="35"
@@ -60,7 +60,6 @@
 
 <script>
 import { mapState } from "vuex"
-import Button from "@/common/components/Button"
 import { cancelOrder } from "@/common/lib/polkadot-provider/command/orders.js"
 
 export default {
@@ -78,10 +77,6 @@ export default {
       api: (state) => state.substrate.api,
       wallet: (state) => state.substrate.wallet
     })  
-  },
-
-  components: {
-    Button
   },
 
   props: {

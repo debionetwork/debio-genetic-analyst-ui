@@ -243,7 +243,7 @@ export default {
 
       this._show = false
       this.clearInput()
-      this.$router.push({ name: "genetic-analyst-dashboard" })
+      this.$router.push({ name: "customer-dashboard" })
     },
 
     clearInput() {

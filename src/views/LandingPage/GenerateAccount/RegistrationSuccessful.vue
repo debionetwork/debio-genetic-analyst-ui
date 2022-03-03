@@ -41,7 +41,7 @@ export default {
   },
   methods: {
     onContinue() {
-      this.$router.push({ name: "genetic-analyst-dashboard" })
+      this.$router.push({ name: "customer-dashboard" })
     }
   }
 }

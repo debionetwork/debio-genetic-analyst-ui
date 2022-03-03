@@ -20,14 +20,14 @@
             .dialog-success__border-text A feature that allows you to request genetic/DNA analysis to Genetic Analyst in DeBio AppChain based on the genetic data uploaded
 
           .dialog-success__buttons
-            Button(
+            ui-debio-button(
               width="140"
               color="secondary"
               style="font-size: 10px;"
               outlined
               @click="toGeneticDataList"
             ) Maybe Later
-            Button(
+            ui-debio-button(
               width="140"
               color="secondary"
               style="font-size: 10px;"
@@ -37,15 +37,14 @@
 </template>
 
 <script>
-import Button from "@/common/components/Button"
+
+import { mapMutations, mapState } from "vuex"
 import checkCircle from "@/assets/check-circle-primary.png"
+import { queryGeneticDataById } from "@/common/lib/polkadot-provider/query/genetic-data"
+
 
 export default {
   name: "SuccessDialog",
-
-  components: {
-    Button
-  },
 
   data: () => ({
     checkCircle
@@ -54,10 +53,21 @@ export default {
 
   props: {
     show: Boolean,
-    title: { type: String, default: "Title" }
+    title: { type: String, default: "Title" },
+    orderId: { type: [String, Number] }
+  },
+
+  computed: {
+    ...mapState({
+      api: (state) => state.substrate.api
+    })
   },
 
   methods: {
+    ...mapMutations({
+      setSelectedGeneticData: "geneticData/SET_SELECTED_DATA"
+    }),
+
     closeDialog() {
       this.$emit("close")
     },
@@ -66,8 +76,10 @@ export default {
       this.$router.push({ name: "customer-genetic-data" })
     },
 
-    toReqAnalysis() {
-      this.$router.push({ name: "customer-request-analysis"})
+    async toReqAnalysis() {
+      const geneticData = await queryGeneticDataById(this.api, this.orderId)
+      this.setSelectedGeneticData(geneticData)
+      this.$router.push({ name: "customer-request-analysis-service"})
     }
   }
 }

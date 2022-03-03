@@ -123,7 +123,7 @@ import {
   polkadotIcon,
   metamaskFoxIcon,
   copyIcon
-} from "@/common/icons"
+} from "@debionetwork/ui-icons"
 
 import localStorage from "@/common/lib/local-storage"
 import { generalDebounce } from "@/common/lib/utils"
