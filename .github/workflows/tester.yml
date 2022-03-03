@@ -4,7 +4,6 @@ on:
   pull_request:
     branches:
       - main
-      - main-tmp
 
 concurrency:
   group: tester-${{ github.event.pull_request.number }}
@@ -12,7 +11,7 @@ concurrency:
 
 jobs:
   testing:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         node-version: [16.x]
