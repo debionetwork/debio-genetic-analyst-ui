@@ -475,6 +475,7 @@ export default {
           this.txWeight = "Calculating..."
           this.txWeight = `${Number(this.web3.utils.fromWei(String(txWeight.partialFee), "ether")).toFixed(4)} DBIO`
           this.step = 2
+          this.scrollToFormsSection()
           this.orderAccepted = true
         }
         if (this.completed) {
@@ -484,6 +485,25 @@ export default {
       } catch {
         this.messageError = "Something went wrong. Please try again later"
       }
+    },
+
+    scrollToFormsSection() {
+      const observer = new MutationObserver((mutations) => {
+        const formFinded = mutations.find(m =>
+          m.addedNodes[0]?.classList?.contains("upload-section") &&
+          m.addedNodes[0]?.classList?.contains("mt-6")
+        )
+        if (formFinded) { // Wait until the form upload showed up
+          document.querySelector(".upload-section__forms").scrollIntoView({ behavior: "smooth" })
+          observer.disconnect()
+        }
+      })
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: false,
+        characterData: false
+      })
     },
 
     handlePrevious() {
@@ -498,6 +518,7 @@ export default {
     async handleAcceptOrder() {
       if (this.orderDataDetails.analysis_info?.status === "InProgress" || this.orderAccepted) {
         this.step = 2
+        this.scrollToFormsSection()
         return
       }
 
@@ -508,6 +529,7 @@ export default {
 
         this.orderAccepted = true
         this.step = 2
+        this.scrollToFormsSection()
       } catch (e) {
         console.error(e)
       } finally {
