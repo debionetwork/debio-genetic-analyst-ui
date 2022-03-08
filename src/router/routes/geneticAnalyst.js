@@ -44,6 +44,12 @@ export default [
         name: "ga-order-details",
         meta: { pageHeader: "Details", parent: "ga-orders" },
         component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Orders/Details")
+      },
+      {
+        path: "registration",
+        name: "ga-registration",
+        meta: { pageHeader: "Registration", maintenance: false},
+        component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Registration")
       }
     ]
   }
