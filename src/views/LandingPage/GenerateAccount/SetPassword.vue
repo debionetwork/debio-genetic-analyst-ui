@@ -42,7 +42,8 @@
                 outlined
             )
             ui-debio-recaptcha(
-                :verify="onVerifyRecaptcha"
+              :sitekey="sitekey"
+              :verify="onVerifyRecaptcha"
             )
             v-btn(
                 :disabled="!buttonDisabled || !isPasswordsValid"
@@ -101,7 +102,11 @@ export default {
     ...mapState({
       substrateApi: (state) => state.substrate.api,
       isLoading: (state) => state.substrate.isLoadingWallet
-    })
+    }),
+
+    sitekey() {
+      return process.env.VUE_APP_RECAPTCHA_SITE_KEY
+    }
   },
 
   rules: {
