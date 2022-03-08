@@ -435,11 +435,11 @@ export default {
           ...data,
           analysis_info: {
             ...analysisData,
-            fileName: analystReportDocument?.rows[0].metadata.name
+            fileName: analystReportDocument?.rows[0]?.metadata?.name
           },
           document: {
             ...geneticData,
-            fileName: geneticLinkName?.rows[0].metadata.name
+            fileName: geneticLinkName?.rows[0]?.metadata?.name
           },
           createdAt: new Date(+data.createdAt.replaceAll(",", "")).toLocaleString("en-GB", {
             day: "numeric",
