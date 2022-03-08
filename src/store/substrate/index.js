@@ -135,7 +135,7 @@ export default {
         api.query.system.events((events) => {
           events.forEach((record) => {
             const { event } = record
-            if (event.section == "serviceRequest" || event.section == "rewards" || event.section == "orders" || event.section == "geneticTesting" || event.section == "balances" || event.section == "electronicMedicalRecord" || event.section == "geneticData" || event.section == "geneticAnalysisOrders" || event.section == "geneticAnalysis") {
+            if (event.section == "serviceRequest" || event.section == "rewards" || event.section == "orders" || event.section == "geneticTesting" || event.section == "balances" || event.section == "electronicMedicalRecord" || event.section == "geneticData" || event.section == "geneticAnalysisOrders" || event.section == "geneticAnalysis" || event.section == "geneticAnalysts") {
               if (event.method === "OrderPaid") localStorage.removeLocalStorageByName("lastOrderStatus")
               commit("SET_LAST_EVENT", event)
             }
