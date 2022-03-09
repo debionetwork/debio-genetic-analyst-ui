@@ -26,14 +26,14 @@ export async function checkIsLoggedIn(to, from, next) {
   if (to.path == "/sign-in" || to.path == "/generate") {
     if (isLoggedIn) {
       await dispatchGetAccount(wallet, address, () => {
-        next("/customer")
+        next("/genetic-analyst")
       })
       return address
-    } 
+    }
 
     next()
     return ""
-  } 
+  }
 
   if (isLoggedIn) {
     await dispatchGetAccount(wallet, address, () => {

@@ -4,18 +4,16 @@
 .pop-up-main{
     justify-content: space-between;
     height: 100%;
-    
+
     & > div > div.forgot-password-text {
         width: 100%;
         height: 51px;
-
         font-family: Raleway;
         font-style: normal;
         font-weight: normal;
         font-size: 15px;
         line-height: 150%;
         color: $color-primary;
-
         display: flex;
         justify-content: flex-end;
 
@@ -27,6 +25,7 @@
     p {
         height: 27px;
     }
+
     .v-btn {
         margin-bottom: 16px;
     }
@@ -69,11 +68,11 @@
 
           div: v-btn.white--text(
             :disabled="!password"
-            elevation="0" 
-            color="primary" 
+            elevation="0"
+            color="primary"
             @click="decryptWallet"
           ) Continue
-          
+
     LandingPagePopUp(v-if="isNoAccount")
       template(v-slot:main): div.pop-up-main
         img(src="@/assets/alert-circle.png")
@@ -88,10 +87,10 @@
           div: v-btn(
               elevation="0"
               color="primary"
-              outlined 
+              outlined
               @click="inputMnemonic"
           ) Input Mnemonic
-          
+
 </template>
 
 <script>
@@ -99,7 +98,7 @@ import { mapGetters, mapState, mapActions } from "vuex"
 import LandingPagePopUp from "@/views/LandingPage/LandingPagePopUp.vue"
 import localStorage from "@/common/lib/local-storage"
 import Kilt from "@kiltprotocol/sdk-js"
-import CryptoJS from "crypto-js"	
+import CryptoJS from "crypto-js"
 import { u8aToHex } from "@polkadot/util"
 import errorMessage from "@/common/constants/error-messages"
 
@@ -237,13 +236,13 @@ export default {
 
       if (!result.success) {
         if (result.error === "Unable to decode using the supplied passphrase") {
-          return this.errorMsg = this.errorMessage.INCORRECT_PASSWORD          
+          return this.errorMsg = this.errorMessage.INCORRECT_PASSWORD
         }
       }
 
       this._show = false
       this.clearInput()
-      this.$router.push({ name: "customer-dashboard" })
+      this.$router.push({ name: "ga-dashboard" })
     },
 
     clearInput() {

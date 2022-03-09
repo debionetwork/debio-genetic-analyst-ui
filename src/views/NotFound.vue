@@ -21,10 +21,10 @@ export default {
   data: () => ({
     Illustration404
   }),
-  
+
   methods: {
     handleToDashboard() {
-      this.$router.push({ name: "customer-dashboard" })
+      this.$router.push({ name: "ga-dashboard" })
     }
   }
 }
