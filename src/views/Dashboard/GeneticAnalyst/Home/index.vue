@@ -25,24 +25,25 @@
             .verification-status__text
               | Your verification submission is {{ verificationStatus === 'Unverified' ? " being reviewed" : verificationStatus }} by Daogenic
 
-        ui-debio-data-table(:headers="headers" :items="orderLists" v-else)
-          template(slot="prepend")
-            .ga-dashboard__text
-              h2.ga-dashboard__table-title Order Lists
-              p.ga-dashboard__table-subtitle.mb-0 List of all services ordered by Customers
+        .ga-dashboard__table(v-else)
+          ui-debio-data-table(:headers="headers" :items="orderLists")
+            template(slot="prepend")
+              .ga-dashboard__text
+                h2.ga-dashboard__table-title Order Lists
+                p.ga-dashboard__table-subtitle.mb-0 List of all services ordered by Customers
 
-          template(v-slot:[`item.id`]="{ item }")
-            span {{ `${item.id.substr(0, 4)}...${item.id.substr(item.id.length - 3)}` }}
+            template(v-slot:[`item.id`]="{ item }")
+              span {{ `${item.id.substr(0, 4)}...${item.id.substr(item.id.length - 3)}` }}
 
-          template(v-slot:[`item.action`]="{ item }")
-            .ga-dashboard__table-action.d-flex.justify-center
-              router-link(:to="{ name: 'ga-order-details', params: { id: item.id, item } }")
-                ui-debio-icon(
-                  :icon="eyeIcon"
-                  role="button"
-                  size="16"
-                  stroke
-                )
+            template(v-slot:[`item.action`]="{ item }")
+              .ga-dashboard__table-action.d-flex.justify-center
+                router-link(:to="{ name: 'ga-order-details', params: { id: item.id, item } }")
+                  ui-debio-icon(
+                    :icon="eyeIcon"
+                    role="button"
+                    size="16"
+                    stroke
+                  )
 
 </template>
 

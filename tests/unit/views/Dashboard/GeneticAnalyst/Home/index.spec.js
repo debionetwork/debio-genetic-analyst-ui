@@ -1,50 +1,59 @@
-import { createLocalVue, shallowMount, config } from "@vue/test-utils"
+import { shallowMount, config } from "@vue/test-utils"
 import GADashboard from "@/views/Dashboard/GeneticAnalyst/Home"
 import Vuex from "vuex"
+import Vue from "vue"
 import Vuetify from "vuetify"
+
+Vue.use(Vuex)
+Vue.use(Vuetify)
 
 config.stubs["router-link"] = { template: "<div></div>" }
 config.stubs["ui-debio-icon"] = { template: "<div></div>" }
 config.stubs["ui-debio-banner"] = { template: "<div></div>" }
+config.stubs["ui-debio-data-table"] = { template: "<div></div>" }
 
 describe("Genetic Analyst Dashboard", () => {
   let container
-  let localVue = null
-
-  beforeEach(() => {
-    localVue = createLocalVue()
-    localVue.use(Vuex)
-    localVue.use(Vuetify)
-  })
-
-  afterEach(() => {
-    localVue = null
-  })
-
-  it("Should render", () => {
-    GADashboard.methods = {
-        getOrdersData: jest.fn(),
-    };
-    container = shallowMount(GADashboard, {
-      localVue,
-      vuetify: new Vuetify(),
-      store: new Vuex.Store({
-        state: {
-          substrate: {
-            api: "API",
-            wallet: "WALLET",
-            mnemonicData: "oil spend nation obey lecture behave lake diary reward forest gym apple"
-          },
-          auth: {
-            loadingData: "LOADING"
-          },
-          metamask: {
-            web3: "WEB3"
-          }
+  const config = {
+    store: new Vuex.Store({
+      state: {
+        substrate: {
+          api: "API",
+          wallet: "WALLET",
+          mnemonicData: "oil spend nation obey lecture behave lake diary reward forest gym apple"
+        },
+        auth: {
+          loadingData: "LOADING"
+        },
+        metamask: {
+          web3: "WEB3"
         }
-      })
+      }
     })
+  }
+
+  it("Should render", async () => {
+    GADashboard.methods = { getOrdersData: jest.fn() }
+
+    container = shallowMount(GADashboard, { ...config })
 
     expect(container.exists()).toBe(true)
+  })
+
+  it("Should not be show table if the account is not Verified yet", async () => {
+    container = shallowMount(GADashboard, { ...config })
+
+    await container.setData({ verificationStatus: "Unverified" })
+
+    expect(container.find(".ga-dashboard__verification-status").exists()).toBe(true)
+  })
+
+  it("Should be show table if the account is Verified", async () => {
+    container = shallowMount(GADashboard, { ...config })
+
+    await container.setData({ verificationStatus: "Verified" })
+
+    expect(container.find(".ga-dashboard__table").exists()).toBe(true)
+    expect(container.find(".ga-dashboard__verification-status").exists()).toBeFalsy()
   })
 })
