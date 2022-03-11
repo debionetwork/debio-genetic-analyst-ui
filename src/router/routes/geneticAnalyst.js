@@ -24,7 +24,7 @@ export default [
       {
         path: "my-account",
         name: "ga-account",
-        meta: { pageHeader: "My Account", maintenance: true },
+        meta: { pageHeader: "My Account"},
         component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Account")
       },
       {
