@@ -122,7 +122,6 @@
               :error="false"
               variant="small"
               placeholder="50,000 DBIO"
-              v-model="stakingAmount"
               disabled
               outlined
               block
@@ -134,9 +133,10 @@
               width="auto"
               height="40px"
               :disabled="stakingStatus != 'Staked'"
+              @click="showUnstakeDialog = true"
               block
             ) Unstake
-        
+                
         label.text-label(
           v-if="stakingStatus == 'WaitingForUnstaked'"
         ) Your staking amount will be returned on 9/2/2022. You can stake again after your unstake period finished.
@@ -301,7 +301,8 @@
                   v-on="on"
                 ) mdi-alert-circle-outline
               span(style="font-size: 10px;") Total fee paid in DBIO to execute this transaction.
-          span.text-label {{ txWeight }}
+          span.text-label {{ Number(txWeight).toFixed(4) }} DBIO
+
         ui-debio-button(
           color="secondary"
           height="2.5rem"
@@ -379,10 +380,10 @@
             block
           )
           ui-debio-file(
-            :error="errorDoc && !document.supportingDocument"
+            :error="errorDoc && !document.supporting_document"
             :rules="$options.rules.document.file"
             :clearFile="clearFile"
-            v-model="document.supportingDocument"
+            v-model="document.supporting_document"
             variant="small"
             accept=".pdf, .doc, .jpg, .png"
             label="Add supporting file"
@@ -403,6 +404,17 @@
       message="Your account has been edited!"      
       @close="isSuccess = false"
     ) 
+
+    ConfirmationDialog(
+      :show="showUnstakeDialog"
+      :txWeight="unstakeTxWeight"
+      title="Unstake"
+      btnMessage="Unstake"
+      message="Your account will be deactivated until you stake again and your staking amount will be returned after 144 hours or 6 days"
+      this.isLoding = true
+      @close="showUnstakeDialog = false"
+      @click="handleUnstake"
+    )
 </template>
 
 <script>
@@ -412,9 +424,11 @@ import CryptoJS from "crypto-js"
 import { u8aToHex } from "@polkadot/util"
 import { analystDetails } from "@/common/lib/polkadot-provider/query/genetic-analyst/analyst"
 import { getCreateRegisterEMRFee } from "@/common/lib/polkadot-provider/command/electronic-medical-record"
-import { updateGeneticAnalystInfo } from "@/common/lib/polkadot-provider/command/genetic-analyst/analysts"
+import { updateGeneticAnalystInfo,  updateGAAvailabilityStatus, unstakeGeneticAnalyst } from "@/common/lib/polkadot-provider/command/genetic-analyst/analysts"
+import { updateQualification } from "@/common/lib/polkadot-provider/command/genetic-analyst/qualifications"
 import { queryGeneticAnalystQualifications } from "@/common/lib/polkadot-provider/query/genetic-analyst-qualifications"
 import { upload } from "@/common/lib/ipfs"
+import { uploadFile, getFileUrl } from "@/common/lib/pinata"
 import { getLocations, getSpecializationCategory } from "@/common/lib/api"
 import { fileTextIcon, pencilIcon, trashIcon } from "@debionetwork/ui-icons"
 import { mapState } from "vuex"
@@ -423,6 +437,7 @@ import localStorage from "@/common/lib/local-storage"
 import rulesHandler from "@/common/constants/rules"
 import errorMessage from "@/common/constants/error-messages"
 import SuccessDialog from "@/common/components/Dialog/SuccessDialogGeneral"
+import ConfirmationDialog from "./ConfirmationDialog.vue"
 
 const initialData = {
   title: "",
@@ -430,14 +445,14 @@ const initialData = {
   month: "",
   year: "",
   description: "",
-  supportingDocument: null
+  supporting_document: null /* eslint-disable camelcase */
 }
 
 export default {
   name: "GAAccount",
   mixins: [validateForms],
 
-  components: { SuccessDialog },
+  components: { SuccessDialog, ConfirmationDialog },
 
   data: () => ({
     fileTextIcon,
@@ -451,6 +466,7 @@ export default {
     errorDoc: false,
     isProfileLoading: false,
     showModal: false,
+    showUnstakeDialog: false,
     isEdit: false,
     cardBlock: false,
     clearFile: false,
@@ -470,16 +486,17 @@ export default {
       specifyOther: "",
       availabilityStatus: "",
       experiences: [{title: ""}],
-      certification: []
+      certification: [],
+      qualificationId: null
     },
     document: {...initialData},
     stakingStatus: "",
-    stakingAmount: "50,000 DBIO",
     countries: [],
     categories: [],
     certificate: null,
     editId: null,
     txWeight: null,
+    unstakeTxWeight: null,
     selectMonths: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
   }),
 
@@ -603,22 +620,26 @@ export default {
           firstName: analystData?.info?.firstName,
           lastName: analystData?.info?.lastName,
           gender: analystData?.info?.gender,
-          dateOfBirth: new Date(+analystData.info.dateOfBirth.replaceAll(",", "")).toLocaleString("fr-CA", {
-            day: "numeric",
-            year: "numeric",
-            month: "numeric"
-          }),
           email: analystData?.info?.email,
           phoneNumber: analystData?.info?.phoneNumber,
           specialization: analystData?.info?.specialization,
           availabilityStatus: analystData?.availabilityStatus
         }
-        
-        this.profile = profileData
-        this.stakingStatus = analystData?.stakeStatus
 
+        const dateOfBirth = analystData.info.dateOfBirth.replaceAll(",", "")
+        const _dateOfBirth = new Date(+dateOfBirth).toLocaleString("fr-CA", {
+          day: "numeric",
+          year: "numeric",
+          month: "numeric"
+        })
+        this.profile = profileData
+        this.profile.dateOfBirth = _dateOfBirth
+        this.stakingStatus = analystData?.stakeStatus
+        
         if (analystData.qualifications.length) {
-          const qualification = await queryGeneticAnalystQualifications(this.api, analystData.qualifications[0])
+          const qualificationId = analystData.qualifications[0]
+          const qualification = await queryGeneticAnalystQualifications(this.api, qualificationId)
+          this.profile.qualificationId = qualificationId
 
           if (qualification.info.experience.length) {
             this.profile.experiences = qualification.info.experience
@@ -629,9 +650,13 @@ export default {
         }
 
         this.txWeight = "Calculating..."
-
+        
         const txWeight = await getCreateRegisterEMRFee(this.api, this.wallet, this.profile)
-        this.txWeight = `${this.web3.utils.fromWei(String(txWeight.partialFee), "ether")} DBIO`
+        const unstakeTxWeight = await getCreateRegisterEMRFee(this.api, this.wallet, this.stakingStatus)
+        
+
+        this.txWeight = `${this.web3.utils.fromWei(String(txWeight.partialFee), "ether")}`
+        this.unstakeTxWeight = `${this.web3.utils.fromWei(String(unstakeTxWeight.partialFee), "ether")}`
       }
     },
 
@@ -647,9 +672,9 @@ export default {
     onSubmitFile() {
       this._touchForms("document")
       
-      const { title, issuer, month, year, description, supportingDocument } = this.document
+      const { title, issuer, month, year, description, supporting_document } = this.document
       
-      if (!title || !issuer || !month || !year || !supportingDocument) return this.errorDoc = true
+      if (!title || !issuer || !month || !year || !supporting_document) return this.errorDoc = true
       
       const context = this
       const fr = new FileReader()
@@ -660,8 +685,8 @@ export default {
           
           const encrypted = await context.encrypt({
             text: fr.result,
-            fileType: supportingDocument.type,
-            fileName: supportingDocument.name
+            fileType: supporting_document.type,
+            fileName: supporting_document.name
           })
 
           const { chunks, fileName, fileType } = encrypted
@@ -672,7 +697,7 @@ export default {
             month,
             year,
             description,
-            supportingDocument,
+            supporting_document,
             chunks,
             fileName,
             fileType,
@@ -690,7 +715,7 @@ export default {
       }
 
       context.loadingDoc = false
-      fr.readAsArrayBuffer(supportingDocument)
+      fr.readAsArrayBuffer(supporting_document)
       this.onCloseModalDocument()
     },
 
@@ -716,8 +741,25 @@ export default {
       this.showModal = true
     },
 
-    handleAvailability(value) {
-      this.profile.availability = value
+    async handleAvailability(value) {
+      this.profile.availabilityStatus = value
+      const status = {Unavailable: value === "Unavailable" ? 1 : 0, Available: value === "Available" ? 1 : 0}
+      
+      try {
+        await updateGAAvailabilityStatus(this.api, this.wallet, status)
+      } catch (error) {
+        console.error(error)
+      }
+    },
+
+    async handleUnstake() {
+      await unstakeGeneticAnalyst(this.api, this.wallet)
+        .then(() => {
+          this.isSuccess = true
+        })
+        .catch(error => {
+          console.error(error)
+        })
     },
 
     addExperience(){
@@ -747,36 +789,62 @@ export default {
         phoneNumber,
         specialization,
         specifyOther,
-        experiences
+        experiences,
+        certification
       } = this.profile
       const phone = this.isEdit ? phoneNumber : `${phoneCode}${phoneNumber}`
+      const _dateOfBirth = new Date(dateOfBirth).getTime()
       const experienceValidation = experiences.length === 1 && experiences.find(value => value.title === "")
       const _specialization = specialization == "Other" ? specifyOther : specialization
-
+      const _experiences = experiences.filter(value => value != "")
+      const qualification = {
+        experience: _experiences,
+        certification: certification
+      }
+      
       if (!profileImage || !firstName || !lastName || !gender || !dateOfBirth || !email || !phone || !_specialization || experienceValidation) {
         return this.error = true
       }
       this.isLoading = true
-      
-      await updateGeneticAnalystInfo(
-        this.api,
-        this.wallet,
-        {
-          boxPublicKey: this.publicKey,
-          firstName,
-          lastName,
-          gender,
-          dateOfBirth,
-          email,
-          phoneNumber,
-          specialization: _specialization,
-          profileImage
+
+      try {
+        for await (let [index, value] of certification.entries()) {
+          const dataFile = await this.setupFileReader({ value })
+
+          await this.upload({
+            encryptedFileChunks: dataFile.chunks,
+            fileName: dataFile.fileName,
+            index: index,
+            fileType: dataFile.fileType
+          })
         }
-      ).then(() => {
+
+        await updateGeneticAnalystInfo(
+          this.api,
+          this.wallet,
+          {
+            boxPublicKey: this.publicKey,
+            firstName,
+            lastName,
+            gender,
+            dateOfBirth: _dateOfBirth,
+            email,
+            phoneNumber,
+            specialization: _specialization,
+            profileImage
+          }
+        )
+        await updateQualification(
+          this.api,
+          this.wallet,
+          this.profile.qualificationId,
+          qualification
+        )
+
         this.isSuccess = true
-      }).catch(error => {
-        console.log(error)
-      })
+      } catch (error) {
+        console.error(error)
+      }
 
       this.isLoading = false
     },
@@ -846,6 +914,36 @@ export default {
           reject(new Error(err.message))
         }
       })
+    },
+
+    setupFileReader({ value }) {
+      return new Promise((resolve, reject) => {
+        const file = value.supporting_document
+        const fr = new FileReader()
+        
+        fr.onload = async function () {
+          resolve(value)
+        }
+
+        fr.onerror = reject
+
+        fr.readAsArrayBuffer(file)
+      })
+    },  
+
+    async upload({ encryptedFileChunks, index, fileType, fileName }) {
+      const data = JSON.stringify(encryptedFileChunks)
+      const blob = new Blob([data], { type: fileType })
+
+      const result = await uploadFile({
+        title: fileName,
+        type: fileType,
+        file: blob
+      })
+
+      const link = getFileUrl(result.IpfsHash)
+
+      this.profile.certificate[index].supporting_document = link
     }
   }
 }
