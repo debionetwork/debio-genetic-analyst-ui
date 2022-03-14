@@ -1,20 +1,14 @@
 import { createLocalVue, shallowMount, config } from "@vue/test-utils"
-import GAAccount from "@/views/Dashboard/GeneticAnalyst/Account"
+import GAAccountConfirmation from "@/views/Dashboard/GeneticAnalyst/Account/ConfirmationDialog"
 import Vuex from "vuex"
 import Vue from "vue"
 import Vuetify from "vuetify"
 
 config.stubs["ui-debio-button"] = { template: "<div></div>" }
-config.stubs["ui-debio-input"] = { template: "<div></div>" }
-config.stubs["ui-debio-dropdown"] = { template: "<div></div>" }
-config.stubs["ui-debio-modal"] = { template: "<div></div>" }
-config.stubs["ui-debio-icon"] = { template: "<div></div>" }
-config.stubs["ui-debio-textarea"] = { template: "<div></div>" }
-config.stubs["ui-debio-file"] = { template: "<div></div>" }
 
 Vue.use(Vuetify)
 
-describe("Genetic Analyst Account Dashboard", () => {
+describe("Genetic Analyst Account Confirmation Dialog", () => {
   let container
   let localVue = null
 
@@ -28,7 +22,7 @@ describe("Genetic Analyst Account Dashboard", () => {
   })
 
   it("Should render", () => {
-    container = shallowMount(GAAccount, {
+    container = shallowMount(GAAccountConfirmation, {
       localVue,
       store: new Vuex.Store({
         state: {
