@@ -1,5 +1,17 @@
 <template lang="pug">
   .layout-dashboard
+    ui-debio-modal.modal-error(
+      :show="showModalError"
+      disable-dismiss
+      :show-title="false"
+      :showCta="true"
+      ctaTitle="Back To Home"
+      :ctaOutlined="false"
+      :ctaAction="goToDashboard"
+    )
+      ui-debio-icon(:icon="cableErrorIcon" fill size="100")
+      h6.modal-error__title Aw, Snap!
+      p.modal-error__subtitle An Internal error occured during your request! try again later!
     ui-debio-modal.font-weight-bold(
       :show="showModalPassword"
       title="Unlock Wallet"
@@ -78,7 +90,8 @@ import {
   eyeOffIcon,
   checkCircleIcon,
   userIcon,
-  fileTextIcon
+  fileTextIcon,
+  cableErrorIcon
 } from "@debionetwork/ui-icons"
 
 import NavigationDrawer from "@/common/components/NavigationDrawer"
@@ -86,6 +99,7 @@ import Navbar from "@/common/components/Navbar.vue"
 import maintenancePageLayout from "@/views/Dashboard/maintenancePageLayout"
 import errorMessage from "@/common/constants/error-messages"
 import localStorage from "@/common/lib/local-storage"
+import VueRouter from "@/router"
 
 export default {
   name: "MainPage",
@@ -98,7 +112,9 @@ export default {
     checkCircleIcon,
     eyeIcon,
     eyeOffIcon,
+    cableErrorIcon,
 
+    showModalError: false,
     showModalPassword: false,
     pageError: null,
     showPassword: false,
@@ -140,8 +156,12 @@ export default {
 
   watch: {
     $route(val) {
+      const query = VueRouter?.history?.current?.query
+
       if (val.meta.maintenance) this.pageError = true
       else this.pageError = null
+
+      if (query) this.showModalError = true
     },
 
     lastEventData(event) {
@@ -193,6 +213,11 @@ export default {
       this.$router.push({ name: "customer-emr-create" })
     },
 
+    goToDashboard() {
+      this.showModalError = false
+      this.$router.push({ name: "dashboard"})
+    },
+
     handleShowPassword() {
       this.showPassword = !this.showPassword
     },
@@ -225,6 +250,10 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+  @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap')
+  @import "@/common/styles/variables.scss"
+  @import "@/common/styles/mixins.sass"
+
   .layout-dashboard
     width: 100%
     min-height: 100vh
@@ -279,4 +308,18 @@ export default {
     &-leave-to
       opacity: 0
       transform: translateX(-12.813rem)
+
+  .modal-error 
+    .ui-debio-modal__card 
+      width: 300px
+      gap: 1rem
+
+    &__title
+      @include h6-opensans
+    
+    &__subtitle 
+      max-width: 200px
+      text-align: center
+      color: #595959
+      @include body-text-3-opensans
 </style>

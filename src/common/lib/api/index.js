@@ -10,10 +10,10 @@ export * from "./genetic-analyst"
 // PLEASE DISCUSS BEFORE YOU WANT TO EDIT THIS SCRIPT
 const apiClientRequest = axios.create({
   baseURL: process.env.VUE_APP_BACKEND_API,
-  headers: { 
+  headers: {
     "Content-Type": "application/json",
     "debio-api-key": process.env.VUE_APP_DEBIO_API_KEY
-  
+
   },
   auth: {
     username: process.env.VUE_APP_USERNAME,
@@ -23,20 +23,27 @@ const apiClientRequest = axios.create({
 
 apiClientRequest.interceptors.response.use(
   response => {
-    if (response?.status === 503) VueRouter.push({ name: "maintenance" })
+    responseValidation(response)
 
     return response;
   },
   error => {
     Sentry.captureException(error);
 
-    if (error?.response?.status === 503 || !error?.response) {
-      VueRouter.push({ name: "maintenance" })
-      return
-    }
+    responseValidation(error)
 
     return Promise.reject(error);
   }
 );
 
 export default apiClientRequest
+
+const responseValidation = (response) => {
+  if (response?.status === 503) {
+    VueRouter.push({ name: "maintenance" })
+  } else if (String(response?.status)[0] == 4 || String(response?.status)[0] == 5) {
+    VueRouter.push({ query: { error: true } })
+  }
+
+  return response;
+}
