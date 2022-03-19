@@ -30,7 +30,7 @@ export default [
       {
         path: "my-services",
         name: "ga-services",
-        meta: { pageHeader: "My Services", maintenance: true },
+        meta: { pageHeader: "My Services" },
         component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Services")
       },
       {

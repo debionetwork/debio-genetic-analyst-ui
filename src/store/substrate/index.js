@@ -141,7 +141,8 @@ export default {
           "geneticData",
           "geneticAnalysisOrders",
           "geneticAnalysis",
-          "geneticAnalysts"
+          "geneticAnalysts",
+          "geneticAnalystServices"
         ]
 
         // Example of how to subscribe to events via storage
