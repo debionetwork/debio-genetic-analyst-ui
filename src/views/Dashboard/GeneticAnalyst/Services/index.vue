@@ -122,7 +122,7 @@ import {
 } from "@/common/lib/polkadot-provider/command/genetic-analyst/services"
 
 export default {
-  name: "GADashboard",
+  name: "GAServices",
 
   data: () => ({
     geneticAnalystIllustration,
@@ -187,6 +187,7 @@ export default {
             this.getServiceList()
             this.showModal = false
             this.isLoading = false
+            this.serviceId = ""
           }
         }
       }
@@ -207,13 +208,10 @@ export default {
     async getServiceList() {
       this.items = []
       const analystDetail = await analystDetails(this.api, this.wallet.address)
-
       this.serviceList = analystDetail.services
 
-      for (let i = 0; i < this.serviceList.length; i++) {
-        const serviceDetail = await serviceDetails(this.api, this.serviceList[i])
-        if (!serviceDetail) break
-
+      for (const serviceId of this.serviceList) {
+        const serviceDetail = await serviceDetails(this.api, serviceId)
         const {
           id,
           info: { description, name: serviceName, testResultSample }

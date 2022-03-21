@@ -11,7 +11,6 @@ config.stubs["ui-debio-banner"] = { template: "<div></div>" }
 config.stubs["ui-debio-card"] = { template: "<div></div>" }
 config.stubs["ui-debio-data-table"] = { template: "<div></div>" }
 
-
 describe("Genetic Analyst Services Dashboard", () => {
   let container
   let localVue = null
@@ -27,7 +26,6 @@ describe("Genetic Analyst Services Dashboard", () => {
   })
 
   it("Should render", () => {
-
     GAServices.methods = {
       getDeleteServiceFee: jest.fn(),
       getServiceList: jest.fn(),
@@ -41,8 +39,7 @@ describe("Genetic Analyst Services Dashboard", () => {
         state: {
           substrate: {
             api: "API",
-            wallet: "WALLET",
-            mnemonicData: "oil spend nation obey lecture behave lake diary reward forest gym apple"
+            wallet: "WALLET"
           },
           metamask: {
             web3: "WEB3"
