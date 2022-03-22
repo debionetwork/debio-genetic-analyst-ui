@@ -161,7 +161,7 @@ export default {
       if (val.meta.maintenance) this.pageError = true
       else this.pageError = null
 
-      if (query) this.showModalError = true
+      if (query.error) this.showModalError = true
     },
 
     lastEventData(event) {
@@ -179,6 +179,7 @@ export default {
     if (!this.mnemonicData) this.showModalPassword = true
     if (this.$route.meta.maintenance) this.pageError = true
     await this.getListNotification()
+    console.log("VueRouter", VueRouter)
   },
 
   rules: {
@@ -215,7 +216,7 @@ export default {
 
     goToDashboard() {
       this.showModalError = false
-      this.$router.push({ name: "dashboard"})
+      this.$router.push({ name: "dashboard", query: {}})
     },
 
     handleShowPassword() {
