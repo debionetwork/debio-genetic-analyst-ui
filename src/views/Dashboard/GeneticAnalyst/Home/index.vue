@@ -73,6 +73,7 @@ import { mapState } from "vuex"
 
 import metamaskDispatchAction from "@/common/lib/metamask/mixins/metamaskServiceHandler"
 import localStorage from "@/common/lib/local-storage";
+import VueRouter from "@/router"
 
 export default {
   name: "GADashboard",
@@ -132,6 +133,10 @@ export default {
   },
 
   watch: {
+    $route() {
+      this.getOrdersData()
+    },
+
     lastEventData: {
       deep: true,
       immediate: true,
@@ -174,10 +179,12 @@ export default {
 
     async getOrdersData(keyword) {
       this.orderLists = []
+      this.isLoading = true
 
       try {
         let orders = []
         const orderData = await GAGetOrders(keyword)
+        const page = VueRouter?.history?.current
 
         for (const order of orderData.data) {
           const sourceData = order._source
@@ -204,12 +211,16 @@ export default {
             })
           }
 
-          orders.push(data)
+          if (page.name == "ga-orders" && data.status == "Done") orders.push(data)
+          else if (page.name == "ga-dashboard" && data.status != "Done") orders.push(data)
+            
         }
 
         this.orderLists = orders
       } catch (e) {
         console.error(e);
+      } finally {
+        this.isLoading = false
       }
     }
   }
