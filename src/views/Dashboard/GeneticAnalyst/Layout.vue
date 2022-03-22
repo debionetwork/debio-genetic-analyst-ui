@@ -179,7 +179,6 @@ export default {
     if (!this.mnemonicData) this.showModalPassword = true
     if (this.$route.meta.maintenance) this.pageError = true
     await this.getListNotification()
-    console.log("VueRouter", VueRouter)
   },
 
   rules: {
