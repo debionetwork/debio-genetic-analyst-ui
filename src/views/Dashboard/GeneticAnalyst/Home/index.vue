@@ -26,11 +26,27 @@
               | Your verification submission is {{ verificationStatus === 'Unverified' ? " being reviewed" : verificationStatus }} by Daogenic
 
         .ga-dashboard__table(v-else)
-          ui-debio-data-table(:headers="headers" :items="orderLists")
+          ui-debio-data-table(:headers="headers" :items="orderLists" :loading="isLoading")
             template(slot="prepend")
-              .ga-dashboard__text
-                h2.ga-dashboard__table-title Order Lists
-                p.ga-dashboard__table-subtitle.mb-0 List of all services ordered by Customers
+              .ga-dashboard__nav
+                .ga-dashboard__text
+                  h2.ga-dashboard__table-title Order Lists
+                  p.ga-dashboard__table-subtitle.mb-0 List of all services ordered by Customers
+                ui-debio-input.ga-dashboard__search-bar(
+                  v-model="searchQuery"
+                  variant="small"
+                  width="270"
+                  placeholder="Service Name, Status"
+                  outlined
+                )
+                  ui-debio-icon(
+                    slot="icon-append"
+                    size="20"
+                    @click="getOrdersData(searchQuery)"
+                    role="button"
+                    :icon="searchIcon"
+                    stroke
+                  )
 
             template(v-slot:[`item.id`]="{ item }")
               span {{ `${item.id.substr(0, 4)}...${item.id.substr(item.id.length - 3)}` }}
@@ -52,19 +68,23 @@ import { GAGetOrders } from "@/common/lib/api"
 import { analystDetails } from "@/common/lib/polkadot-provider/query/genetic-analyst/analyst"
 import { analysisDetails } from "@/common/lib/polkadot-provider/query/genetic-analyst/analysis"
 import { generalDebounce } from "@/common/lib/utils"
-import { geneticAnalystIllustration, eyeIcon, alertIcon } from "@debionetwork/ui-icons"
+import { geneticAnalystIllustration, eyeIcon, alertIcon, searchIcon } from "@debionetwork/ui-icons"
 import { mapState } from "vuex"
 
+import metamaskDispatchAction from "@/common/lib/metamask/mixins/metamaskServiceHandler"
 import localStorage from "@/common/lib/local-storage";
 
 export default {
   name: "GADashboard",
+  mixins: [metamaskDispatchAction],
 
   data: () => ({
     geneticAnalystIllustration,
     eyeIcon,
     alertIcon,
+    searchIcon,
 
+    searchQuery: "",
     verificationStatus: null,
     cardBlock: false,
     orderLists: [],
@@ -119,12 +139,24 @@ export default {
         if (val?.section === "geneticAnalysisOrders") await this.getOrdersData()
         if (val?.method === "GeneticAnalystUpdateVerificationStatus") await this.getVerificationStatus()
       }, 100)
-    }
+    },
+
+    searchQuery: generalDebounce(async function (newVal) {
+      await this.metamaskDispatchAction(this.getOrdersData, newVal)
+    }, 500)
   },
 
   async created() {
-    await this.getVerificationStatus()
-    await this.getOrdersData()
+    try {
+      this.isLoading = true
+
+      await this.getVerificationStatus()
+      await this.getOrdersData()
+    } catch (e) {
+      console.error(e)
+    } finally {
+      this.isLoading = false
+    }
   },
 
   mounted() {
@@ -140,12 +172,12 @@ export default {
       this.verificationStatus = verificationStatus
     },
 
-    async getOrdersData() {
+    async getOrdersData(keyword) {
       this.orderLists = []
 
       try {
         let orders = []
-        const orderData = await GAGetOrders()
+        const orderData = await GAGetOrders(keyword)
 
         for (const order of orderData.data) {
           const sourceData = order._source
@@ -193,6 +225,11 @@ export default {
       display: flex
       flex-direction: column
       gap: toRem(35px)
+
+    &__nav
+      display: flex
+      align-items: center
+      justify-content: space-between
 
     &__table-title
       @include body-text-medium-1

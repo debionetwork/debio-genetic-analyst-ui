@@ -1,20 +1,20 @@
 import { createLocalVue, shallowMount, config } from "@vue/test-utils"
-import MainPage from "@/views/Dashboard/GeneticAnalyst/Layout"
+import GAAccountConfirmation from "@/views/Dashboard/GeneticAnalyst/Account/ConfirmationDialog"
 import Vuex from "vuex"
+import Vue from "vue"
 import Vuetify from "vuetify"
 
-config.stubs["ui-debio-icon"] = { template: "<div></div>" }
-config.stubs["ui-debio-modal"] = { template: "<div></div>" }
-config.stubs["ui-debio-input"] = { template: "<div></div>" }
+config.stubs["ui-debio-button"] = { template: "<div></div>" }
 
-describe("Genetic Analyst Layout", () => {
+Vue.use(Vuetify)
+
+describe("Genetic Analyst Account Confirmation Dialog", () => {
   let container
   let localVue = null
 
   beforeEach(() => {
     localVue = createLocalVue()
     localVue.use(Vuex)
-    localVue.use(Vuetify)
   })
 
   afterEach(() => {
@@ -22,16 +22,8 @@ describe("Genetic Analyst Layout", () => {
   })
 
   it("Should render", () => {
-    MainPage.computed = {
-      computeNavs: jest.fn()
-    };
-    MainPage.mixins = [];
-    MainPage.methods = {
-      getListNotification: jest.fn()
-    };
-    container = shallowMount(MainPage, {
+    container = shallowMount(GAAccountConfirmation, {
       localVue,
-      vuetify: new Vuetify(),
       store: new Vuex.Store({
         state: {
           substrate: {

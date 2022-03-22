@@ -1,7 +1,18 @@
-import { createLocalVue, shallowMount } from "@vue/test-utils"
+import { createLocalVue, shallowMount, config } from "@vue/test-utils"
 import GAAccount from "@/views/Dashboard/GeneticAnalyst/Account"
 import Vuex from "vuex"
+import Vue from "vue"
 import Vuetify from "vuetify"
+
+config.stubs["ui-debio-button"] = { template: "<div></div>" }
+config.stubs["ui-debio-input"] = { template: "<div></div>" }
+config.stubs["ui-debio-dropdown"] = { template: "<div></div>" }
+config.stubs["ui-debio-modal"] = { template: "<div></div>" }
+config.stubs["ui-debio-icon"] = { template: "<div></div>" }
+config.stubs["ui-debio-textarea"] = { template: "<div></div>" }
+config.stubs["ui-debio-file"] = { template: "<div></div>" }
+
+Vue.use(Vuetify)
 
 describe("Genetic Analyst Account Dashboard", () => {
   let container
@@ -10,7 +21,6 @@ describe("Genetic Analyst Account Dashboard", () => {
   beforeEach(() => {
     localVue = createLocalVue()
     localVue.use(Vuex)
-    localVue.use(Vuetify)
   })
 
   afterEach(() => {
@@ -20,7 +30,6 @@ describe("Genetic Analyst Account Dashboard", () => {
   it("Should render", () => {
     container = shallowMount(GAAccount, {
       localVue,
-      vuetify: new Vuetify(),
       store: new Vuex.Store({
         state: {
           substrate: {
