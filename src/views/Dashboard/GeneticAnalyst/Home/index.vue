@@ -73,7 +73,6 @@ import { mapState } from "vuex"
 
 import metamaskDispatchAction from "@/common/lib/metamask/mixins/metamaskServiceHandler"
 import localStorage from "@/common/lib/local-storage";
-import VueRouter from "@/router"
 
 export default {
   name: "GADashboard",
@@ -184,7 +183,7 @@ export default {
       try {
         let orders = []
         const orderData = await GAGetOrders(keyword)
-        const page = VueRouter?.history?.current
+        const page = this.$router?.history?.current
 
         for (const order of orderData.data) {
           const sourceData = order._source
