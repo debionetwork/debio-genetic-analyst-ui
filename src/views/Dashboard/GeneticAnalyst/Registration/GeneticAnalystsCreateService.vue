@@ -1,35 +1,35 @@
 <template lang="pug">
-  .customer-geneticAnalysts-registration
-    .customer-geneticAnalysts-registration__wrapper
-      .customer-geneticAnalysts-registration__nav
-        .customer-geneticAnalysts-registration__nav-button(@click="handleBack")
-          v-icon.customer-geneticAnalysts-registration__nav-icon mdi-chevron-left
+  .customer-geneticAnalysts-createService
+    .customer-geneticAnalysts-createService__wrapper
+      .customer-geneticAnalysts-createService__nav
+        .customer-geneticAnalysts-createService__nav-button(@click="handleBack")
+          v-icon.customer-geneticAnalysts-createService__nav-icon mdi-chevron-left
       
-      .customer-geneticAnalysts-registration__main
-        .customer-geneticAnalysts-registration__stepper
+      .customer-geneticAnalysts-createService__main
+        .customer-geneticAnalysts-createService__stepper
           ui-debio-stepper(
             :items="stepperItems"
           )
-        .customer-geneticAnalysts-registration__title Set Up Account
+        .customer-geneticAnalysts-createService__title Set Up Service
 
-        .customer-geneticAnalysts-registration__form
-          GeneticAnalystsFormRegistration
+        .customer-geneticAnalysts-createService__form
+          GeneticAnalystsFormCreateService
 
         
 </template>
 
 <script>
-import GeneticAnalystsFormRegistration from "./GeneticAnalystsFormRegistration.vue"
-
+// import GeneticAnalystsFormCreateService from "./GeneticAnalystsFormRegistration.vue"
+import GeneticAnalystsFormCreateService from "./GeneticAnalystsFormCreateService.vue"
 export default {
-  name: "GeneticAnalystsRegistration",
+  name: "GeneticAnalystsCreateService",
 
-  components: { GeneticAnalystsFormRegistration },
+  components: { GeneticAnalystsFormCreateService },
 
   data: () => ({
     stepperItems: [
-      {number: 1, title: "Set Up Account", active: true},
-      {number: 2, title: "Set Up Service", active: false}
+      {number: 1, title: "Set Up Account", active: false},
+      {number: 2, title: "Set Up Service", active: true}
     ]
 
   }),
@@ -45,7 +45,7 @@ export default {
 <style lang="sass">
   @import "@/common/styles/mixins.sass"
 
-  .customer-geneticAnalysts-registration
+  .customer-geneticAnalysts-createService
     width: 100%
     height: 100%
     background: #FFFFFF

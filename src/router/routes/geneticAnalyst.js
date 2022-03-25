@@ -50,6 +50,12 @@ export default [
         name: "ga-registration",
         meta: { pageHeader: "Registration", maintenance: false},
         component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Registration")
+      },
+      {
+        path: "create-service",
+        name: "ga-create-service",
+        meta: { pageHeader: "Create Service", maintenance: false},
+        component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Registration/GeneticAnalystsCreateService")
       }
     ]
   }

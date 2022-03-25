@@ -69,7 +69,7 @@
 
     .geneticAnalysts-registration-form__card
       .geneticAnalysts-registration-form__avatar-wrapper
-        .geneticAnalysts-registration-form__avatar-image
+        .geneticAnalysts-registration-form__avatar-image(@click="handleSeletImage")
           ui-debio-avatar(
             :src="computedImageLink"
             size="100"
@@ -77,14 +77,36 @@
             borderSize="1"
             borderColor="#000000"
           )
+          .geneticAnalysts-registration-form__avatar-file
             ui-debio-file(
               v-model="profileImage"
               accept="[.jpg, .png, .jpeg]"
-
+              variant="small"
+              style="display: none"
+              hide-input
+              validate-on-blur
+              outlined
+              block
+              ref="fileInput"
             )
+        .geneticAnalysts-registration-form__avatar-action
+          .geneticAnalysts-registration-form__avatar-description
+            span Upload file(.jpg, .png -
+            span Maximum file size is 2MB)
+          
+          .geneticAnalysts-registration-form__avatar-button
+            ui-debio-button(
+              color="secondary" 
+              width="160px"
+              height="35"
+              @click="handleUploadProfile"
+              style="font-size: 12px;"
+            ) Upload
+
 
       .geneticAnalysts-registration-form__informasion-wrapper
-        .geneticAnalysts-registration-form__informasion-title Basic Information
+        .geneticAnalysts-registration-form__basic-informasion
+          .geneticAnalysts-registration-form__basic-informasion-title Basic Information
           .geneticAnalysts-registration-form__name-wrapper
             .geneticAnalysts-registration-form__firstName
               ui-debio-input(
@@ -104,8 +126,8 @@
               )
 
           .geneticAnalysts-registration-form__gender-wrapper Sex
-            v-radio-group(v-model="sex" row)
-              v-radio(label="Male" value="male")
+            v-radio-group.geneticAnalysts-registration-form__gender-radio(v-model="sex" row)
+              v-radio.small-radio(label="Male" value="male")
               v-radio(label="Female" value="female")
 
           .geneticAnalysts-registration-form__birth-wrapper
@@ -155,18 +177,24 @@
                 block
               )
         
-        .geneticAnalysts-registration-form__qualification-title Qualification
-          .geneticAnalysts-registration-form__specialization-wrapper Specialization
-            v-autocomplete(
-                  dense
-                  v-model="specialization"
-                  :items="specializationList"
-                  placeholder="Select Specialization"
-                  :rules="[val => !!val || 'specialization require']"
-                  autocomplete="off"
-                  outlined)
+        .geneticAnalysts-registration-form__qualification-wrapper
+          .geneticAnalysts-registration-form__qualification-title Qualification
+          .geneticAnalysts-registration-form__specialization-wrapper
+           
+            ui-debio-dropdown(
+              :items="specializationList"
+              variant="small"
+              label="Specialization"
+              placeholder="Select Specialization"
+              v-model="specialization"
+              outlined
+              close-on-select
+              validate-on-blur
+              block
+            )
 
-          .geneticAnalysts-registration-form__experience-wrapper Experience
+          .geneticAnalysts-registration-form__experience-wrapper
+            .geneticAnalysts-registration-form__experience-title Experience
             .geneticAnalysts-registration-form__experience-input-wrapper(v-for="(i) in expCount" :key="(i)")
               .geneticAnalysts-registration-form__experience-input
                 ui-debio-input(
@@ -177,7 +205,7 @@
                   :placeholder="experienceInput[i - 1]"
                 )
               .geneticAnalysts-registration-form__experience-button(@click="handleDeleteExp" v-if="expCount > 1 && i > 1")
-                v-icon.geneticAnalysts-registration-form__experience-icon mdi-close-circle-outline
+                v-icon(style="color: #C400A5").geneticAnalysts-registration-form__experience-icon mdi-close-circle-outline
             .geneticAnalysts-registration-form__experience-action(@click="addExperience")
               v-icon.geneticAnalysts-registration-form__experience-action-icon mdi-plus
               .geneticAnalysts-registration-form__experience-action-label Add Experience
@@ -185,8 +213,16 @@
         .geneticAnalysts-registration-form__certification-wrapper
           .geneticAnalysts-registration-form__certification-label Certification
           .geneticAnalysts-registration-form__certification-button(@click="certificationForm")
-            v-icon.geneticAnalysts-registration-form__certification-icon mdi-plus-box
-            
+            v-icon(style="color: #5640A5").geneticAnalysts-registration-form__certification-icon mdi-plus-box
+
+        .geneticAnalysts-registration-form__certification-list-wrapper
+          .geneticAnalysts-registration-form__certification-list-box
+            .geneticAnalysts-registration-form__certification-list(v-for="(i) in 3" :key="(i)")
+              .geneticAnalysts-registration-form__certification-list-name Certification Name
+              .geneticAnalysts-registration-form__certification-list-description(style="max-width: 390px") lorem
+              .geneticAnalysts-registration-form__certification-list-action
+              
+
 
 
 
@@ -196,8 +232,12 @@
 </template>
 
 <script>
+import { mapState } from "vuex"
+
+
+
 export default {
-  name: "GeneticAnalystsForm",
+  name: "GeneticAnalystsFormRegistration",
 
   data: () => ({
     profileImage: null,
@@ -226,12 +266,17 @@ export default {
       description: "",
       supportingFile: null
     },
-    monthList: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-    monthSelected: "",
-    yearSelected: ""
+    monthList: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
   }),
 
   computed: {
+    ...mapState({
+      api: (state) => state.substrate.api,
+      wallet: (state) => state.substrate.wallet,
+      lastEventData: (state) => state.substrate.lastEventData,
+      mnemonicData: (state) => state.substrate.mnemonicData,
+      web3: (state) => state.metamask.web3
+    }),
     computedImageLink() {
       return this.profileImage ? this.profileImage : require("@/assets/add-image-placeholder.png")
     },
@@ -278,10 +323,6 @@ export default {
       this.expCount += 1
     },
 
-    isHide() {
-      
-    },
-
     certificationForm() {
       console.log("show certification")
       this.showModalCertification = true
@@ -293,6 +334,14 @@ export default {
 
     onCloseModalDocument() {
       this.showModalCertification = false
+    },
+
+    handleSeletImage() {
+      this.$refs.fileInput.$refs["input-file"].click()
+    },
+
+    handleUploadProfile() {
+      console.log("handle updload profile")
     }
   }
 }
@@ -316,14 +365,33 @@ export default {
     &__avatar-wrapper
       border: solid 0.5px black
       padding: 5px
+      display: flex
+      flex-direction: row
+      gap: 20px
+    
+    &__avatar-action
+      display: flex
+      flex-direction: column
+      gap: 17px
+      margin: 10px 0 0 0
+    
+    &__avatar-description
+      display: flex
+      flex-direction: column
+      @include body-text-3-opensans
+      gap: 5px
 
     &__informasion-wrapper
       display: flex
       flex-direction: column
+      margin: 10px 0 0 0
     
-    &__informasion-title
+    &__basic-informasion
       display: flex
       flex-direction: column
+
+    &__basic-informasion-title
+      @include button-2
 
     &__name-wrapper
       margin: 10px 0 0 0
@@ -334,11 +402,24 @@ export default {
 
     &__gender-wrapper
       font-size: 14px
+      margin: 15px 0 0 0
+    
+    &__gender-radio
+      margin: 0 !important
+
+      &::v-deep
+        .v-input__control > .v-input__slot > .v-input--radio-group__input > .v-radio > .v-input--selection-controls__input > .v-icon > .v-icon.v-icon
+          font-size: 20px !important
+
+    &__phone-wrapper
+      font-size: 12px
+      margin: 15px 0 0 0
 
     &__phone-title
       display: flex
       flex-direction: row
       gap: 20px
+      margin: 5px 0 0 0
 
 
     &__phone-list
@@ -346,6 +427,26 @@ export default {
 
     &__phone-number
       width: 80%
+
+    &__email-wrapper
+      margin: -5px 0 0 0
+    
+    &__linkedIn-wrapper
+      margin: 15px 0 0 0
+
+    &__qualification-title
+      @include button-2
+      margin: 15px 0 0 0
+    
+    &__specialization-wrapper
+      margin: 15px 0 0 0
+
+    &__experience-wrapper
+      margin: 15px 0 0 0
+    
+    &__experience-title
+      @include body-text-3-opensans
+      margin: 0 0 10px 0
 
     &__experience-input-wrapper
       display: flex
@@ -380,11 +481,25 @@ export default {
       justify-content: space-between
       align-items: center
 
+    &__certification-label
+      @include button-2
+
     &__certification-button
       cursor: pointer
 
     &__certification-icon
       font-size: 40px !important
       
+    &__certification-list-box
+      height: 100%
+      width: 100%
+      border: dashed 1px #8AC1FF
+      border-radius: 2px
+      background-color: #F9F9FF
+      margin: 10px 0 0 0
+      padding: 10px
 
+    &__certification-list
+      margin: 10px 0
+      border: dashed 1px black
 </style>
