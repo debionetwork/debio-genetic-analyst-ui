@@ -1,5 +1,5 @@
 import { shallowMount, config } from "@vue/test-utils"
-import GADashboard from "@/views/Dashboard/GeneticAnalyst/Home"
+import GADashboard from "@/common/components/Orders/OrderList"
 import Vuex from "vuex"
 import Vue from "vue"
 import Vuetify from "vuetify"
@@ -33,7 +33,7 @@ describe("Genetic Analyst Dashboard", () => {
   }
 
   it("Should render", async () => {
-    GADashboard.methods = { getOrdersData: jest.fn() }
+    GADashboard.methods = { getOrdersData: jest.fn(), getVerificationStatus: jest.fn() }
 
     container = shallowMount(GADashboard, { ...config })
 
