@@ -227,7 +227,7 @@ export default {
         commit("SET_MNEMONIC_DATA", CryptoJS.AES.decrypt(encryptedMnemonic, password));
       }
     },
-    async getAllAccounts({ commit, state }, { address }) {
+    async getAllAccounts({ commit }, { address }) {
       try {
         commit("SET_LOADING_WALLET", true)
         const pair = keyring.getPair(address)
