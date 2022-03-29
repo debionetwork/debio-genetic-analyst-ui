@@ -4,12 +4,17 @@ import Vuex from "vuex"
 import Vuetify from "vuetify"
 import _ from "lodash"
 import {
+  serviceDetails
+} from "../../../../../../src/common/lib/polkadot-provider/query/genetic-analyst/services"
+import {
   deleteGeneticAnalystService,
   deleteGeneticAnalystServiceFee
 } from "../../../../../../src/common/lib/polkadot-provider/command/genetic-analyst/services"
 import {
   errorHandler
 } from "../../../../../../src/common/lib/error-handler"
+import { queryGeneticAnalystByAccountId } from "@debionetwork/polkadot-provider"
+import { serviceDataMock } from "./index.mock"
 
 config.stubs["ui-debio-error-dialog"] = { template: "<div></div>" }
 config.stubs["ui-debio-modal"] = { template: "<div></div>" }
@@ -18,6 +23,10 @@ config.stubs["ui-debio-button"] = { template: "<div></div>" }
 config.stubs["ui-debio-banner"] = { template: "<div></div>" }
 config.stubs["ui-debio-card"] = { template: "<div></div>" }
 config.stubs["ui-debio-data-table"] = { template: "<div></div>" }
+
+jest.mock("../../../../../../src/common/lib/polkadot-provider/query/genetic-analyst/services", () => ({
+  serviceDetails: jest.fn()
+}));
 
 jest.mock("../../../../../../src/common/lib/polkadot-provider/command/genetic-analyst/services", () => ({
   deleteGeneticAnalystService: jest.fn(),
@@ -30,6 +39,10 @@ jest.mock("../../../../../../src/common/lib/polkadot-provider/command/genetic-an
 
 jest.mock("../../../../../../src/common/lib/error-handler", () => ({
   errorHandler: jest.fn(() => true)  
+}));
+
+jest.mock("@debionetwork/polkadot-provider", () => ({
+  queryGeneticAnalystByAccountId: jest.fn()  
 }));
 
 describe("Genetic Analyst Services Dashboard", () => {
@@ -190,20 +203,43 @@ describe("Genetic Analyst Services Dashboard", () => {
 
   it("methods.getServiceList should return", async () => {
     // Arrange
-    const WEIGHT = 1
+    const PRICE = "PRICE"
     const gaServices = _.cloneDeep(GAServices)
     gaServices.methods.api = "API"
-    gaServices.methods.wallet = "WALLET"
-    gaServices.methods.serviceId = "SERVICE_ID"
-    gaServices.methods.web3 = {
-      utils: {
-        fromWei: jest.fn(() => {
-          return WEIGHT
-        })
-      }
+    gaServices.methods.wallet = {
+      address: "ADDRESS"
     }
+    gaServices.methods.formatPrice = jest.fn(() => PRICE)
+    serviceDetails.mockReturnValue(serviceDataMock)
+    queryGeneticAnalystByAccountId.mockReturnValue({
+      services: [serviceDataMock.id]
+    })
 
     // Assert
+    expect(await gaServices.methods.getServiceList()).toBeUndefined()
+    expect(gaServices.methods.items).toEqual([
+      {
+        id: 'ID',
+        description: 'string',
+        serviceName: 'string',
+        testResultSample: 'string',
+        price: 'PRICE',
+        duration: '1 Days',
+        currency: 'DAI'
+      }
+    ])
+    expect(gaServices.methods.formatPrice).toBeCalledTimes(1)
+    expect(gaServices.methods.formatPrice).toBeCalledWith(serviceDataMock.info.pricesByCurrency[0].totalPrice)
+    expect(serviceDetails).toBeCalledTimes(1)
+    expect(serviceDetails).toBeCalledWith(
+      gaServices.methods.api,
+      serviceDataMock.id
+    )
+    expect(queryGeneticAnalystByAccountId).toBeCalledTimes(1)
+    expect(queryGeneticAnalystByAccountId).toBeCalledWith(
+      gaServices.methods.api,
+      gaServices.methods.wallet.address
+    )
   })
 
   it("methods.formatPrice should return", () => {
