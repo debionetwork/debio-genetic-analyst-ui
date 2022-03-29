@@ -11,7 +11,13 @@
             img(:src="computeAvatar")
           div.avatar__upload
             span Upload fle (.jpg, .png - Maximum fle size is 2MB)
-            input.file-input(type="file" ref="input-file" accept=".png, .jpg, .jpeg" @change="handleFileChange")
+            input.file-input(
+              type="file" 
+              ref="input-file" 
+              accept=".png, .jpg" 
+              @change="handleFileChange" 
+              :rules="$options.rules.profile.profileImage"
+            )
             ui-debio-button(
               color="primary"
               @click="handleChooseFile"
@@ -19,6 +25,7 @@
               :disabled="isProfileLoading"
             ) Upload
             span.text-error(v-if="error && !profile.profileImage") This field is required
+            span.text-error(v-else-if="errorProfile") {{errorProfile}}
 
         span.text-title Basic Information
 
@@ -103,7 +110,7 @@
           v-col
             ui-debio-input(
               :error="error && !profile.phoneNumber"
-              :rules="$options.rules.profile.phone"
+              :rules="$options.rules.profile.phoneNumber"
               variant="small"
               :label="!profile.phoneNumber ? ' ' : 'Phone'"
               placeholder="Add Phone Number"
@@ -239,8 +246,7 @@
           ) 
             v-icon mdi-plus
         
-        span.text-no-file(v-if="!profile.certification.length") You're currently don't have certifcation
-        template(v-else)
+        template(v-if="profile.certification.length > 0")
           .ga-account__file-item(v-for="(item, index) in profile.certification" :key="index + 10")
             ui-debio-modal.modal-confirm(
               :show="showModalConfirm === index"
@@ -288,6 +294,7 @@
                   fill
                   @click="showModalConfirm = index"
                 )
+        span.text-no-file(v-else) You're currently don't have certifcation
 
         div.ga-account__space-between
           span.text-label Estimated transaction weight
@@ -374,6 +381,8 @@
             variant="small"
             label="Description"
             placeholder="Add Description"
+            :error="isDirty.document && isDirty.document.description"
+            :rules="$options.rules.document.description"
             v-model="document.description"
             validate-on-blur
             outlined
@@ -438,6 +447,7 @@ import rulesHandler from "@/common/constants/rules"
 import errorMessage from "@/common/constants/error-messages"
 import SuccessDialog from "@/common/components/Dialog/SuccessDialogGeneral"
 import ConfirmationDialog from "./ConfirmationDialog.vue"
+import errorMessages from "@/common/constants/error-messages"
 
 const initialData = {
   title: "",
@@ -491,6 +501,7 @@ export default {
     },
     document: {...initialData},
     stakingStatus: "",
+    errorProfile: "",
     countries: [],
     categories: [],
     certificate: null,
@@ -553,7 +564,13 @@ export default {
       ],
       phoneNumber:  [
         rulesHandler.FIELD_REQUIRED,
-        val => /^[0-9]+$/.test(val) || "Phone number is invalid"
+        val => /^[0-9]+$/.test(val) || "Phone number is invalid",
+        rulesHandler.MAX_CHARACTER(12)
+      ],
+      profileImage: [
+        rulesHandler.FIELD_REQUIRED,
+        rulesHandler.FILE_SIZE(2000000),
+        (val) => (val && (val.type === "image/png" || val.type === "image/jpg")) || errorMessage.FILE_FORMAT("PNG/JPG")
       ]
     },
     document: {
@@ -573,6 +590,9 @@ export default {
       year: [
         (val) => !!val || errorMessage.REQUIRED
       ],
+      description: [
+        rulesHandler.MAX_CHARACTER(255)
+      ],
       file: [
         rulesHandler.FIELD_REQUIRED,
         rulesHandler.FILE_SIZE(2000000),
@@ -582,16 +602,18 @@ export default {
   },
 
   async created() {
+    if (this.mnemonicData) this.initialDataKey()
+  },
+
+  async mounted() {
     await this.getCountries()
     await this.getSecialization()
     await this.getAccountData()
-    if (this.mnemonicData) this.initialDataKey()
   },
 
   methods: {
     initialDataKey() {
       const cred = Kilt.Identity.buildFromMnemonic(this.mnemonicData.toString(CryptoJS.enc.Utf8))
-
       this.publicKey = u8aToHex(cred.boxKeyPair.publicKey)
       this.secretKey = u8aToHex(cred.boxKeyPair.secretKey)
     },
@@ -669,53 +691,42 @@ export default {
       this.document = {...initialData}
     },
 
-    onSubmitFile() {
+    async onSubmitFile() {
       this._touchForms("document")
       
       const { title, issuer, month, year, description, supporting_document } = this.document
-      
+
       if (!title || !issuer || !month || !year || !supporting_document) return this.errorDoc = true
-      
-      const context = this
-      const fr = new FileReader()
-      
-      fr.onload = async function() {
-        try {
-          this.loadingDoc = true
-          
-          const encrypted = await context.encrypt({
-            text: fr.result,
-            fileType: supporting_document.type,
-            fileName: supporting_document.name
-          })
+            
+      try {
+        this.loadingDoc = true
+        const dataFile = await this.setupFileReader(this.document)
 
-          const { chunks, fileName, fileType } = encrypted
+        const linkFile = await this.upload({
+          encryptedFileChunks: dataFile.chunks,
+          fileName: dataFile.fileName,
+          fileType: dataFile.fileType
+        })
 
-          const dataFile = {
-            title,
-            issuer,
-            month,
-            year,
-            description,
-            supporting_document,
-            chunks,
-            fileName,
-            fileType,
-            createdAt: new Date().getTime()
-          }
-
-          if (context.isEdit) {
-            context.profile.certification[context.editId] = dataFile
-          } else {
-            context.profile.certification.push(dataFile)
-          }
-        } catch(e) {
-          console.log(e)
+        const document = {
+          title,
+          issuer,
+          month,
+          year,
+          description,
+          supporting_document: linkFile
         }
+
+        if (this.editId != null) {
+          this.profile.certification[this.editId] = {...document}
+        } else {
+          this.profile.certification.push({...document})
+        }
+      } catch(e) {
+        console.log(e)
       }
 
-      context.loadingDoc = false
-      fr.readAsArrayBuffer(supporting_document)
+      this.loadingDoc = false
       this.onCloseModalDocument()
     },
 
@@ -795,6 +806,7 @@ export default {
       const phone = this.isEdit ? phoneNumber : `${phoneCode}${phoneNumber}`
       const _dateOfBirth = new Date(dateOfBirth).getTime()
       const experienceValidation = experiences.length === 1 && experiences.find(value => value.title === "")
+      const certificateValidation = certification.length > 0 && certification.find(value => !value.supporting_document)
       const _specialization = specialization == "Other" ? specifyOther : specialization
       const _experiences = experiences.filter(value => value != "")
       const qualification = {
@@ -802,23 +814,12 @@ export default {
         certification: certification
       }
       
-      if (!profileImage || !firstName || !lastName || !gender || !dateOfBirth || !email || !phone || !_specialization || experienceValidation) {
+      if (!profileImage || !firstName || !lastName || !gender || !dateOfBirth || !email || !phone || !_specialization || experienceValidation || certificateValidation) {
         return this.error = true
       }
       this.isLoading = true
 
       try {
-        for await (let [index, value] of certification.entries()) {
-          const dataFile = await this.setupFileReader({ value })
-
-          await this.upload({
-            encryptedFileChunks: dataFile.chunks,
-            fileName: dataFile.fileName,
-            index: index,
-            fileType: dataFile.fileType
-          })
-        }
-
         await updateGeneticAnalystInfo(
           this.api,
           this.wallet,
@@ -857,6 +858,9 @@ export default {
       if (!event.target.value) return
       const file = event.target.files[0]
       
+      if (file.type != "image/jpg" && file.type != "image/png") return this.errorProfile = errorMessages.FILE_FORMAT("PNG/JPG")
+      else if (file.size > 2000000) return this.errorProfile = errorMessages.FILE_SIZE(2)
+      
       this.isProfileLoading = true
       
       const fr = new FileReader()
@@ -877,6 +881,7 @@ export default {
         
         context.isProfileLoading = false
       })
+      this.errorProfile = ""
     },
 
     async encrypt({ text, fileType, fileName }) {
@@ -884,10 +889,10 @@ export default {
       const arrChunks = []
       let chunksAmount
       const pair = {
-        secretKey: this.secretKey,
-        publicKey: this.publicKey
+        secretKey: context.secretKey,
+        publicKey: context.publicKey
       }
-
+      
       return await new Promise((resolve, reject) => {
         try {
           cryptWorker.workerEncryptFile.postMessage({ pair, text, fileType }) // Access this object in e.data in worker
@@ -916,22 +921,42 @@ export default {
       })
     },
 
-    setupFileReader({ value }) {
-      return new Promise((resolve, reject) => {
-        const file = value.supporting_document
+    setupFileReader(value) {
+      return new Promise((res, rej) => {
+        const context = this
         const fr = new FileReader()
-        
+
+        const { title, description, supporting_document } = value
+
         fr.onload = async function () {
-          resolve(value)
+          try {
+            const encrypted = await context.encrypt({
+              text: fr.result,
+              fileType: supporting_document.type,
+              fileName: supporting_document.name
+            })
+
+            const { chunks, fileName, fileType } = encrypted
+            const dataFile = {
+              title,
+              description,
+              supporting_document,
+              chunks,
+              fileName,
+              fileType,
+              createdAt: new Date().getTime()
+            }
+            res(dataFile)
+          } catch (e) {
+            console.error(e)
+          }
         }
-
-        fr.onerror = reject
-
-        fr.readAsArrayBuffer(file)
+        fr.onerror = rej
+        fr.readAsArrayBuffer(value.supporting_document)
       })
     },  
 
-    async upload({ encryptedFileChunks, index, fileType, fileName }) {
+    async upload({ encryptedFileChunks, fileType, fileName }) {
       const data = JSON.stringify(encryptedFileChunks)
       const blob = new Blob([data], { type: fileType })
 
@@ -942,8 +967,7 @@ export default {
       })
 
       const link = getFileUrl(result.IpfsHash)
-
-      this.profile.certificate[index].supporting_document = link
+      return link
     }
   }
 }
