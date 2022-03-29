@@ -234,7 +234,7 @@ import {
 import { serviceDetails } from "@/common/lib/polkadot-provider/query/genetic-analyst/services"
 import { mapState } from "vuex"
 import { generalDebounce } from "@/common/lib/utils"
-import { uploadFile, getFileUrl, downloadFile, decryptFile, downloadDocumentFile, getIpfsMetaData } from "@/common/lib/pinata"
+import { uploadFile, getFileUrl, downloadFile, decryptFile, downloadDocumentFile, getIpfsMetaData } from "@/common/lib/pinata-proxy"
 import rulesHandler from "@/common/constants/rules"
 
 import Card from "./Card.vue"

@@ -428,7 +428,7 @@ import { updateGeneticAnalyst,  updateGeneticAnalystAvailabilityStatus, unstakeG
 import { updateQualification } from "@/common/lib/polkadot-provider/command/genetic-analyst/qualifications"
 import { queryGeneticAnalystQualifications } from "@/common/lib/polkadot-provider/query/genetic-analyst-qualifications"
 import { upload } from "@/common/lib/ipfs"
-import { uploadFile, getFileUrl } from "@/common/lib/pinata"
+import { uploadFile, getFileUrl } from "@/common/lib/pinata-proxy"
 import { getLocations, getSpecializationCategory } from "@/common/lib/api"
 import { fileTextIcon, pencilIcon, trashIcon } from "@debionetwork/ui-icons"
 import { mapState } from "vuex"
