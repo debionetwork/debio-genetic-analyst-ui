@@ -422,9 +422,9 @@ import Kilt from "@kiltprotocol/sdk-js"
 import cryptWorker from "@/common/lib/ipfs/crypt-worker"
 import CryptoJS from "crypto-js"
 import { u8aToHex } from "@polkadot/util"
-import { analystDetails } from "@/common/lib/polkadot-provider/query/genetic-analyst/analyst"
-import { getCreateRegisterEMRFee } from "@/common/lib/polkadot-provider/command/electronic-medical-record"
-import { updateGeneticAnalystInfo,  updateGAAvailabilityStatus, unstakeGeneticAnalyst } from "@/common/lib/polkadot-provider/command/genetic-analyst/analysts"
+import { queryGeneticAnalystByAccountId } from "@debionetwork/polkadot-provider"
+import { getAddElectronicMedicalRecordFee } from "@debionetwork/polkadot-provider"
+import { updateGeneticAnalyst,  updateGeneticAnalystAvailabilityStatus, unstakeGeneticAnalyst } from "@debionetwork/polkadot-provider"
 import { updateQualification } from "@/common/lib/polkadot-provider/command/genetic-analyst/qualifications"
 import { queryGeneticAnalystQualifications } from "@/common/lib/polkadot-provider/query/genetic-analyst-qualifications"
 import { upload } from "@/common/lib/ipfs"
@@ -611,7 +611,7 @@ export default {
     async getAccountData() {
       const accountId = localStorage.getAddress()
       let profileData = this.profile
-      const analystData = await analystDetails(this.api, accountId)
+      const analystData = await queryGeneticAnalystByAccountId(this.api, accountId)
       
       if (analystData) {
         profileData = {
@@ -651,8 +651,8 @@ export default {
 
         this.txWeight = "Calculating..."
         
-        const txWeight = await getCreateRegisterEMRFee(this.api, this.wallet, this.profile)
-        const unstakeTxWeight = await getCreateRegisterEMRFee(this.api, this.wallet, this.stakingStatus)
+        const txWeight = await getAddElectronicMedicalRecordFee(this.api, this.wallet, this.profile)
+        const unstakeTxWeight = await getAddElectronicMedicalRecordFee(this.api, this.wallet, this.stakingStatus)
         
 
         this.txWeight = `${this.web3.utils.fromWei(String(txWeight.partialFee), "ether")}`
@@ -746,7 +746,7 @@ export default {
       const status = {Unavailable: value === "Unavailable" ? 1 : 0, Available: value === "Available" ? 1 : 0}
       
       try {
-        await updateGAAvailabilityStatus(this.api, this.wallet, status)
+        await updateGeneticAnalystAvailabilityStatus(this.api, this.wallet, status)
       } catch (error) {
         console.error(error)
       }
@@ -819,7 +819,7 @@ export default {
           })
         }
 
-        await updateGeneticAnalystInfo(
+        await updateGeneticAnalyst(
           this.api,
           this.wallet,
           {

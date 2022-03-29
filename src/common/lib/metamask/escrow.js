@@ -1,6 +1,6 @@
 import store from "@/store"
 import { sendTransaction } from "./wallet"
-import { getOrdersData } from "@/common/lib/polkadot-provider/query/orders"
+import { queryOrderDetailByOrderID } from "@debionetwork/polkadot-provider"
 
 
 /**
@@ -72,7 +72,7 @@ export async function approveDaiStakingAmount(stakerAddress, stakingAmount) {
 
 export async function sendPaymentOrder(api, orderId, ethAccount, sellerEth) {
   const contracEscrowInterface = store.getters["metamask/contracts/getEscrowContract"]
-  const currentData = await getOrdersData(api, orderId)
+  const currentData = await queryOrderDetailByOrderID(api, orderId)
   const serviceId = currentData.serviceId
   const customerSubstrateAddress = currentData.customerId
   const sellerSubstrateAddress = currentData.sellerId

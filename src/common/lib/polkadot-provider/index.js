@@ -1,5 +1,4 @@
-import { setEthAddress } from "./command/user-profile"
-import { queryBalance } from "./query/balance"
+import { setEthAddress, queryAccountBalance } from "@debionetwork/polkadot-provider"
 import { checkApiConnection, toFormatDebioCoin } from "./util"
 
 const serviceHandlerMixin = {
@@ -66,7 +65,7 @@ const serviceHandlerMixin = {
 
 export {
   setEthAddress,
-  queryBalance,
+  queryAccountBalance,
   toFormatDebioCoin,
   serviceHandlerMixin
 }

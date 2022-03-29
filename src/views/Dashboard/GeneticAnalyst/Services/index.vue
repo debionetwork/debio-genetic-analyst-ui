@@ -114,7 +114,7 @@ import {
 } from "@debionetwork/ui-icons"
 
 import { errorHandler } from "@/common/lib/error-handler"
-import { analystDetails } from "@/common/lib/polkadot-provider/query/genetic-analyst/analyst"
+import { queryGeneticAnalystByAccountId } from "@debionetwork/polkadot-provider"
 import { serviceDetails } from "@/common/lib/polkadot-provider/query/genetic-analyst/services"
 import { 
   deleteGeneticAnalystService, 
@@ -207,7 +207,7 @@ export default {
 
     async getServiceList() {
       this.items = []
-      const analystDetail = await analystDetails(this.api, this.wallet.address)
+      const analystDetail = await queryGeneticAnalystByAccountId(this.api, this.wallet.address)
       this.serviceList = analystDetail.services
 
       for (const serviceId of this.serviceList) {

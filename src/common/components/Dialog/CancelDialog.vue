@@ -60,7 +60,7 @@
 
 <script>
 import { mapState } from "vuex"
-import { cancelOrder } from "@/common/lib/polkadot-provider/command/orders.js"
+import { cancelOrder } from "@debionetwork/polkadot-provider"
 
 export default {
   name: "CancelDialog",
