@@ -219,13 +219,13 @@ describe("Genetic Analyst Services Dashboard", () => {
     expect(await gaServices.methods.getServiceList()).toBeUndefined()
     expect(gaServices.methods.items).toEqual([
       {
-        id: 'ID',
-        description: 'string',
-        serviceName: 'string',
-        testResultSample: 'string',
-        price: 'PRICE',
-        duration: '1 Days',
-        currency: 'DAI'
+        id: "ID",
+        description: "string",
+        serviceName: "string",
+        testResultSample: "string",
+        price: "PRICE",
+        duration: "1 Days",
+        currency: "DAI"
       }
     ])
     expect(gaServices.methods.formatPrice).toBeCalledTimes(1)
