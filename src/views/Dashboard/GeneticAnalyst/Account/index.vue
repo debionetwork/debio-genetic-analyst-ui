@@ -608,6 +608,7 @@ export default {
     await this.getCountries()
     await this.getSecialization()
     await this.getAccountData()
+  },
 
   methods: {
     initialDataKey() {
