@@ -26,7 +26,6 @@
             ) Upload
             span.text-error(v-if="error && !profile.profileImage") This field is required
             span.text-error(v-else-if="errorProfile") {{errorProfile}}
-
         span.text-title Basic Information
 
         v-row
@@ -609,7 +608,6 @@ export default {
     await this.getCountries()
     await this.getSecialization()
     await this.getAccountData()
-  },
 
   methods: {
     initialDataKey() {
@@ -967,6 +965,7 @@ export default {
       })
 
       const link = getFileUrl(result.IpfsHash)
+      
       return link
     }
   }

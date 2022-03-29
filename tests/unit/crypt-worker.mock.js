@@ -1,6 +1,6 @@
 module.exports = {
-    workerEncryptFile: {
-        onmessage: '',
-        postMessage: () => {} 
-    }
+  workerEncryptFile: {
+    onmessage: "",
+    postMessage: () => {} 
+  }
 };

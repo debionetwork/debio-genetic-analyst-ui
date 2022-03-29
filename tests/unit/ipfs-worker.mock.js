@@ -1,6 +1,6 @@
 module.exports = {
-    workerUpload: {
-        onmessage: '',
-        postMessage: () => {} 
-    },
+  workerUpload: {
+    onmessage: "",
+    postMessage: () => {} 
+  }
 };

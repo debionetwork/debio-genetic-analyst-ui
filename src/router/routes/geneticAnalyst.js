@@ -30,13 +30,13 @@ export default [
       {
         path: "my-services",
         name: "ga-services",
-        meta: { pageHeader: "My Services", maintenance: true },
+        meta: { pageHeader: "My Services" },
         component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Services")
       },
       {
         path: "orders",
         name: "ga-orders",
-        meta: { pageHeader: "Orders", maintenance: true },
+        meta: { pageHeader: "Orders"},
         component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Orders")
       },
       {

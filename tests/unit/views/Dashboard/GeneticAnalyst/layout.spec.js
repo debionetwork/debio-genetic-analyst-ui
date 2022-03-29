@@ -23,11 +23,11 @@ describe("Genetic Analyst Layout", () => {
 
   it("Should render", () => {
     MainPage.computed = {
-      computeNavs: jest.fn(),
+      computeNavs: jest.fn()
     };
     MainPage.mixins = [];
     MainPage.methods = {
-      getListNotification: jest.fn(),
+      getListNotification: jest.fn()
     };
     container = shallowMount(MainPage, {
       localVue,
