@@ -7,9 +7,9 @@ import {
   deleteGeneticAnalystService,
   deleteGeneticAnalystServiceFee
 } from "../../../../../../src/common/lib/polkadot-provider/command/genetic-analyst/services"
-// import {
-//   errorHandler
-// } from "../../../../../../src/common/lib/error-handler"
+import {
+  errorHandler
+} from "../../../../../../src/common/lib/error-handler"
 
 config.stubs["ui-debio-error-dialog"] = { template: "<div></div>" }
 config.stubs["ui-debio-modal"] = { template: "<div></div>" }
@@ -26,6 +26,10 @@ jest.mock("../../../../../../src/common/lib/polkadot-provider/command/genetic-an
       partialFee: "partialFee"
     }
   })
+}));
+
+jest.mock("../../../../../../src/common/lib/error-handler", () => ({
+  errorHandler: jest.fn(() => true)  
 }));
 
 describe("Genetic Analyst Services Dashboard", () => {
@@ -246,6 +250,32 @@ describe("Genetic Analyst Services Dashboard", () => {
     // Assert
     expect(await gaServices.methods.onDelete()).toBeUndefined()
     expect(gaServices.methods.isLoading).toBeTruthy()
+    expect(deleteGeneticAnalystService).toBeCalledTimes(1)
+    expect(deleteGeneticAnalystService).toBeCalledWith(
+      gaServices.methods.api,
+      gaServices.methods.wallet,
+      gaServices.methods.serviceId
+    )
+  })
+
+  it("methods.onDelete on error should return", async () => {
+    // Arrange
+    const ERROR = "ERROR"
+    const gaServices = _.cloneDeep(GAServices)
+    gaServices.methods.api = "API"
+    gaServices.methods.wallet = "WALLET"
+    gaServices.methods.serviceId = "SERVICE_ID"
+    deleteGeneticAnalystService.mockImplementation(() => {
+      throw new Error(ERROR)
+    })
+
+    // Assert
+    expect(await gaServices.methods.onDelete()).toBeUndefined()
+    expect(gaServices.methods.error).toBeTruthy()
+    expect(gaServices.methods.showModal).toBeFalsy()
+    expect(gaServices.methods.isLoading).toBeFalsy()
+    expect(errorHandler).toBeCalledTimes(1)
+    expect(errorHandler).toBeCalledWith(ERROR)
     expect(deleteGeneticAnalystService).toBeCalledTimes(1)
     expect(deleteGeneticAnalystService).toBeCalledWith(
       gaServices.methods.api,

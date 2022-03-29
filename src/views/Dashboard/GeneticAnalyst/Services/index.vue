@@ -241,8 +241,7 @@ export default {
         this.isLoading = true
         await deleteGeneticAnalystService(this.api, this.wallet, this.serviceId)
       } catch (e) {
-        const error = await(errorHandler(e.message))
-        this.error = error
+        this.error = await(errorHandler(e.message))
         this.showModal = false
         this.isLoading = false
       }
