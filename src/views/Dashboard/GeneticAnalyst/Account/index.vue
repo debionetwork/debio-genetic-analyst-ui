@@ -458,6 +458,8 @@ const initialData = {
   supporting_document: null /* eslint-disable camelcase */
 }
 
+const imageType = ["image/jpg", "image/png", "image/jpeg"]
+
 export default {
   name: "GAAccount",
   mixins: [validateForms],
@@ -558,7 +560,7 @@ export default {
       ],
       email:  [
         rulesHandler.FIELD_REQUIRED,
-        val => /^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/.test(val) || "Email is invalid. It should contain @ followed by a domain",
+        rulesHandler.EMAIL,
         rulesHandler.MAX_CHARACTER(255),
         rulesHandler.ENGLISH_ALPHABET
       ],
@@ -570,7 +572,7 @@ export default {
       profileImage: [
         rulesHandler.FIELD_REQUIRED,
         rulesHandler.FILE_SIZE(2000000),
-        (val) => (val && (val.type === "image/png" || val.type === "image/jpg")) || errorMessage.FILE_FORMAT("PNG/JPG")
+        rulesHandler.DEFAULT_IMAGE
       ]
     },
     document: {
@@ -596,7 +598,7 @@ export default {
       file: [
         rulesHandler.FIELD_REQUIRED,
         rulesHandler.FILE_SIZE(2000000),
-        (val) => (val && (val.type === "application/pdf" || val.type === "application/msword" || val.type === "application/msword" || val.type === "image/png" || val.type === "image/jpg" || val.type === "image/jpeg")) || errorMessage.FILE_FORMAT("PDF/DOC/PNG/JPG")
+        rulesHandler.DEFAULT_IMAGE || rulesHandler.DEFAULT_ACCEPT_DOCUMENTS
       ]
     }
   },
@@ -858,7 +860,8 @@ export default {
       if (!event.target.value) return
       const file = event.target.files[0]
       
-      if (file.type != "image/jpg" && file.type != "image/png") return this.errorProfile = errorMessages.FILE_FORMAT("PNG/JPG")
+      if (!imageType.includes(file.type)) return this.errorProfile = errorMessages.FILE_FORMAT("PNG/JPG")
+      // if (file.type != "image/jpg" && file.type != "image/png") return this.errorProfile = errorMessages.FILE_FORMAT("PNG/JPG")
       else if (file.size > 2000000) return this.errorProfile = errorMessages.FILE_SIZE(2)
       
       this.isProfileLoading = true
