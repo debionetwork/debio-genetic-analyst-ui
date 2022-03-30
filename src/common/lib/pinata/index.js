@@ -73,7 +73,7 @@ export const downloadFile = async (ipfsLink, withMetaData = false) => {
 }
 
 export const getIpfsMetaData = async (cid) => {
-  const listResponse = await fetch(`https://api.pinata.cloud/data/pinList?status=pinned&hashContains=${cid}`, {
+  const listResponse = await fetch(`https://api.pinata.cloud/data/pinList?hashContains=${cid}`, {
     headers: {
       "pinata_api_key": pinataKey,
       "pinata_secret_api_key": pinataSecretKey

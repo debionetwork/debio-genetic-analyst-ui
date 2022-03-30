@@ -131,11 +131,25 @@ export default {
           provider: wsProvider
         })
 
+        const allowedSections = [
+          "serviceRequest",
+          "rewards",
+          "orders",
+          "geneticTesting",
+          "balances",
+          "electronicMedicalRecord",
+          "geneticData",
+          "geneticAnalysisOrders",
+          "geneticAnalysis",
+          "geneticAnalysts",
+          "geneticAnalystServices"
+        ]
+
         // Example of how to subscribe to events via storage
         api.query.system.events((events) => {
           events.forEach((record) => {
             const { event } = record
-            if (event.section == "serviceRequest" || event.section == "rewards" || event.section == "orders" || event.section == "geneticTesting" || event.section == "balances" || event.section == "electronicMedicalRecord" || event.section == "geneticData" || event.section == "geneticAnalysisOrders" || event.section == "geneticAnalysis") {
+            if (allowedSections.includes(event.section)) {
               if (event.method === "OrderPaid") localStorage.removeLocalStorageByName("lastOrderStatus")
               commit("SET_LAST_EVENT", event)
             }

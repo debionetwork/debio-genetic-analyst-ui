@@ -27,14 +27,14 @@ describe("Genetic Analysis Order Details", () => {
   it("Should render", () => {
     GAOrderDetails.methods = {
       initialDataKey: jest.fn(), 
-      metamaskDispatchAction: jest.fn(), 
+      metamaskDispatchAction: jest.fn() 
     };
     container = shallowMount(GAOrderDetails, {
       localVue,
       vuetify: new Vuetify(),
       $route: {
         params: {
-            id: "ID"
+          id: "ID"
         }
       },
       store: new Vuex.Store({

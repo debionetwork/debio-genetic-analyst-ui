@@ -345,9 +345,12 @@ export default {
         RESULTREADY: "Done"
       }
 
-      if (this.step === 1) return this.orderDataDetails?.analysis_info?.status === "Registered"
+      const getGeneticStatus = GENETIC_STATUS[this.orderDataDetails?.analysis_info?.status?.toUpperCase()]
+
+      if (!getGeneticStatus) return "Loading please wait..."
+      else if (this.step === 1) return this.orderDataDetails?.analysis_info?.status === "Registered"
         ? "Awaiting Order"
-        : `${GENETIC_STATUS[this.orderDataDetails?.analysis_info?.status?.toUpperCase()]} Order`
+        : `${getGeneticStatus} Order`
 
       else return sectionTitles[this.step - 2]
     }
@@ -435,11 +438,11 @@ export default {
           ...data,
           analysis_info: {
             ...analysisData,
-            fileName: analystReportDocument?.rows[0]?.metadata?.name
+            fileName: analystReportDocument.rows[0].metadata.name
           },
           document: {
             ...geneticData,
-            fileName: geneticLinkName?.rows[0]?.metadata?.name
+            fileName: geneticLinkName.rows[0].metadata.name
           },
           createdAt: new Date(+data.createdAt.replaceAll(",", "")).toLocaleString("en-GB", {
             day: "numeric",
@@ -482,7 +485,8 @@ export default {
           this.hilightDescription = this.orderDataDetails?.analysis_info?.comment
           this.step = 3
         }
-      } catch {
+      } catch (e) {
+        console.error(e)
         this.messageError = "Something went wrong. Please try again later"
       }
     },

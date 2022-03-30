@@ -1,11 +1,20 @@
 <template lang="pug">
-  .ga-orders
-    h1 ORDERS
+  OrdersPage(:filter="dataFilter")
 </template>
 
 <script>
+import OrdersPage from "@/common/components/Orders/OrderList"
+
 export default {
-  name: "GAOrders"
+  name: "GAOrders",
+  
+  components: {OrdersPage},
+
+  data: () => ({
+    dataFilter: {
+      status: ["Done"]
+    }
+  })
 }
 </script>
 
