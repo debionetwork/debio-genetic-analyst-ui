@@ -127,10 +127,9 @@ import {
 
 import localStorage from "@/common/lib/local-storage"
 import { generalDebounce } from "@/common/lib/utils"
-import { queryBalance } from "@/common/lib/polkadot-provider/query/balance"
-import { ethAddressByAccountId } from "@/common/lib/polkadot-provider/query/user-profile"
+import { queryAccountBalance } from "@debionetwork/polkadot-provider"
+import { queryEthAdressByAccountId } from "@debionetwork/polkadot-provider"
 import { getBalanceDAI } from "@/common/lib/metamask/wallet"
-import { fromEther } from "@/common/lib/balance-format"
 import { startApp } from "@/common/lib/metamask"
 import { handleSetWallet } from "@/common/lib/wallet"
 
@@ -282,8 +281,7 @@ export default {
       
       if (selectedMenu.type === "polkadot") {
         this.walletAddress = this.wallet.address
-        const formatedBalance = await fromEther(this.walletBalance)
-        this.activeBalance = Number(formatedBalance).toFixed(3)
+        this.activeBalance = Number(this.walletBalance).toFixed(3)
       }
 
       if (selectedMenu.type === "metamask" && !this.loginStatus) return
@@ -316,7 +314,7 @@ export default {
 
     async fetchWalletBalance() {
       try {
-        const balanceNummber = await queryBalance(
+        const balanceNummber = await queryAccountBalance(
           this.api,
           this.wallet.address
         )
@@ -328,7 +326,7 @@ export default {
 
     async checkMetamaskAddress() {
       if (this.metamaskWalletAddress === "") {
-        const ethRegisterAddress = await ethAddressByAccountId(
+        const ethRegisterAddress = await queryEthAdressByAccountId(
           this.api,
           this.wallet.address
         )

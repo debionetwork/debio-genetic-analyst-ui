@@ -65,8 +65,7 @@
 
 <script>
 import { GAGetOrders } from "@/common/lib/api"
-import { analystDetails } from "@/common/lib/polkadot-provider/query/genetic-analyst/analyst"
-import { analysisDetails } from "@/common/lib/polkadot-provider/query/genetic-analyst/analysis"
+import { queryGeneticAnalystByAccountId, queryGeneticAnalysisById } from "@debionetwork/polkadot-provider"
 import { generalDebounce } from "@/common/lib/utils"
 import { geneticAnalystIllustration, eyeIcon, alertIcon, searchIcon } from "@debionetwork/ui-icons"
 import { mapState } from "vuex"
@@ -172,7 +171,7 @@ export default {
 
   methods: {
     async getVerificationStatus() {
-      const { verificationStatus } = await analystDetails(this.api, localStorage.getAddress())
+      const { verificationStatus } = await queryGeneticAnalystByAccountId(this.api, localStorage.getAddress())
       this.verificationStatus = verificationStatus
     },
 
@@ -187,7 +186,7 @@ export default {
 
         for (const order of orderData.data) {
           const sourceData = order._source
-          const analysisData = await analysisDetails(this.api, order._source.genetic_analysis_tracking_id)
+          const analysisData = await queryGeneticAnalysisById(this.api, order._source.genetic_analysis_tracking_id)
           const GENETIC_STATUS = {
             REGISTERED: "Open",
             INPROGRESS: "In Progress",

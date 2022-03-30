@@ -114,7 +114,7 @@ import {
 } from "@debionetwork/ui-icons"
 
 import { errorHandler } from "@/common/lib/error-handler"
-import { analystDetails } from "@/common/lib/polkadot-provider/query/genetic-analyst/analyst"
+import { queryGeneticAnalystByAccountId } from "@debionetwork/polkadot-provider"
 import { serviceDetails } from "@/common/lib/polkadot-provider/query/genetic-analyst/services"
 import { 
   deleteGeneticAnalystService, 
@@ -200,14 +200,14 @@ export default {
 
   methods: {
     async getDeleteServiceFee() {
-      this.txWeight = "Calculatiing..."
+      this.txWeight = "Calculating..."
       const txWeight = await deleteGeneticAnalystServiceFee(this.api, this.wallet, this.serviceId)
       this.txWeight = `${Number(this.web3.utils.fromWei(String(txWeight.partialFee), "ether")).toFixed(4)} DBIO`
     },
 
     async getServiceList() {
       this.items = []
-      const analystDetail = await analystDetails(this.api, this.wallet.address)
+      const analystDetail = await queryGeneticAnalystByAccountId(this.api, this.wallet.address)
       this.serviceList = analystDetail.services
 
       for (const serviceId of this.serviceList) {
@@ -241,8 +241,7 @@ export default {
         this.isLoading = true
         await deleteGeneticAnalystService(this.api, this.wallet, this.serviceId)
       } catch (e) {
-        const error = await(errorHandler(e.message))
-        this.error = error
+        this.error = await(errorHandler(e.message))
         this.showModal = false
         this.isLoading = false
       }

@@ -219,20 +219,22 @@ import { u8aToHex } from "@polkadot/util"
 import { chevronLeftIcon, timerIcon, alertIcon } from "@debionetwork/ui-icons"
 import { validateForms } from "@/common/lib/validate"
 import {
-  updateStatusOrder,
-  rejectOrder,
+  processGeneticAnalysis,
+  rejectGeneticAnalysis,
+  submitGeneticAnalysis,
+  queryGeneticAnalysisOrderById,
+  queryGeneticAnalysisById,
+  geneticDataById,
+  queryGeneticAnalystByAccountId
+} from "@debionetwork/polkadot-provider"
+import {
   rejectOrderFee,
-  submitOrderReportFee,
-  submitOrderReport
+  submitOrderReportFee
 } from "@/common/lib/polkadot-provider/command/genetic-analyst/orders"
-import { orderDetails } from "@/common/lib/polkadot-provider/query/genetic-analyst/orders"
-import { analysisDetails } from "@/common/lib/polkadot-provider/query/genetic-analyst/analysis"
-import { geneticDataById } from "@/common/lib/polkadot-provider/query/genetic-analyst/geneticData"
 import { serviceDetails } from "@/common/lib/polkadot-provider/query/genetic-analyst/services"
-import { analystDetails } from "@/common/lib/polkadot-provider/query/genetic-analyst/analyst"
 import { mapState } from "vuex"
 import { generalDebounce } from "@/common/lib/utils"
-import { uploadFile, getFileUrl, downloadFile, decryptFile, downloadDocumentFile, getIpfsMetaData } from "@/common/lib/pinata"
+import { uploadFile, getFileUrl, downloadFile, decryptFile, downloadDocumentFile, getIpfsMetaData } from "@/common/lib/pinata-proxy"
 import rulesHandler from "@/common/constants/rules"
 
 import Card from "./Card.vue"
@@ -418,7 +420,7 @@ export default {
 
     async prepareData(id) {
       try {
-        const data = await orderDetails(this.api, id)
+        const data = await queryGeneticAnalysisOrderById(this.api, id)
 
         // Prevent continue requests if the order doesn't exist on the data records
         if (!data) {
@@ -427,8 +429,8 @@ export default {
         }
 
         const serviceData = await serviceDetails(this.api, data.serviceId)
-        const analystData = await analystDetails(this.api, data.sellerId)
-        const analysisData = await analysisDetails(this.api, data.geneticAnalysisTrackingId)
+        const analystData = await queryGeneticAnalystByAccountId(this.api, data.sellerId)
+        const analysisData = await queryGeneticAnalysisById(this.api, data.geneticAnalysisTrackingId)
         const geneticData = await geneticDataById(this.api, data.geneticDataId)
 
         const geneticLinkName = await getIpfsMetaData(JSON.parse(data.geneticLink)[0].split("/").pop())
@@ -528,7 +530,7 @@ export default {
 
       try {
         this.isLoading = true
-        await updateStatusOrder(this.api, this.wallet, this.orderDataDetails.geneticAnalysisTrackingId, "InProgress")
+        await processGeneticAnalysis(this.api, this.wallet, this.orderDataDetails.geneticAnalysisTrackingId, "InProgress")
         await this.calculateDocumentFee()
 
         this.orderAccepted = true
@@ -554,7 +556,7 @@ export default {
 
     async handleSubmitRejection() {
       try {
-        await rejectOrder(
+        await rejectGeneticAnalysis(
           this.api,
           this.wallet,
           this.orderDataDetails.geneticAnalysisTrackingId,
@@ -647,7 +649,7 @@ export default {
           fileType: dataFile.fileType
         })
 
-        await submitOrderReport(
+        await submitGeneticAnalysis(
           this.api,
           this.wallet,
           this.orderDataDetails.geneticAnalysisTrackingId,
@@ -655,7 +657,7 @@ export default {
           this.document.description
         )
 
-        await updateStatusOrder(this.api, this.wallet, this.orderDataDetails.geneticAnalysisTrackingId, "ResultReady")
+        await processGeneticAnalysis(this.api, this.wallet, this.orderDataDetails.geneticAnalysisTrackingId, "ResultReady")
       } catch (e) {
         this.isLoading = false
         console.error(e)

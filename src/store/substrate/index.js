@@ -6,10 +6,7 @@ import { Keyring } from "@polkadot/keyring"
 import localStorage from "@/common/lib/local-storage"
 import masterConfigEvent from "./event-types.json"
 import { ApiPromise, WsProvider } from "@polkadot/api"
-import { processEvent } from "@/common/lib/polkadot-provider/events"
-import { queryEntireLabDataById } from "@/common/lib/polkadot-provider/query/labs"
-import { queryEntireDoctorDataById } from "@/common/lib/polkadot-provider/query/doctors"
-import { queryEntireHospitalDataById } from "@/common/lib/polkadot-provider/query/hospitals"
+import { processEvent } from "@debionetwork/polkadot-provider"
 
 const {
   cryptoWaitReady
@@ -230,7 +227,7 @@ export default {
         commit("SET_MNEMONIC_DATA", CryptoJS.AES.decrypt(encryptedMnemonic, password));
       }
     },
-    async getAllAccounts({ commit, state }, { address }) {
+    async getAllAccounts({ commit }, { address }) {
       try {
         commit("SET_LOADING_WALLET", true)
         const pair = keyring.getPair(address)
@@ -238,83 +235,11 @@ export default {
         commit("SET_WALLET", pair)
         commit("SET_LOADING_WALLET", false)
 
-        commit("SET_LAB_ACCOUNT", null)
-        commit("SET_IS_LAB_ACCOUNT_EXIST", false)
-        const labAccount = await queryEntireLabDataById(state.api, address)
-        if (labAccount) {
-          commit("SET_LAB_ACCOUNT", labAccount)
-          commit("SET_IS_LAB_ACCOUNT_EXIST", true)
-        }
-
-        commit("SET_DOCTOR_ACCOUNT", null)
-        commit("SET_IS_DOCTOR_ACCOUNT_EXIST", false)
-        const doctorAccount = await queryEntireDoctorDataById(state.api, address)
-        if (doctorAccount) {
-          commit("SET_DOCTOR_ACCOUNT", doctorAccount)
-          commit("SET_IS_DOCTOR_ACCOUNT_EXIST", true)
-        }
-
-        commit("SET_HOSPITAL_ACCOUNT", null)
-        commit("SET_IS_HOSPITAL_ACCOUNT_EXIST", false)
-        const hospitalAccount = await queryEntireHospitalDataById(state.api, address)
-        if (hospitalAccount) {
-          commit("SET_HOSPITAL_ACCOUNT", hospitalAccount)
-          commit("SET_IS_HOSPITAL_ACCOUNT_EXIST", true)
-        }
-
         return { success: true }
       } catch (err) {
         console.error(err)
         commit("CLEAR_WALLET")
         commit("SET_LOADING_WALLET", false)
-        return { success: false, error: err.message }
-      }
-    },
-    async getLabAccount({ commit, state }) {
-      try {
-        commit("SET_LAB_ACCOUNT", null)
-        commit("SET_IS_LAB_ACCOUNT_EXIST", false)
-        const labAccount = await queryEntireLabDataById(state.api, state.wallet.address)
-        if (labAccount) {
-          commit("SET_LAB_ACCOUNT", labAccount)
-          commit("SET_IS_LAB_ACCOUNT_EXIST", true)
-        }
-
-        return { success: true }
-      } catch (err) {
-        console.error(err)
-        return { success: false, error: err.message }
-      }
-    },
-    async getDoctorAccount({ commit, state }) {
-      try {
-        commit("SET_DOCTOR_ACCOUNT", null)
-        commit("SET_IS_DOCTOR_ACCOUNT_EXIST", false)
-        const doctorAccount = await queryEntireDoctorDataById(state.api, state.wallet.address)
-        if (doctorAccount) {
-          commit("SET_DOCTOR_ACCOUNT", doctorAccount)
-          commit("SET_IS_DOCTOR_ACCOUNT_EXIST", true)
-        }
-
-        return { success: true }
-      } catch (err) {
-        console.error(err)
-        return { success: false, error: err.message }
-      }
-    },
-    async getHospitalAccount({ commit, state }) {
-      try {
-        commit("SET_HOSPITAL_ACCOUNT", null)
-        commit("SET_IS_HOSPITAL_ACCOUNT_EXIST", false)
-        const hospitalAccount = await queryEntireHospitalDataById(state.api, state.wallet.address)
-        if (hospitalAccount) {
-          commit("SET_HOSPITAL_ACCOUNT", hospitalAccount)
-          commit("SET_IS_HOSPITAL_ACCOUNT_EXIST", true)
-        }
-
-        return { success: true }
-      } catch (err) {
-        console.error(err)
         return { success: false, error: err.message }
       }
     },

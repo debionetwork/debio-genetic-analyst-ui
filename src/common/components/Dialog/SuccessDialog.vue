@@ -40,7 +40,7 @@
 
 import { mapMutations, mapState } from "vuex"
 import checkCircle from "@/assets/check-circle-primary.png"
-import { queryGeneticDataById } from "@/common/lib/polkadot-provider/query/genetic-data"
+import { queryGeneticDataById } from "@debionetwork/polkadot-provider"
 
 
 export default {

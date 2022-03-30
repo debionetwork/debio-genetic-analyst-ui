@@ -1,4 +1,4 @@
-import { queryBalance } from "@/common/lib/polkadot-provider/query/balance"
+import { queryAccountBalance } from "@debionetwork/polkadot-provider"
 import store from "@/store/index"
 
 export async function toFormatDebioCoin(valueCoin) {
@@ -10,7 +10,7 @@ export async function toFormatDebioCoin(valueCoin) {
     addCoin = valueCoin.toString().replace("000000000000000", "")
   }
   if (addCoin != "") {
-    const balance = await queryBalance(
+    const balance = await queryAccountBalance(
       store.getters["substrate/getAPI"],
       store.getters["substrate/wallet"].address
     )
