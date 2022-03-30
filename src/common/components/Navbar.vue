@@ -130,7 +130,6 @@ import { generalDebounce } from "@/common/lib/utils"
 import { queryAccountBalance } from "@debionetwork/polkadot-provider"
 import { queryEthAdressByAccountId } from "@debionetwork/polkadot-provider"
 import { getBalanceDAI } from "@/common/lib/metamask/wallet"
-import { fromEther } from "@/common/lib/balance-format"
 import { startApp } from "@/common/lib/metamask"
 import { handleSetWallet } from "@/common/lib/wallet"
 
@@ -282,8 +281,7 @@ export default {
       
       if (selectedMenu.type === "polkadot") {
         this.walletAddress = this.wallet.address
-        const formatedBalance = await fromEther(this.walletBalance)
-        this.activeBalance = Number(formatedBalance).toFixed(3)
+        this.activeBalance = Number(this.walletBalance).toFixed(3)
       }
 
       if (selectedMenu.type === "metamask" && !this.loginStatus) return
