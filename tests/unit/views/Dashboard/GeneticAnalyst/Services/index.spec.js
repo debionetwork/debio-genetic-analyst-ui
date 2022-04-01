@@ -4,16 +4,14 @@ import Vuex from "vuex"
 import Vuetify from "vuetify"
 import _ from "lodash"
 import {
-  serviceDetails
-} from "../../../../../../src/common/lib/polkadot-provider/query/genetic-analyst/services"
-import {
+  queryGeneticAnalystByAccountId,
+  queryGeneticAnalystServicesByHashId,
   deleteGeneticAnalystService,
   deleteGeneticAnalystServiceFee
-} from "../../../../../../src/common/lib/polkadot-provider/command/genetic-analyst/services"
+} from "@debionetwork/polkadot-provider"
 import {
   errorHandler
 } from "../../../../../../src/common/lib/error-handler"
-import { queryGeneticAnalystByAccountId } from "@debionetwork/polkadot-provider"
 import { serviceDataMock } from "./index.mock"
 
 config.stubs["ui-debio-error-dialog"] = { template: "<div></div>" }
@@ -24,17 +22,7 @@ config.stubs["ui-debio-banner"] = { template: "<div></div>" }
 config.stubs["ui-debio-card"] = { template: "<div></div>" }
 config.stubs["ui-debio-data-table"] = { template: "<div></div>" }
 
-jest.mock("../../../../../../src/common/lib/polkadot-provider/query/genetic-analyst/services", () => ({
-  serviceDetails: jest.fn()
-}));
-
-jest.mock("../../../../../../src/common/lib/polkadot-provider/command/genetic-analyst/services", () => ({
-  deleteGeneticAnalystService: jest.fn(),
-  deleteGeneticAnalystServiceFee: jest.fn(() => {
-    return {
-      partialFee: "partialFee"
-    }
-  })
+jest.mock("@debionetwork/polkadot-provider", () => ({
 }));
 
 jest.mock("../../../../../../src/common/lib/error-handler", () => ({
@@ -42,6 +30,13 @@ jest.mock("../../../../../../src/common/lib/error-handler", () => ({
 }));
 
 jest.mock("@debionetwork/polkadot-provider", () => ({
+  queryGeneticAnalystServicesByHashId: jest.fn(),
+  deleteGeneticAnalystService: jest.fn(),
+  deleteGeneticAnalystServiceFee: jest.fn(() => {
+    return {
+      partialFee: "partialFee"
+    }
+  }),
   queryGeneticAnalystByAccountId: jest.fn()  
 }));
 
@@ -51,6 +46,7 @@ describe("Genetic Analyst Services Dashboard", () => {
   let localVue = null
 
   beforeEach(() => {
+    queryGeneticAnalystServicesByHashId.mockClear()
     deleteGeneticAnalystService.mockClear()
     deleteGeneticAnalystServiceFee.mockClear()
 
@@ -210,7 +206,7 @@ describe("Genetic Analyst Services Dashboard", () => {
       address: "ADDRESS"
     }
     gaServices.methods.formatPrice = jest.fn(() => PRICE)
-    serviceDetails.mockReturnValue(serviceDataMock)
+    queryGeneticAnalystServicesByHashId.mockReturnValue(serviceDataMock)
     queryGeneticAnalystByAccountId.mockReturnValue({
       services: [serviceDataMock.id]
     })
@@ -230,8 +226,8 @@ describe("Genetic Analyst Services Dashboard", () => {
     ])
     expect(gaServices.methods.formatPrice).toBeCalledTimes(1)
     expect(gaServices.methods.formatPrice).toBeCalledWith(serviceDataMock.info.pricesByCurrency[0].totalPrice)
-    expect(serviceDetails).toBeCalledTimes(1)
-    expect(serviceDetails).toBeCalledWith(
+    expect(queryGeneticAnalystServicesByHashId).toBeCalledTimes(1)
+    expect(queryGeneticAnalystServicesByHashId).toBeCalledWith(
       gaServices.methods.api,
       serviceDataMock.id
     )
