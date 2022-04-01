@@ -115,11 +115,11 @@ import {
 
 import { errorHandler } from "@/common/lib/error-handler"
 import { queryGeneticAnalystByAccountId } from "@debionetwork/polkadot-provider"
-import { serviceDetails } from "@/common/lib/polkadot-provider/query/genetic-analyst/services"
+import { queryGeneticAnalystServicesByHashId } from "@debionetwork/polkadot-provider"
 import { 
   deleteGeneticAnalystService, 
   deleteGeneticAnalystServiceFee 
-} from "@/common/lib/polkadot-provider/command/genetic-analyst/services"
+} from "@debionetwork/polkadot-provider"
 
 export default {
   name: "GAServices",
@@ -211,7 +211,7 @@ export default {
       this.serviceList = analystDetail.services
 
       for (const serviceId of this.serviceList) {
-        const serviceDetail = await serviceDetails(this.api, serviceId)
+        const serviceDetail = await queryGeneticAnalystServicesByHashId(this.api, serviceId)
         const {
           id,
           info: { description, name: serviceName, testResultSample }

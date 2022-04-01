@@ -425,8 +425,8 @@ import { u8aToHex } from "@polkadot/util"
 import { queryGeneticAnalystByAccountId } from "@debionetwork/polkadot-provider"
 import { getAddElectronicMedicalRecordFee } from "@debionetwork/polkadot-provider"
 import { updateGeneticAnalyst,  updateGeneticAnalystAvailabilityStatus, unstakeGeneticAnalyst } from "@debionetwork/polkadot-provider"
-import { updateQualification } from "@/common/lib/polkadot-provider/command/genetic-analyst/qualifications"
-import { queryGeneticAnalystQualifications } from "@/common/lib/polkadot-provider/query/genetic-analyst-qualifications"
+import { updateQualification } from "@debionetwork/polkadot-provider"
+import { queryGeneticAnalystQualificationsByHashId } from "@debionetwork/polkadot-provider"
 import { upload } from "@/common/lib/ipfs"
 import { uploadFile, getFileUrl } from "@/common/lib/pinata-proxy"
 import { getLocations, getSpecializationCategory } from "@/common/lib/api"
@@ -638,7 +638,7 @@ export default {
         
         if (analystData.qualifications.length) {
           const qualificationId = analystData.qualifications[0]
-          const qualification = await queryGeneticAnalystQualifications(this.api, qualificationId)
+          const qualification = await queryGeneticAnalystQualificationsByHashId(this.api, qualificationId)
           this.profile.qualificationId = qualificationId
 
           if (qualification.info.experience.length) {
