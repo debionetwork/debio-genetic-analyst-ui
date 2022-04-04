@@ -597,7 +597,7 @@ export default {
       file: [
         rulesHandler.FIELD_REQUIRED,
         rulesHandler.FILE_SIZE(2000000),
-        rulesHandler.DEFAULT_IMAGE || rulesHandler.DEFAULT_ACCEPT_DOCUMENTS
+        rulesHandler.DEFAULT_IMAGE && rulesHandler.DEFAULT_ACCEPT_DOCUMENTS
       ]
     }
   },
@@ -621,13 +621,13 @@ export default {
 
     async getCountries() {
       const { data : { data }} = await getLocations()
-      
+
       this.countries = data;
     },
 
     async getSecialization() {
       const categories = await getSpecializationCategory()
-      
+
       this.categories = categories;
     },
 
@@ -658,7 +658,7 @@ export default {
         this.profile = profileData
         this.profile.dateOfBirth = _dateOfBirth
         this.stakingStatus = analystData?.stakeStatus
-        
+
         if (analystData.qualifications.length) {
           const qualificationId = analystData.qualifications[0]
           const qualification = await queryGeneticAnalystQualifications(this.api, qualificationId)
@@ -673,10 +673,10 @@ export default {
         }
 
         this.txWeight = "Calculating..."
-        
+
         const txWeight = await getAddElectronicMedicalRecordFee(this.api, this.wallet, this.profile)
         const unstakeTxWeight = await getAddElectronicMedicalRecordFee(this.api, this.wallet, this.stakingStatus)
-        
+
 
         this.txWeight = `${this.web3.utils.fromWei(String(txWeight.partialFee), "ether")}`
         this.unstakeTxWeight = `${this.web3.utils.fromWei(String(unstakeTxWeight.partialFee), "ether")}`
@@ -694,11 +694,11 @@ export default {
 
     async onSubmitFile() {
       this._touchForms("document")
-      
+
       const { title, issuer, month, year, description, supporting_document } = this.document
 
       if (!title || !issuer || !month || !year || !supporting_document) return this.errorDoc = true
-            
+
       try {
         this.loadingDoc = true
         const dataFile = await this.setupFileReader(this.document)
@@ -741,7 +741,7 @@ export default {
       this.showModalConfirm = null
       const files = this.profile.certification
       files.splice(idx, 1)
-      
+
       this.profile.certification = files
     },
 
@@ -754,11 +754,12 @@ export default {
     },
 
     async handleAvailability(value) {
+      const accountId = localStorage.getAddress()
       this.profile.availabilityStatus = value
       const status = {Unavailable: value === "Unavailable" ? 1 : 0, Available: value === "Available" ? 1 : 0}
-      
+
       try {
-        await updateGeneticAnalystAvailabilityStatus(this.api, this.wallet, status)
+        await updateGeneticAnalystAvailabilityStatus(this.api, this.wallet, accountId, status)
       } catch (error) {
         console.error(error)
       }
@@ -814,14 +815,14 @@ export default {
         experience: _experiences,
         certification: certification
       }
-      
+
       if (!profileImage || !firstName || !lastName || !gender || !dateOfBirth || !email || !phone || !_specialization || experienceValidation || certificateValidation) {
         return this.error = true
       }
       this.isLoading = true
 
       try {
-        await updateGeneticAnalystInfo(
+        await updateGeneticAnalyst(
           this.api,
           this.wallet,
           {
@@ -858,13 +859,13 @@ export default {
     handleFileChange (event) {
       if (!event.target.value) return
       const file = event.target.files[0]
-      
+
       if (!imageType.includes(file.type)) return this.errorProfile = errorMessages.FILE_FORMAT("PNG/JPG")
       // if (file.type != "image/jpg" && file.type != "image/png") return this.errorProfile = errorMessages.FILE_FORMAT("PNG/JPG")
       else if (file.size > 2000000) return this.errorProfile = errorMessages.FILE_SIZE(2)
-      
+
       this.isProfileLoading = true
-      
+
       const fr = new FileReader()
       fr.readAsArrayBuffer(file)
 
@@ -878,9 +879,9 @@ export default {
         })
         const computeLink = `${uploaded.ipfsPath[0].data.ipfsFilePath}/${uploaded.fileName}`
         const imageUrl = `https://ipfs.io/ipfs/${computeLink}` // this is an image file that can be sent to server...
-        
+
         context.profile.profileImage = imageUrl
-        
+
         context.isProfileLoading = false
       })
       this.errorProfile = ""
@@ -894,7 +895,7 @@ export default {
         secretKey: context.secretKey,
         publicKey: context.publicKey
       }
-      
+
       return await new Promise((resolve, reject) => {
         try {
           cryptWorker.workerEncryptFile.postMessage({ pair, text, fileType }) // Access this object in e.data in worker
@@ -956,7 +957,7 @@ export default {
         fr.onerror = rej
         fr.readAsArrayBuffer(value.supporting_document)
       })
-    },  
+    },
 
     async upload({ encryptedFileChunks, fileType, fileName }) {
       const data = JSON.stringify(encryptedFileChunks)
@@ -969,7 +970,7 @@ export default {
       })
 
       const link = getFileUrl(result.IpfsHash)
-      
+
       return link
     }
   }
