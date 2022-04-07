@@ -200,6 +200,46 @@
           "identity": "lab_id"
         }
       }
+    },
+    "geneticAnalyst": {
+      "geneticAnalysts": {
+        "GeneticAnalystUpdateVerificationStatus": {
+          "message": "",
+          "value": "verificationStatus",
+          "value_message": "Your account has been ",
+          "route": "",
+          "params": "",
+          "identity": "accountId"
+        },
+        "GeneticAnalystRegistered": {
+          "message": "",
+          "value": "",
+          "value_message": "You've successfully submitted your account verification.",
+          "route": "",
+          "params": "",
+          "identity": "accountId"
+        }
+      },
+      "geneticAnalystServices": {
+        "GeneticAnalystServiceCreated": {
+          "message": "You've successfully added your new service - ",
+          "value": "id",
+          "value_message": "id",
+          "route": "",
+          "params": "",
+          "identity": "ownerId"
+        }
+      },
+      "geneticAnalysisOrders": {
+        "GeneticAnalysisOrderCreated": {
+          "message": "A new order ",
+          "value": "id",
+          "value_message": "id",
+          "route": "",
+          "params": "",
+          "identity": "ownerId"
+        }
+      }
     }
   }
 }

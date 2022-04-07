@@ -169,7 +169,7 @@ export default {
         this.$store.dispatch("substrate/addListNotification", {
           address: this.wallet.address,
           event: event,
-          role: "customer"
+          role: "geneticAnalyst"
         });
       }
     }
