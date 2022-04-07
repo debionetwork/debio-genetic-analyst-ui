@@ -41,7 +41,7 @@ export const uploadFile = val => {
 }
 
 export const getFileUrl = cid => {
-  return `https://ipfs.debio.network/ipfs/${cid}`
+  return `${process.env.VUE_APP_PINATA_GATEWAY}/${cid}`
 }
 
 export const downloadFile = async (ipfsLink, withMetaData = false) => {
