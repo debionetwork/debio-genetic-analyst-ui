@@ -89,6 +89,7 @@ jobs:
           VUE_APP_PASSWORD=${{ secrets.VUE_APP_PASSWORD }}
           VUE_APP_MIXPANEL_TOKEN=${{ secrets.VUE_APP_MIXPANEL_TOKEN }}
           VUE_APP_SENTRY_DSN=${{ secrets.VUE_APP_SENTRY_DSN }}
+          VUE_APP_PINATA_GATEWAY=${{ secrets.VUE_APP_PINATA_GATEWAY }}
           VUE_APP_PINATA_KEY=${{ secrets.VUE_APP_PINATA_KEY }}
           VUE_APP_PINATA_SECRET_KEY=${{ secrets.VUE_APP_PINATA_SECRET_KEY }}
           VUE_APP_PINATA_JWT_KEY=${{ secrets.VUE_APP_PINATA_JWT_KEY }}
