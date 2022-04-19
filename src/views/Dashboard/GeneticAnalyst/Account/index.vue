@@ -276,7 +276,7 @@
                   color="#D3C9D1"
                   fill
                 )
-                .ga-account__file-name {{ item.fileName }}
+                .ga-account__file-name {{ item.file ? item.file.name : "" }}
 
               .avatar 
                 ui-debio-icon.icon-text.icon-button(
@@ -388,10 +388,10 @@
             block
           )
           ui-debio-file(
-            :error="errorDoc && !document.supporting_document"
+            :error="errorDoc && !document.supportingDocument"
             :rules="$options.rules.document.file"
             :clearFile="clearFile"
-            v-model="document.supporting_document"
+            v-model="document.file"
             variant="small"
             accept=".pdf, .doc, .jpg, .png"
             label="Add supporting file"
@@ -454,7 +454,8 @@ const initialData = {
   month: "",
   year: "",
   description: "",
-  supporting_document: null /* eslint-disable camelcase */
+  supportingDocument: null, /* eslint-disable camelcase */
+  file: null
 }
 
 const imageType = ["image/jpg", "image/png", "image/jpeg"]
@@ -635,7 +636,7 @@ export default {
       const accountId = localStorage.getAddress()
       let profileData = this.profile
       const analystData = await queryGeneticAnalystByAccountId(this.api, accountId)
-      
+
       if (analystData) {
         profileData = {
           ...profileData,
@@ -662,6 +663,7 @@ export default {
         if (analystData.qualifications.length) {
           const qualificationId = analystData.qualifications[0]
           const qualification = await queryGeneticAnalystQualificationsByHashId(this.api, qualificationId)
+
           this.profile.qualificationId = qualificationId
 
           if (qualification.info.experience.length) {
@@ -695,19 +697,29 @@ export default {
     async onSubmitFile() {
       this._touchForms("document")
 
-      const { title, issuer, month, year, description, supporting_document } = this.document
+      const { title, issuer, month, year, description, file, supportingDocument } = this.document
 
-      if (!title || !issuer || !month || !year || !supporting_document) return this.errorDoc = true
+      if (!title || !issuer || !month || !year) return this.errorDoc = true
 
       try {
         this.loadingDoc = true
-        const dataFile = await this.setupFileReader(this.document)
+        let linkFile = ""
 
-        const linkFile = await this.upload({
-          encryptedFileChunks: dataFile.chunks,
-          fileName: dataFile.fileName,
-          fileType: dataFile.fileType
-        })
+        if (!supportingDocument && file) {
+          const dataFile = await this.setupFileReader(this.document)
+
+          linkFile = await this.upload({
+            encryptedFileChunks: dataFile.chunks,
+            fileType: dataFile.fileType,
+            fileName: dataFile.fileName
+          })
+        }
+
+        if (!supportingDocument && !file) {
+          this.errorDoc = true 
+          this.loadingDoc = true
+          return
+        }
 
         const document = {
           title,
@@ -715,16 +727,17 @@ export default {
           month,
           year,
           description,
-          supporting_document: linkFile
+          supportingDocument: this.editId != null ? supportingDocument : linkFile,
+          file
         }
-
+        
         if (this.editId != null) {
           this.profile.certification[this.editId] = {...document}
         } else {
           this.profile.certification.push({...document})
         }
       } catch(e) {
-        console.log(e)
+        console.error(e)
       }
 
       this.loadingDoc = false
@@ -808,7 +821,7 @@ export default {
       const phone = this.isEdit ? phoneNumber : `${phoneCode}${phoneNumber}`
       const _dateOfBirth = new Date(dateOfBirth).getTime()
       const experienceValidation = experiences.length === 1 && experiences.find(value => value.title === "")
-      const certificateValidation = certification.length > 0 && certification.find(value => !value.supporting_document)
+      const certificateValidation = certification.length > 0 && certification.find(value => !value.supportingDocument)
       const _specialization = specialization == "Other" ? specifyOther : specialization
       const _experiences = experiences.filter(value => value != "")
       const qualification = {
@@ -845,6 +858,7 @@ export default {
         )
 
         this.isSuccess = true
+        this.getAccountData()
       } catch (error) {
         console.error(error)
       }
@@ -929,21 +943,21 @@ export default {
         const context = this
         const fr = new FileReader()
 
-        const { title, description, supporting_document } = value
+        const { title, description, file } = value
 
         fr.onload = async function () {
           try {
             const encrypted = await context.encrypt({
               text: fr.result,
-              fileType: supporting_document.type,
-              fileName: supporting_document.name
+              fileType: file.type,
+              fileName: file.name
             })
 
             const { chunks, fileName, fileType } = encrypted
             const dataFile = {
               title,
               description,
-              supporting_document,
+              file,
               chunks,
               fileName,
               fileType,
@@ -955,7 +969,7 @@ export default {
           }
         }
         fr.onerror = rej
-        fr.readAsArrayBuffer(value.supporting_document)
+        fr.readAsArrayBuffer(value.file)
       })
     },
 
@@ -970,7 +984,6 @@ export default {
       })
 
       const link = getFileUrl(result.IpfsHash)
-
       return link
     }
   }

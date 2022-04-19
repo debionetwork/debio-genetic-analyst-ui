@@ -13,7 +13,7 @@
     "@babel/runtime": "^7.12.5",
     "@bit/joshk.vue-spinners-css.spinner-loader": "^1.1.5",
     "@debionetwork/pinata-ipfs": "0.0.2",
-    "@debionetwork/polkadot-provider": "0.0.8",
+    "@debionetwork/polkadot-provider": "0.0.10",
     "@debionetwork/ui-components": "0.0.4",
     "@debionetwork/ui-icons": "0.0.2",
     "@kiltprotocol/sdk-js": "^0.21.0",
