@@ -40,7 +40,7 @@ export default apiClientRequest
 
 const responseValidation = (response) => {
   if (response?.status === 503) VueRouter.push({ name: "maintenance" })
-  else if (String(response?.status)[0] == 4 || String(response?.status)[0] == 5) VueRouter.push({ query: { error: true } })
+  else if (String(response?.status)[0] === "4" || String(response?.status)[0] === "5") VueRouter.push({ query: { error: true } })
 
   return response;
 }
