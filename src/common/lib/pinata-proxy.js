@@ -23,12 +23,12 @@ export const uploadFile = val => {
   store.dispatch("geneticData/setCancel", {
     source
   })
-  
+
   return pinataIpfsUploadFile(
     options,
     val.file,
     pinataJwtKey,
-    source,
+    source.token,
     (progressEvent) => {
       if(progressEvent.lengthComputable) {
         let percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total )

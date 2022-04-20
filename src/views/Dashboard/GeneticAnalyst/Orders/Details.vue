@@ -146,7 +146,7 @@
                 :title="`Download ${orderDataDetails.document.fileName}`"
                 :aria-label="orderDataDetails.document.fileName"
                 role="button"
-                @click="handleDownloadFile(orderDataDetails.geneticLink, orderDataDetails.document.fileName)"
+                @click="handleDownloadFile(orderDataDetails.document.reportLink, orderDataDetails.document.fileName)"
               ) {{ orderDataDetails.document.fileName }}
 
               .order-details__actions.d-flex.justify-space-between(v-if="orderDataDetails.analysis_info.status !== 'Rejected' && step === 1")
@@ -202,11 +202,21 @@
               ) Total fee paid in DBIO to execute this transaction.
 
             span.upload-section__tx-price {{ txWeight }}
-          ui-debio-button(block :loading="isLoading" :disabled="isLoading" @click="handleSubmitForms" color="secondary") SUBMIT
+          ui-debio-button(
+            block
+            :loading="isLoading"
+            :disabled="isLoading"
+            @click="handleSubmitForms"
+            color="secondary"
+          ) SUBMIT
 
     UploadingDialog(
       :show="downloading"
       type="download"
+    )
+    UploadingDialog(
+      :show="isUploading"
+      type="upload"
     )
 </template>
 
@@ -221,17 +231,15 @@ import { validateForms } from "@/common/lib/validate"
 import {
   processGeneticAnalysis,
   rejectGeneticAnalysis,
-  submitGeneticAnalysis,
+  createGeneticAnalysisOrder,
   queryGeneticAnalysisOrderById,
-  queryGeneticAnalysisById,
-  geneticDataById,
-  queryGeneticAnalystByAccountId
+  queryGeneticAnalysisByGeneticAnalysisTrackingId,
+  queryGeneticDataById,
+  queryGeneticAnalystByAccountId,
+  cancelGeneticAnalysisOrderFee,
+  createGeneticAnalysisOrderFee,
+  queryGeneticAnalystServicesByHashId
 } from "@debionetwork/polkadot-provider"
-import {
-  rejectGeneticAnalysisFee,
-  submitGeneticAnalysisFee
-} from "@debionetwork/polkadot-provider"
-import { queryGeneticAnalystServicesByHashId } from "@debionetwork/polkadot-provider"
 import { mapState } from "vuex"
 import { generalDebounce } from "@/common/lib/utils"
 import { uploadFile, getFileUrl, downloadFile, decryptFile, downloadDocumentFile, getIpfsMetaData } from "@/common/lib/pinata-proxy"
@@ -256,6 +264,7 @@ export default {
     showTooltip: false,
     isLoading: false,
     downloading: false,
+    isUploading: false,
     showModalReject: false,
     orderAccepted: false,
     orderRejected: false,
@@ -430,10 +439,10 @@ export default {
 
         const serviceData = await queryGeneticAnalystServicesByHashId(this.api, data.serviceId)
         const analystData = await queryGeneticAnalystByAccountId(this.api, data.sellerId)
-        const analysisData = await queryGeneticAnalysisById(this.api, data.geneticAnalysisTrackingId)
-        const geneticData = await geneticDataById(this.api, data.geneticDataId)
+        const analysisData = await queryGeneticAnalysisByGeneticAnalysisTrackingId(this.api, data.geneticAnalysisTrackingId)
+        const geneticData = await queryGeneticDataById(this.api, data.geneticDataId)
 
-        const geneticLinkName = await getIpfsMetaData(JSON.parse(data.geneticLink)[0].split("/").pop())
+        const geneticLinkName = await getIpfsMetaData(JSON.parse(geneticData.reportLink)[0].split("/").pop())
         const analystReportDocument = await getIpfsMetaData(analysisData.reportLink.split("/").pop())
 
         this.orderDataDetails = {
@@ -469,7 +478,7 @@ export default {
 
         if (this.orderDataDetails?.analysis_info?.status === "Rejected") this.hilightDescription = this.orderDataDetails.analysis_info.rejectedDescription
         if (this.orderDataDetails?.analysis_info?.status === "InProgress") {
-          const txWeight = await submitGeneticAnalysisFee(
+          const txWeight = await createGeneticAnalysisOrderFee(
             this.api,
             this.wallet,
             this.orderDataDetails.geneticAnalysisTrackingId,
@@ -583,13 +592,13 @@ export default {
     },
 
     async calculateRejectFee() {
-      const txWeight = await rejectGeneticAnalysisFee(this.api, this.wallet, this.orderDataDetails.geneticAnalysisTrackingId, this.rejectionTitle, this.rejectionDesc)
+      const txWeight = await cancelGeneticAnalysisOrderFee(this.api, this.wallet, this.orderDataDetails.geneticAnalysisTrackingId, this.rejectionTitle, this.rejectionDesc)
       this.txWeight = "Calculating..."
       this.txWeight = `${Number(this.web3.utils.fromWei(String(txWeight.partialFee), "ether")).toFixed(4)} DBIO`
     },
 
     async calculateDocumentFee() {
-      const txWeight = await submitGeneticAnalysisFee(
+      const txWeight = await createGeneticAnalysisOrderFee(
         this.api,
         this.wallet,
         this.orderDataDetails.geneticAnalysisTrackingId,
@@ -641,7 +650,7 @@ export default {
       if (docDescription || docFile) return
 
       try {
-        this.isLoading = true
+        this.isUploading = true
         const dataFile = await this.processFile()
         await this.upload({
           encryptedFileChunks: dataFile.chunks,
@@ -649,7 +658,7 @@ export default {
           fileType: dataFile.fileType
         })
 
-        await submitGeneticAnalysis(
+        await createGeneticAnalysisOrder(
           this.api,
           this.wallet,
           this.orderDataDetails.geneticAnalysisTrackingId,
@@ -658,8 +667,9 @@ export default {
         )
 
         await processGeneticAnalysis(this.api, this.wallet, this.orderDataDetails.geneticAnalysisTrackingId, "ResultReady")
+        this.isUploading = false
       } catch (e) {
-        this.isLoading = false
+        this.isUploading = false
         console.error(e)
       }
     },
