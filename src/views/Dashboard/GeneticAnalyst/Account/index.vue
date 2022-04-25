@@ -699,7 +699,10 @@ export default {
 
       const { title, issuer, month, year, description, file, supportingDocument } = this.document
 
-      if (!title || !issuer || !month || !year) return this.errorDoc = true
+      if (!title || !issuer || !month || !year) {
+        this.errorDoc = true
+        return 
+      }
 
       try {
         this.loadingDoc = true
