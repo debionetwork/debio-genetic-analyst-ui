@@ -65,7 +65,7 @@
 
 <script>
 import { GAGetOrders } from "@/common/lib/api"
-import { queryGeneticAnalystByAccountId, queryGeneticAnalysisById } from "@debionetwork/polkadot-provider"
+import { queryGeneticAnalystByAccountId, queryGeneticAnalysisByGeneticAnalysisTrackingId } from "@debionetwork/polkadot-provider"
 import { generalDebounce } from "@/common/lib/utils"
 import { geneticAnalystIllustration, eyeIcon, alertIcon, searchIcon } from "@debionetwork/ui-icons"
 import { mapState } from "vuex"
@@ -123,7 +123,7 @@ export default {
   }),
 
   props: {
-    filter: {type: Object, default: null}
+    filter: { type: Array, default: () => [] }
   },
 
   computed: {
@@ -186,7 +186,7 @@ export default {
 
         for (const order of orderData.data) {
           const sourceData = order._source
-          const analysisData = await queryGeneticAnalysisById(this.api, order._source.genetic_analysis_tracking_id)
+          const analysisData = await queryGeneticAnalysisByGeneticAnalysisTrackingId(this.api, sourceData._source.genetic_analysis_tracking_id)
           const GENETIC_STATUS = {
             REGISTERED: "Open",
             INPROGRESS: "In Progress",
@@ -209,7 +209,7 @@ export default {
             })
           }
 
-          if (this.filter["status"] && this.filter["status"].includes(data.status)) orders.push(data)            
+          if (this.filter?.includes(data.status)) orders.push(data)
         }
 
         this.orderLists = orders

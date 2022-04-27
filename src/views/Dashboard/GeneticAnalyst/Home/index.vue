@@ -11,9 +11,7 @@ export default {
   components: {OrdersPage},
 
   data: () => ({
-    dataFilter: {
-      status: ["Open", "In Progress", "Rejected"]
-    }
+    dataFilter: ["Open", "In Progress", "Rejected"]
   })
 }
 </script>

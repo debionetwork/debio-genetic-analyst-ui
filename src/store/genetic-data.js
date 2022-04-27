@@ -1,6 +1,8 @@
 const defaultState ={
   selectedData: null,
-  selectedAnalysisSerivice: null
+  selectedAnalysisSerivice: null,
+  loadingProgress: null,
+  cancelUpload: null
 }
 
 export default {
@@ -13,6 +15,14 @@ export default {
 
     SET_SELECTED_SERVICE(state, data){
       state.selectedAnalysisSerivice = data
+    },
+
+    SET_LOADING_PROGRESS(state, data) {
+      state.loadingProgress = data
+    },
+
+    SET_CANCEL_UPLOAD(state, data) {
+      state.cancelUpload = data
     }
   },
   actions: {
@@ -22,6 +32,14 @@ export default {
 
     async getSelectedAnalysisService({ commit }, data) {
       commit("SET_SELECTED_SERVICE", data)
+    },
+
+    async getLoadingProgress({ commit }, data) {
+      commit("SET_LOADING_PROGRESS", data)
+    },
+
+    async setCancel({ commit }, data) {
+      commit("SET_CANCEL_UPLOAD", data)
     }
   }
 }
