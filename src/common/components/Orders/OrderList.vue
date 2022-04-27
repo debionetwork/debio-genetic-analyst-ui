@@ -186,7 +186,7 @@ export default {
 
         for (const order of orderData.data) {
           const sourceData = order._source
-          const analysisData = await queryGeneticAnalysisByGeneticAnalysisTrackingId(this.api, sourceData._source.genetic_analysis_tracking_id)
+          const analysisData = await queryGeneticAnalysisByGeneticAnalysisTrackingId(this.api, sourceData.genetic_analysis_tracking_id)
           const GENETIC_STATUS = {
             REGISTERED: "Open",
             INPROGRESS: "In Progress",

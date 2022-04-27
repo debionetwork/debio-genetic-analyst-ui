@@ -439,7 +439,7 @@ export default {
 
         const serviceData = await queryGeneticAnalystServicesByHashId(this.api, data.serviceId)
         const analystData = await queryGeneticAnalystByAccountId(this.api, data.sellerId)
-        const analysisData = await queryGeneticAnalysisByGeneticAnalysisTrackingId(this.api, data.geneticAnalysisTrackingId)
+        const analysisData = await queryGeneticAnalysisByGeneticAnalysisTrackingId(this.api, data.geneticAnalysisdTrackingId)
         const geneticData = await queryGeneticDataById(this.api, data.geneticDataId)
 
         const geneticLinkName = await getIpfsMetaData(JSON.parse(geneticData.reportLink)[0].split("/").pop())
