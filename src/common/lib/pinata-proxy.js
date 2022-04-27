@@ -1,4 +1,6 @@
 import Kilt from "@kiltprotocol/sdk-js"
+import axios from "axios"
+import store from "@/store"
 import { uploadFile as pinataIpfsUploadFile, downloadJson, getIpfsMetaData as pinataIpfsGetIpfsMetadata, downloadDocumentFileInBrowser } from "@debionetwork/pinata-ipfs"
 
 const pinataJwtKey = process.env.VUE_APP_PINATA_JWT_KEY
@@ -15,10 +17,26 @@ export const uploadFile = val => {
     pinataOptions: { cidVersion: 0 }
   }
 
+  const CancelToken = axios.CancelToken
+  const source = CancelToken.source()
+
+  store.dispatch("geneticData/setCancel", {
+    source
+  })
+
   return pinataIpfsUploadFile(
     options,
     val.file,
-    pinataJwtKey
+    pinataJwtKey,
+    source.token,
+    (progressEvent) => {
+      if (progressEvent.lengthComputable) {
+        let percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+        store.dispatch("geneticData/getLoadingProgress", {
+          progress: percentCompleted
+        })
+      }
+    }
   )
 }
 
