@@ -12,7 +12,7 @@ export default {
 
   data: () => ({
     dataFilter: {
-      trakingStatus: ["Done"],
+      trackingStatus: ["Done", "Rejected"],
       orderStatus: ["Paid", "Refunded"]
     }
   })

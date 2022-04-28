@@ -165,8 +165,8 @@ export default {
       this.verificationStatus = verificationStatus
     },
 
-    async getGAByTrakingId(trakingId) {
-      const analysisData = await queryGeneticAnalysisByGeneticAnalysisTrackingId(this.api, trakingId)
+    async getGAByTrackingId(trackingId) {
+      const analysisData = await queryGeneticAnalysisByGeneticAnalysisTrackingId(this.api, trackingId)
       
       return analysisData
     },
@@ -206,7 +206,7 @@ export default {
       for(const item of orders) {
         let _item = item
         let status = item.status
-        const analysisData = await this.getGAByTrakingId(_item.genetic_analysis_tracking_id).catch(() => null)
+        const analysisData = await this.getGAByTrackingId(_item.genetic_analysis_tracking_id).catch(() => null)
         
         const GENETIC_STATUS = {
           REGISTERED: "Open",
@@ -218,7 +218,7 @@ export default {
         if (analysisData) {
           status = GENETIC_STATUS[analysisData.status.toUpperCase()]
           
-          if (this.filter.trakingStatus.includes(status)) orderLists.push({..._item, status})
+          if (this.filter.trackingStatus.includes(status)) orderLists.push({..._item, status})
         }
       }
       
