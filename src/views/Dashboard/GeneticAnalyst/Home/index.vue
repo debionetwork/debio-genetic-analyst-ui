@@ -11,11 +11,12 @@ export default {
   components: {OrdersPage},
 
   data: () => ({
-    dataFilter: ["Open", "In Progress", "Rejected"]
+    dataFilter: {
+      trakingStatus: ["Open", "In Progress", "Rejected"],
+      orderStatus: ["Paid"]
+    }
   })
 }
 </script>
 
-<style lang="sass">
-
-</style>
+<style lang="sass"></style>

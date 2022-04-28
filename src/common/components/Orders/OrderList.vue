@@ -123,7 +123,7 @@ export default {
   }),
 
   props: {
-    filter: { type: Array, default: () => [] }
+    filter: { type: Object, default: () => {} }
   },
 
   computed: {
@@ -149,24 +149,14 @@ export default {
     }, 500)
   },
 
-  async created() {
-    try {
-      this.isLoading = true
-
-      await this.getVerificationStatus()
-      await this.getOrdersData()
-    } catch (e) {
-      console.error(e)
-    } finally {
-      this.isLoading = false
-    }
-  },
-
-  mounted() {
+  async mounted() {
     window.addEventListener("resize", () => {
       if (window.innerWidth <= 959) this.cardBlock = true
       else this.cardBlock = false
     })
+
+    await this.getVerificationStatus()
+    await this.getOrdersData()
   },
 
   methods: {
@@ -175,24 +165,23 @@ export default {
       this.verificationStatus = verificationStatus
     },
 
+    async getGAByTrakingId(trakingId) {
+      const analysisData = await queryGeneticAnalysisByGeneticAnalysisTrackingId(this.api, trakingId)
+      
+      return analysisData
+    },
+
     async getOrdersData(keyword) {
-      this.orderLists = []
       this.isLoading = true
-
+      let orderLists = []
+      let orders = []
+      
       try {
-        let orders = []
         const orderData = await GAGetOrders(keyword)
-        // const page = this.$router?.history?.current
-
+        
         for (const order of orderData.data) {
           const sourceData = order._source
-          const analysisData = await queryGeneticAnalysisByGeneticAnalysisTrackingId(this.api, sourceData.genetic_analysis_tracking_id)
-          const GENETIC_STATUS = {
-            REGISTERED: "Open",
-            INPROGRESS: "In Progress",
-            REJECTED: "Rejected",
-            RESULTREADY: "Done"
-          }
+          
           const formatedPrice = `
             ${Number(this.web3.utils.fromWei(String(sourceData.service_info?.prices_by_currency[0]?.total_price.replaceAll(",", "") || 0), "ether")).toFixed(4)} 
             ${sourceData?.currency}
@@ -201,23 +190,40 @@ export default {
           const data = {
             ...sourceData,
             price: formatedPrice,
-            status: GENETIC_STATUS[analysisData.status.toUpperCase()],
             created_at: new Date(+sourceData.created_at.replaceAll(",", "")).toLocaleString("en-GB", {
               day: "numeric",
               year: "numeric",
               month: "short"
             })
           }
-
-          if (this.filter?.includes(data.status)) orders.push(data)
+          
+          if (this.filter.orderStatus.includes(sourceData.status)) orders.push(data)
         }
-
-        this.orderLists = orders
       } catch (e) {
         console.error(e);
-      } finally {
-        this.isLoading = false
+      } 
+      
+      for(const item of orders) {
+        let _item = item
+        let status = item.status
+        const analysisData = await this.getGAByTrakingId(_item.genetic_analysis_tracking_id).catch(() => null)
+        
+        const GENETIC_STATUS = {
+          REGISTERED: "Open",
+          INPROGRESS: "In Progress",
+          REJECTED: "Rejected",
+          RESULTREADY: "Done"
+        }
+        
+        if (analysisData) {
+          status = GENETIC_STATUS[analysisData.status.toUpperCase()]
+          
+          if (this.filter.trakingStatus.includes(status)) orderLists.push({..._item, status})
+        }
       }
+      
+      this.orderLists = orderLists
+      this.isLoading = false
     }
   }
 }
