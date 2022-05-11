@@ -89,36 +89,18 @@
           validate-on-blur
         )
 
-        v-row
-          v-col(sm="4" v-if="!profile.phoneNumber")
-            ui-debio-dropdown(
-              :items="countries"
-              :error="error && !profile.phoneCode"
-              :rules="$options.rules.profile.date"
-              variant="small"
-              label="Phone"
-              placeholder=""
-              v-model="profile.phoneCode"
-              item-text="phone_code"
-              item-value="phone_code"
-              outlined
-              close-on-select
-              validate-on-blur
-              block
-            )
-          v-col
-            ui-debio-input(
-              :error="error && !profile.phoneNumber"
-              :rules="$options.rules.profile.phoneNumber"
-              variant="small"
-              :label="!profile.phoneNumber ? ' ' : 'Phone'"
-              placeholder="Add Phone Number"
-              v-model="profile.phoneNumber"
-              outlined
-              block
-              validate-on-blur
-              style="margin-top: 15px;"
-            )
+        ui-debio-input(
+          :error="error && !profile.phoneNumber"
+          :rules="$options.rules.profile.phoneNumber"
+          variant="small"
+          label="Phone"
+          placeholder="Add Phone Number"
+          v-model="profile.phoneNumber"
+          outlined
+          block
+          validate-on-blur
+          style="margin-top: 15px;"
+        )
         
         label.text-label Staking Amount
 
@@ -276,7 +258,7 @@
                   color="#D3C9D1"
                   fill
                 )
-                .ga-account__file-name {{ item.file ? item.file.name : "" }}
+                .ga-account__file-name {{ item.file ? limitChar(item.file.name) : "" }}
 
               .avatar 
                 ui-debio-icon.icon-text.icon-button(
@@ -492,7 +474,6 @@ export default {
       gender: "",
       dateOfBirth: null,
       email: "",
-      phoneCode: "",
       phoneNumber: "",
       specialization: null,
       specifyOther: "",
@@ -593,7 +574,8 @@ export default {
         (val) => !!val || errorMessage.REQUIRED
       ],
       description: [
-        rulesHandler.MAX_CHARACTER(255)
+        rulesHandler.MAX_CHARACTER(255),
+        rulesHandler.ENGLISH_ALPHABET
       ],
       file: [
         rulesHandler.FIELD_REQUIRED,
@@ -814,14 +796,12 @@ export default {
         gender,
         dateOfBirth,
         email,
-        phoneCode,
         phoneNumber,
         specialization,
         specifyOther,
         experiences,
         certification
       } = this.profile
-      const phone = this.isEdit ? phoneNumber : `${phoneCode}${phoneNumber}`
       const _dateOfBirth = new Date(dateOfBirth).getTime()
       const experienceValidation = experiences.length === 1 && experiences.find(value => value.title === "")
       const certificateValidation = certification.length > 0 && certification.find(value => !value.supportingDocument)
@@ -832,7 +812,7 @@ export default {
         certification: certification
       }
 
-      if (!profileImage || !firstName || !lastName || !gender || !dateOfBirth || !email || !phone || !_specialization || experienceValidation || certificateValidation) {
+      if (!profileImage || !firstName || !lastName || !gender || !dateOfBirth || !email || !phoneNumber || !_specialization || experienceValidation || certificateValidation) {
         return this.error = true
       }
       this.isLoading = true
@@ -988,6 +968,10 @@ export default {
 
       const link = getFileUrl(result.IpfsHash)
       return link
+    },
+
+    limitChar(value) {
+      return value.length > 32 ? `${value.substring(0, 32)}...` : value
     }
   }
 }
