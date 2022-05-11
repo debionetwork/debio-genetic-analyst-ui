@@ -231,13 +231,13 @@ import { validateForms } from "@/common/lib/validate"
 import {
   processGeneticAnalysis,
   rejectGeneticAnalysis,
-  createGeneticAnalysisOrder,
+  submitGeneticAnalysis,
   queryGeneticAnalysisOrderById,
   queryGeneticAnalysisByGeneticAnalysisTrackingId,
   queryGeneticDataById,
   queryGeneticAnalystByAccountId,
-  cancelGeneticAnalysisOrderFee,
-  createGeneticAnalysisOrderFee,
+  rejectGeneticAnalysisFee,
+  submitGeneticAnalysisFee,
   queryGeneticAnalystServicesByHashId
 } from "@debionetwork/polkadot-provider"
 import { mapState } from "vuex"
@@ -393,6 +393,7 @@ export default {
   async created() {
     if (this.mnemonicData) this.initialDataKey()
     await this.prepareData(this.$route.params.id)
+
   },
 
   rules: {
@@ -478,10 +479,10 @@ export default {
 
         if (this.orderDataDetails?.analysis_info?.status === "Rejected") this.hilightDescription = this.orderDataDetails.analysis_info.rejectedDescription
         if (this.orderDataDetails?.analysis_info?.status === "InProgress") {
-          const txWeight = await createGeneticAnalysisOrderFee(
+          const txWeight = await submitGeneticAnalysisFee(
             this.api,
             this.wallet,
-            this.orderDataDetails.geneticAnalysisTrackingId,
+            this.orderDataDetails.geneticAnalysisdTrackingId,
             this.document.recordLink,
             this.document.description
           )
@@ -539,7 +540,7 @@ export default {
 
       try {
         this.isLoading = true
-        await processGeneticAnalysis(this.api, this.wallet, this.orderDataDetails.geneticAnalysisTrackingId, "InProgress")
+        await processGeneticAnalysis(this.api, this.wallet, this.orderDataDetails.geneticAnalysisdTrackingId, "InProgress")
         await this.calculateDocumentFee()
 
         this.orderAccepted = true
@@ -568,7 +569,7 @@ export default {
         await rejectGeneticAnalysis(
           this.api,
           this.wallet,
-          this.orderDataDetails.geneticAnalysisTrackingId,
+          this.orderDataDetails.geneticAnalysisdTrackingId,
           this.rejectionTitle,
           this.rejectionDesc
         )
@@ -592,16 +593,16 @@ export default {
     },
 
     async calculateRejectFee() {
-      const txWeight = await cancelGeneticAnalysisOrderFee(this.api, this.wallet, this.orderDataDetails.geneticAnalysisTrackingId, this.rejectionTitle, this.rejectionDesc)
+      const txWeight = await rejectGeneticAnalysisFee(this.api, this.wallet, this.orderDataDetails.geneticAnalysisdTrackingId, this.rejectionTitle, this.rejectionDesc)
       this.txWeight = "Calculating..."
       this.txWeight = `${Number(this.web3.utils.fromWei(String(txWeight.partialFee), "ether")).toFixed(4)} DBIO`
     },
 
     async calculateDocumentFee() {
-      const txWeight = await createGeneticAnalysisOrderFee(
+      const txWeight = await submitGeneticAnalysisFee(
         this.api,
         this.wallet,
-        this.orderDataDetails.geneticAnalysisTrackingId,
+        this.orderDataDetails.geneticAnalysisdTrackingId,
         this.document.recordLink,
         this.document.description
       )
@@ -625,8 +626,9 @@ export default {
             const { type, data } = await downloadFile(links[i], true)
             const decryptedFile = decryptFile([data], pair, type)
             fileType = type
-            decryptedArrays = [...decryptedArrays, ...decryptedFile]
+            decryptedArrays = [...decryptedArrays, ...(decryptedFile ? decryptedFile : [])]
           }
+
 
           const unit8Arr = new Uint8Array(decryptedArrays)
           await downloadDocumentFile(unit8Arr, computeFileName, fileType)
@@ -658,15 +660,15 @@ export default {
           fileType: dataFile.fileType
         })
 
-        await createGeneticAnalysisOrder(
+        await submitGeneticAnalysis(
           this.api,
           this.wallet,
-          this.orderDataDetails.geneticAnalysisTrackingId,
+          this.orderDataDetails.geneticAnalysisdTrackingId,
           this.document.recordLink,
           this.document.description
         )
 
-        await processGeneticAnalysis(this.api, this.wallet, this.orderDataDetails.geneticAnalysisTrackingId, "ResultReady")
+        await processGeneticAnalysis(this.api, this.wallet, this.orderDataDetails.geneticAnalysisdTrackingId, "ResultReady")
         this.isUploading = false
       } catch (e) {
         this.isUploading = false
