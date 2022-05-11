@@ -101,37 +101,6 @@
           validate-on-blur
           style="margin-top: 15px;"
         )
-
-        //- v-row
-        //-   v-col(sm="4" v-if="!profile.phoneNumber")
-        //-     ui-debio-dropdown(
-        //-       :items="countries"
-        //-       :error="error && !profile.phoneCode"
-        //-       :rules="$options.rules.profile.date"
-        //-       variant="small"
-        //-       label="Phone"
-        //-       placeholder=""
-        //-       v-model="profile.phoneCode"
-        //-       item-text="phone_code"
-        //-       item-value="phone_code"
-        //-       outlined
-        //-       close-on-select
-        //-       validate-on-blur
-        //-       block
-        //-     )
-        //-   v-col
-        //-     ui-debio-input(
-        //-       :error="error && !profile.phoneNumber"
-        //-       :rules="$options.rules.profile.phoneNumber"
-        //-       variant="small"
-        //-       :label="!profile.phoneNumber ? ' ' : 'Phone'"
-        //-       placeholder="Add Phone Number"
-        //-       v-model="profile.phoneNumber"
-        //-       outlined
-        //-       block
-        //-       validate-on-blur
-        //-       style="margin-top: 15px;"
-        //-     )
         
         label.text-label Staking Amount
 
@@ -505,7 +474,6 @@ export default {
       gender: "",
       dateOfBirth: null,
       email: "",
-      // phoneCode: "",
       phoneNumber: "",
       specialization: null,
       specifyOther: "",
@@ -828,14 +796,12 @@ export default {
         gender,
         dateOfBirth,
         email,
-        // phoneCode,
         phoneNumber,
         specialization,
         specifyOther,
         experiences,
         certification
       } = this.profile
-      // const phone = this.isEdit ? phoneNumber : `${phoneCode}${phoneNumber}`
       const _dateOfBirth = new Date(dateOfBirth).getTime()
       const experienceValidation = experiences.length === 1 && experiences.find(value => value.title === "")
       const certificateValidation = certification.length > 0 && certification.find(value => !value.supportingDocument)
