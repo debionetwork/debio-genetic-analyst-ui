@@ -75,6 +75,7 @@
           block
           validate-on-blur
           type="date"
+          :max="new Date().toISOString().slice(0, 10)"
         )
 
         ui-debio-input(
@@ -587,13 +588,13 @@ export default {
 
   async created() {
     if (this.mnemonicData) this.initialDataKey()
-  },
-
-  async mounted() {
     await this.getCountries()
     await this.getSecialization()
     await this.getAccountData()
   },
+
+  // async mounted() {
+  // },
 
   methods: {
     initialDataKey() {
@@ -618,7 +619,7 @@ export default {
       const accountId = localStorage.getAddress()
       let profileData = this.profile
       const analystData = await queryGeneticAnalystByAccountId(this.api, accountId)
-
+      
       if (analystData) {
         profileData = {
           ...profileData,
@@ -764,13 +765,12 @@ export default {
     },
 
     async handleUnstake() {
-      await unstakeGeneticAnalyst(this.api, this.wallet)
-        .then(() => {
-          this.isSuccess = true
-        })
-        .catch(error => {
-          console.error(error)
-        })
+      try {
+        await unstakeGeneticAnalyst(this.api, this.wallet)
+        this.isSuccess = true
+      } catch (error) {
+        console.error(error)
+      }
     },
 
     addExperience(){
@@ -841,7 +841,6 @@ export default {
         )
 
         this.isSuccess = true
-        this.getAccountData()
       } catch (error) {
         console.error(error)
       }
