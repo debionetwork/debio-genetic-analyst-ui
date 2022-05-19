@@ -418,8 +418,9 @@ import { getAddElectronicMedicalRecordFee } from "@debionetwork/polkadot-provide
 import { updateGeneticAnalyst,  updateGeneticAnalystAvailabilityStatus, unstakeGeneticAnalyst } from "@debionetwork/polkadot-provider"
 import { updateQualification } from "@debionetwork/polkadot-provider"
 import { queryGeneticAnalystQualificationsByHashId } from "@debionetwork/polkadot-provider"
-import { uploadFile, getFileUrl } from "@/common/lib/pinata-proxy"
-import { getLocations, getSpecializationCategory } from "@/common/lib/api"
+import { uploadFile, getFileUrl, getIpfsMetaData } from "@/common/lib/pinata-proxy"
+import { getSpecializationCategory } from "@/common/lib/api"
+// import { getLocations, getSpecializationCategory } from "@/common/lib/api"
 import { fileTextIcon, pencilIcon, trashIcon } from "@debionetwork/ui-icons"
 import { mapState } from "vuex"
 import { validateForms } from "@/common/lib/validate"
@@ -436,8 +437,8 @@ const initialData = {
   month: "",
   year: "",
   description: "",
-  supportingDocument: null, /* eslint-disable camelcase */
-  file: null
+  file: null,
+  supportingDocument: null /* eslint-disable camelcase */
 }
 
 const imageType = ["image/jpg", "image/png", "image/jpeg"]
@@ -587,25 +588,16 @@ export default {
 
   async created() {
     if (this.mnemonicData) this.initialDataKey()
-    await this.getCountries()
-    await this.getSecialization()
     await this.getAccountData()
+    await this.getSecialization()
   },
 
-  // async mounted() {
-  // },
 
   methods: {
     initialDataKey() {
       const cred = Kilt.Identity.buildFromMnemonic(this.mnemonicData.toString(CryptoJS.enc.Utf8))
       this.publicKey = u8aToHex(cred.boxKeyPair.publicKey)
       this.secretKey = u8aToHex(cred.boxKeyPair.secretKey)
-    },
-
-    async getCountries() {
-      const { data : { data }} = await getLocations()
-
-      this.countries = data;
     },
 
     async getSecialization() {
@@ -651,8 +643,22 @@ export default {
           if (qualification.info.experience.length) {
             this.profile.experiences = qualification.info.experience
           }
+          
           if (qualification.info.certification.length) {
-            this.profile.certification = qualification.info.certification
+            let certifications = []
+            for (const cert of qualification.info.certification) {
+              const {rows} = await getIpfsMetaData(cert.supportingDocument?.split("/").pop())
+              
+              const _certificate = {
+                ...cert, 
+                file: {
+                  name: rows[0].metadata.name ?? "Supporting Document File"
+                }
+              }
+              
+              certifications.push(_certificate)
+            }
+            this.profile.certification = certifications
           }
         }
 
@@ -680,49 +686,39 @@ export default {
       this._touchForms("document")
 
       const { title, issuer, month, year, description, file, supportingDocument } = this.document
-
+      const doc = file
       if (!title || !issuer || !month || !year) {
         this.errorDoc = true
         return 
       }
 
-      try {
+      const document = {
+        title,
+        issuer,
+        month,
+        year,
+        description,
+        file: doc
+      }
+      
+      if (this.editId != null) {
+        this.profile.certification[this.editId] = {...document, supportingDocument}
+      } else {
+        if (!doc) {
+          this.errorDoc = true
+          return 
+        }
         this.loadingDoc = true
-        let linkFile = ""
 
-        if (!supportingDocument && file) {
-          const dataFile = await this.setupFileReader(this.document)
-
-          linkFile = await this.upload({
-            encryptedFileChunks: dataFile.chunks,
-            fileType: dataFile.fileType,
-            fileName: dataFile.fileName
-          })
-        }
-
-        if (!supportingDocument && !file) {
-          this.errorDoc = true 
-          this.loadingDoc = true
-          return
-        }
-
-        const document = {
-          title,
-          issuer,
-          month,
-          year,
-          description,
-          supportingDocument: this.editId != null ? supportingDocument : linkFile,
-          file
-        }
+        const dataFile = await this.setupFileReader(doc)
+        const result = await uploadFile({
+          title: dataFile.name,
+          type: dataFile.type,
+          file: dataFile
+        })
+        const linkFile = getFileUrl(result.IpfsHash)
         
-        if (this.editId != null) {
-          this.profile.certification[this.editId] = {...document}
-        } else {
-          this.profile.certification.push({...document})
-        }
-      } catch(e) {
-        console.error(e)
+        this.profile.certification.push({...document, supportingDocument: linkFile})
       }
 
       this.loadingDoc = false
@@ -851,120 +847,43 @@ export default {
       if (this.$refs["input-file"]) this.$refs["input-file"].click()
     },
 
-    handleFileChange (event) {
+    
+    async handleFileChange (event) {
       if (!event.target.value) return
       const file = event.target.files[0]
-      console.log("file", file)
+      
       if (!imageType.includes(file.type)) return this.errorProfile = errorMessages.FILE_FORMAT("PNG/JPG")
       // if (file.type != "image/jpg" && file.type != "image/png") return this.errorProfile = errorMessages.FILE_FORMAT("PNG/JPG")
       else if (file.size > 2000000) return this.errorProfile = errorMessages.FILE_SIZE(2)
 
       this.isProfileLoading = true
 
-      const fr = new FileReader()
-      fr.readAsArrayBuffer(file)
-
-      const context = this
-      fr.addEventListener("load", async () => {
-        // Upload
-        const uploaded = await this.upload({
-          fileChunk: fr.result,
-          fileType: file.type,
-          fileName: file.name
-        })
-        const imageUrl = uploaded // this is an image file that can be sent to server...
-
-        context.profile.profileImage = imageUrl
-
-        context.isProfileLoading = false
+      const dataFile = await this.setupFileReader(file)
+      const result = await uploadFile({
+        title: dataFile.name,
+        type: dataFile.type,
+        file: dataFile
       })
+      const link = getFileUrl(result.IpfsHash)
+      
+      this.profile.profileImage = link
+      this.isProfileLoading = false
       this.errorProfile = ""
     },
 
-    async encrypt({ text, fileType, fileName }) {
-      const context = this
-      const arrChunks = []
-      let chunksAmount
-      const pair = {
-        secretKey: context.secretKey,
-        publicKey: context.publicKey
-      }
-
-      return await new Promise((resolve, reject) => {
-        try {
-          cryptWorker.workerEncryptFile.postMessage({ pair, text, fileType }) // Access this object in e.data in worker
-          cryptWorker.workerEncryptFile.onmessage = async (event) => {
-            if (event.data.chunksAmount) {
-              chunksAmount = event.data.chunksAmount
-              return
-            }
-
-            arrChunks.push(event.data)
-            context.encryptProgress = (arrChunks.length / chunksAmount) * 100
-
-            if (arrChunks.length === chunksAmount) {
-              resolve({
-                fileName: fileName,
-                chunks: arrChunks,
-                fileType: fileType
-              })
-            }
-          }
-
-          this.fileEmpty = false
-        } catch (err) {
-          reject(new Error(err.message))
-        }
-      })
-    },
-
     setupFileReader(value) {
-      return new Promise((res, rej) => {
-        const context = this
+      return new Promise((resolve, reject) => {
+        const file = value
         const fr = new FileReader()
 
-        const { title, description, file } = value
-
-        fr.onload = async function () {
-          try {
-            const encrypted = await context.encrypt({
-              text: fr.result,
-              fileType: file.type,
-              fileName: file.name
-            })
-
-            const { chunks, fileName, fileType } = encrypted
-            const dataFile = {
-              title,
-              description,
-              file,
-              chunks,
-              fileName,
-              fileType,
-              createdAt: new Date().getTime()
-            }
-            res(dataFile)
-          } catch (e) {
-            console.error(e)
-          }
+        fr.onload = async function() {
+          resolve(value)
         }
-        fr.onerror = rej
-        fr.readAsArrayBuffer(value.file)
+
+        fr.onerror = reject
+
+        fr.readAsArrayBuffer(file)
       })
-    },
-
-    async upload({ encryptedFileChunks, fileType, fileName }) {
-      const data = JSON.stringify(encryptedFileChunks)
-      const blob = new Blob([data], { type: fileType })
-
-      const result = await uploadFile({
-        title: fileName,
-        type: fileType,
-        file: blob
-      })
-
-      const link = getFileUrl(result.IpfsHash)
-      return link
     },
 
     limitChar(value) {
