@@ -410,7 +410,6 @@
 
 <script>
 import Kilt from "@kiltprotocol/sdk-js"
-import cryptWorker from "@/common/lib/ipfs/crypt-worker"
 import CryptoJS from "crypto-js"
 import { u8aToHex } from "@polkadot/util"
 import { queryGeneticAnalystByAccountId } from "@debionetwork/polkadot-provider"
@@ -420,7 +419,6 @@ import { updateQualification } from "@debionetwork/polkadot-provider"
 import { queryGeneticAnalystQualificationsByHashId } from "@debionetwork/polkadot-provider"
 import { uploadFile, getFileUrl, getIpfsMetaData } from "@/common/lib/pinata-proxy"
 import { getSpecializationCategory } from "@/common/lib/api"
-// import { getLocations, getSpecializationCategory } from "@/common/lib/api"
 import { fileTextIcon, pencilIcon, trashIcon } from "@debionetwork/ui-icons"
 import { mapState } from "vuex"
 import { validateForms } from "@/common/lib/validate"
