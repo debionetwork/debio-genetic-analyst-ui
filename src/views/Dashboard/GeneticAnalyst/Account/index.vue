@@ -418,7 +418,6 @@ import { getAddElectronicMedicalRecordFee } from "@debionetwork/polkadot-provide
 import { updateGeneticAnalyst,  updateGeneticAnalystAvailabilityStatus, unstakeGeneticAnalyst } from "@debionetwork/polkadot-provider"
 import { updateQualification } from "@debionetwork/polkadot-provider"
 import { queryGeneticAnalystQualificationsByHashId } from "@debionetwork/polkadot-provider"
-import { upload } from "@/common/lib/ipfs"
 import { uploadFile, getFileUrl } from "@/common/lib/pinata-proxy"
 import { getLocations, getSpecializationCategory } from "@/common/lib/api"
 import { fileTextIcon, pencilIcon, trashIcon } from "@debionetwork/ui-icons"
@@ -855,7 +854,7 @@ export default {
     handleFileChange (event) {
       if (!event.target.value) return
       const file = event.target.files[0]
-
+      console.log("file", file)
       if (!imageType.includes(file.type)) return this.errorProfile = errorMessages.FILE_FORMAT("PNG/JPG")
       // if (file.type != "image/jpg" && file.type != "image/png") return this.errorProfile = errorMessages.FILE_FORMAT("PNG/JPG")
       else if (file.size > 2000000) return this.errorProfile = errorMessages.FILE_SIZE(2)
@@ -868,13 +867,12 @@ export default {
       const context = this
       fr.addEventListener("load", async () => {
         // Upload
-        const uploaded = await upload({
+        const uploaded = await this.upload({
           fileChunk: fr.result,
           fileType: file.type,
           fileName: file.name
         })
-        const computeLink = `${uploaded.ipfsPath[0].data.ipfsFilePath}/${uploaded.fileName}`
-        const imageUrl = `https://ipfs.io/ipfs/${computeLink}` // this is an image file that can be sent to server...
+        const imageUrl = uploaded // this is an image file that can be sent to server...
 
         context.profile.profileImage = imageUrl
 
