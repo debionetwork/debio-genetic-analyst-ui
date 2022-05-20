@@ -587,7 +587,7 @@ export default {
   async created() {
     if (this.mnemonicData) this.initialDataKey()
     await this.getAccountData()
-    await this.getSecialization()
+    await this.getSpecialization()
   },
 
 
@@ -598,7 +598,7 @@ export default {
       this.secretKey = u8aToHex(cred.boxKeyPair.secretKey)
     },
 
-    async getSecialization() {
+    async getSpecialization() {
       const categories = await getSpecializationCategory()
 
       this.categories = categories;
