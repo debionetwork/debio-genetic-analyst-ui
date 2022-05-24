@@ -7,6 +7,7 @@ import localStorage from "@/common/lib/local-storage"
 import masterConfigEvent from "./event-types.json"
 import { ApiPromise, WsProvider } from "@polkadot/api"
 import { processEvent } from "@debionetwork/polkadot-provider"
+import { queryGeneticAnalystByAccountId } from "@debionetwork/polkadot-provider"
 
 const {
   cryptoWaitReady
@@ -33,7 +34,8 @@ const defaultState = {
   lastEventData: null,
   localListNotification: [],
   configEvent: null,
-  mnemonicData: null
+  mnemonicData: null,
+  GAAccount: null
 }
 
 export default {
@@ -99,6 +101,9 @@ export default {
     },
     SET_MNEMONIC_DATA(state, event) {
       state.mnemonicData = event
+    },
+    SET_GA_ACCOUNT(state, labAccount) {
+      state.GAAccount = labAccount
     }
   },
   actions: {
@@ -197,8 +202,8 @@ export default {
           localStorage.setAddress(pair.address)
           commit("SET_WALLET_PUBLIC_KEY", u8aToHex(pair.publicKey))
           commit("SET_WALLET", pair)
-          
-          localStorage.setLocalStorageByName("mnemonic_data", CryptoJS.AES.encrypt(file[1].mnemonic, password));	
+
+          localStorage.setLocalStorageByName("mnemonic_data", CryptoJS.AES.encrypt(file[1].mnemonic, password));
           commit("SET_MNEMONIC_DATA", file[1])
           commit("SET_LOADING_WALLET", false)
 
@@ -366,6 +371,21 @@ export default {
         commit("SET_LIST_NOTIFICATION", listNotification)
       } catch (err) {
         console.error(err)
+      }
+    },
+    async getGAAccount({ commit, state }) {
+      try {
+        commit("SET_GA_ACCOUNT", null)
+        const GAAccount = await queryGeneticAnalystByAccountId(state.api, state.wallet.address)
+        
+        if (GAAccount) {
+          commit("SET_GA_ACCOUNT", GAAccount)
+        }
+
+        return { success: true, GAAccount }
+      } catch (err) {
+        console.error(err)
+        return { success: false, error: err.message }
       }
     }
   },

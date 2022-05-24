@@ -1,7 +1,7 @@
 import localStorage from "./local-storage"
 import store from "@/store/index"
 
-async function dispatchGetAccount(wallet, address, func){
+async function dispatchGetAccount(wallet, address, func) {
   if (wallet == null) {
     if (address != "") {
       await store.dispatch("substrate/getAllAccounts", {
@@ -44,4 +44,23 @@ export async function checkIsLoggedIn(to, from, next) {
 
   next("/landing-page")
   return ""
+}
+
+export async function checkAccountStatus(to, from, next) {
+  const { GAAccount } = await store.dispatch("substrate/getGAAccount")
+
+  if (!GAAccount) {
+    next("/genetic-analyst/registration")
+  } else {
+    if (GAAccount.verificationStatus !== "Verified") {
+      if (GAAccount.stakeStatus === "Unstaked") {
+        next({ name: "ga-registration" })
+      } else {
+        next({ name: "ga-dashboard-verification" })
+      }
+    } else {
+      next()
+    }
+  }
+
 }

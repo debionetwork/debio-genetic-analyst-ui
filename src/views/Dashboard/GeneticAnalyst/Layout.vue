@@ -157,7 +157,7 @@ export default {
   watch: {
     $route(val) {
       const query = VueRouter?.history?.current?.query
-
+      
       if (val.meta.maintenance) this.pageError = true
       else this.pageError = null
 
@@ -178,6 +178,7 @@ export default {
   async mounted() {
     if (!this.mnemonicData) this.showModalPassword = true
     if (this.$route.meta.maintenance) this.pageError = true
+    await this.getAccount()
     await this.getListNotification()
   },
 
@@ -243,6 +244,19 @@ export default {
         }, 1300)
       } catch (e) {
         this.error = e
+      }
+    },
+
+    async getAccount() {
+      const { GAAccount } = await this.$store.dispatch("substrate/getGAAccount")
+      
+      if (!GAAccount || (GAAccount && GAAccount?.verificationStatus !== "Verified")) {
+        const navigation = []
+        this.navs.forEach(element => {
+          if (element["text"] !== "Dashboard") navigation.push({...element, disabled: true})
+          else navigation.push(element)
+        });
+        this.navs = navigation
       }
     }
   }

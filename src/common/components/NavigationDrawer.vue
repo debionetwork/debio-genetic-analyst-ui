@@ -144,19 +144,20 @@
       .drawer-item.pt-1.pb-1(v-for="(item, key) in items" :key="key")
         ui-debio-button.btn-drawer(
           :class="customClass(item.active)"
-          :to="{ name: item.route }"
+          :to="item.disabled ? {} : { name: item.route } "
           :height="'50px'"
           :color="'none'"
           text
           block
+          :style="item.disabled ? 'pointer-events: none' : '' "
         )
           ui-debio-icon.btnDrawerIcon(
             :icon="item.icon"
             size="24"
             stroke
-            :color="item.active ? '#C400A5' : '#363636'"
+            :color="item.active ? '#C400A5' : item.disabled ? '#D3C9D1' : '#363636'"
           )
-          span.navTitle {{ item.text }}
+          span.navTitle(:style="item.disabled ? 'color: #D3C9D1' : ''") {{ item.text }}
 
       v-divider.lineDivider
       .d-flex.flex-column.align-center
