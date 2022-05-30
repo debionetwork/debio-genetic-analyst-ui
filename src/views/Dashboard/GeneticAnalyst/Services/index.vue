@@ -185,7 +185,7 @@ export default {
         const dataEvent = JSON.parse(e.data.toString())
         if (dataEvent[1] === this.wallet.address) {
           const toRefetch = ["GeneticAnalystServiceDeleted", "GeneticAnalystServiceUpdated", "GeneticAnalystServiceCreated"]
-          
+
           if (toRefetch.includes(e.method)) {
             this.getServiceList()
             this.showModal = false
@@ -197,7 +197,7 @@ export default {
     }
   },
 
-  async created() {
+  async mounted() {
     await this.getServiceList()
   }, 
 

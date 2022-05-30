@@ -128,7 +128,7 @@ describe("Genetic Analyst Services Dashboard", () => {
     
     const PARAM = {
       data: `[0,${gaServices.watch.wallet.address}]`,
-      method: "GeneticAnalystServiceCreated"
+      method: "GeneticDataUpdated"
     }
 
     // Assert
