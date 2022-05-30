@@ -111,7 +111,18 @@
             span(style="font-size: 10px;") Total fee paid in DBIO to execute this transaction.
         span.text-label {{ Number(txWeight).toFixed(4) }} DBIO
 
-      v-row
+      v-row(v-if="editPage")
+        v-col.file-wrapper
+          ui-debio-button(
+            color="secondary"
+            height="2.5rem"
+            :loading="loading"
+            :disabled="loading || disableService"
+            block
+            @click="handleSubmit"
+          ) Submit
+
+      v-row(v-else)
         v-col.file-wrapper(class="pr-2")
           ui-debio-button(
             color="secondary"
@@ -135,7 +146,7 @@
 import {mapState} from "vuex"
 import errorMessages from "@/common/constants/error-messages"
 import {uploadFile, getFileUrl} from "@/common/lib/pinata-proxy"
-import {createGeneticAnalystServiceFee} from "@/common/lib/polkadot-provider/command/genetic-analyst/services"
+// import {createGeneticAnalystServiceFee} from "@/common/lib/polkadot-provider/command/genetic-analyst/services"
 import rulesHandler from "@/common/constants/rules"
 
 const documentFormat = [
@@ -150,7 +161,6 @@ export default {
 
   data: () => ({
     currency: [{currency: "DBIO"}],
-    txWeight: 0,
     service: {
       name: "",
       currency: "DBIO",
@@ -170,16 +180,23 @@ export default {
     onSubmit: {type: Function},
     data: {type: Object, default: null},
     isBulk: {type: Boolean, default: false},
-    isEdit: {type: Boolean, default: false}
+    isEdit: {type: Boolean, default: false},
+    editPage: {type: Boolean, default: false},
+    txWeight: {type: Number, default: 0}
   },
 
   watch: { 
     data: function(newVal) {
+      console.log("newVal", newVal)
       this.service = newVal
     },
 
     isEdit: function(newVal) {
       this.isEdit = newVal
+    },
+
+    txWeight: function(newVal) {
+      this.txWeight = newVal
     }
   },
 
@@ -230,20 +247,16 @@ export default {
     }
   },
 
-  async created() {
-    this.loading = true
-
-    await this.getServiceTxWeight()
-
-    this.loading = false
-  },
+  // async created() {
+  //   await this.getServiceTxWeight()
+  // },
 
   methods: {
-    async getServiceTxWeight() {
-      const getTxWeight = await createGeneticAnalystServiceFee(this.api, this.wallet, this.service)
+    // async getServiceTxWeight() {
+    //   const getTxWeight = await createGeneticAnalystServiceFee(this.api, this.wallet, this.service)
 
-      this.txWeight = `${this.web3.utils.fromWei(String(getTxWeight.partialFee), "ether")}`
-    },
+    //   this.txWeight = `${this.web3.utils.fromWei(String(getTxWeight.partialFee), "ether")}`
+    // },
     
     handleSubmit() {
       if (serviceValidation(this.service)) {

@@ -41,10 +41,22 @@ export default [
         component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Account")
       },
       {
-        path: "my-services",
+        path: "services",
         name: "ga-services",
         meta: { pageHeader: "My Services" },
         component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Services")
+      },
+      {
+        path: "service/add",
+        name: "ga-add-services",
+        meta: { pageHeader: "Add Services", parent: "ga-services" },
+        component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Services/AddService")
+      },
+      {
+        path: "service/edit/:id",
+        name: "ga-edit-service",
+        meta: { pageHeader: "Edit Service", parent: "ga-services" },
+        component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Services/EditService")
       },
       {
         path: "orders",
