@@ -394,6 +394,7 @@
       title="Success"
       message="Your account has been edited!"      
       @close="isSuccess = false"
+      @submit="isSuccess = false"
     ) 
 
     ConfirmationDialog(
