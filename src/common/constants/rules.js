@@ -11,5 +11,6 @@ export default Object.freeze({
   },
   DEFAULT_ACCEPT_DOCUMENTS: val => (!!val && (val.type === "application/pdf" || val.type === "application/msword" || val.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document")) || errorMessages.FILE_FORMAT("PDF/DOC/DOCX"),
   EMAIL: val => /^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/.test(val) || errorMessages.EMAIL,
-  DEFAULT_IMAGE: (val) => (val && (val.type === "image/png" || val.type === "image/jpg")) || errorMessages.FILE_FORMAT("PNG/JPG")
+  DEFAULT_IMAGE: (val) => (val && (val.type === "image/png" || val.type === "image/jpg")) || errorMessages.FILE_FORMAT("PNG/JPG"),
+  WEBSITE: (val) => /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_.~#?&/=]*)/.test(val) || errorMessages.INVALID_WEBSITE
 })

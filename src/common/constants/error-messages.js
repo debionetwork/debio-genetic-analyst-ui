@@ -4,6 +4,7 @@ export default Object.freeze({
   REQUIRED: "This field is required",
   EMAIL: "Email is invalid. It should contain @ followed by a domain",
   INCORRECT_PASSWORD: "The password you entered is incorrect",
+  INVALID_WEBSITE: "Website is invalid. It should contain protocol (https://) followed by a domain",
 
   /**
    *

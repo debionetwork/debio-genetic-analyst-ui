@@ -18,7 +18,7 @@
           ui-debio-button.dialog-success__buttons(
             color="secondary"
             block
-            @click="closeDialog"
+            @click="onSubmit"
           ) Ok
 
 </template>
@@ -45,6 +45,10 @@ export default {
   methods: {
     closeDialog() {
       this.$emit("close")
+    },
+
+    onSubmit() {
+      this.$emit("submit")
     }
   }
 }
