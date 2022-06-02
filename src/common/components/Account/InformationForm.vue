@@ -7,7 +7,7 @@
       ) 
         img(:src="computeAvatar")
       div.avatar__upload
-        span Upload fle (.jpg, .png - Maximum fle size is 2MB)
+        span Upload file (.jpg, .png - Maximum file size is 2MB)
         input.file-input(
           type="file" 
           ref="input-file" 

@@ -40,7 +40,8 @@
             color="secondary"
             block
             @click="handleSubmit"
-            :disabled="!sufficientBalance"
+            :loading="loading"
+            :disabled="!sufficientBalance || loading"
           ) Stake
 
 </template>
@@ -63,7 +64,8 @@ export default {
 
   props: {
     show: Boolean,
-    isEdit: {type: Boolean, default: false}
+    isEdit: {type: Boolean, default: false},
+    loading: {type: Boolean, default: false}
   },
 
   computed: {

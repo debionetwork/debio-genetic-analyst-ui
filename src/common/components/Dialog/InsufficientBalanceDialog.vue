@@ -22,7 +22,7 @@
             color="secondary"
             block
             @click="closeDialog"
-          ) DISMIS
+          ) DISMISS
 
 </template>
 

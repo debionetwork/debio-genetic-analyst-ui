@@ -67,6 +67,7 @@
 
       StakeDialog(
         :show="showStakeDialog" 
+        :loading="submitLoading"
         @close="showStakeDialog = false"
         @submit="onSubmit"
       )
@@ -215,7 +216,6 @@ export default {
       const services = []
       const data = this.services
       this.submitLoading = true
-      this.showStakeDialog = false
 
       data.forEach(element => {
         delete element.file
@@ -228,6 +228,8 @@ export default {
         await bulkCreateGeneticAnalystService(this.api, this.wallet, services)
 
         localStorage.removeLocalStorageByName("temporaryServices")
+        this.showStakeDialog = false
+
         await this.goToDashboard()
       } catch (error) {
         console.error(error)

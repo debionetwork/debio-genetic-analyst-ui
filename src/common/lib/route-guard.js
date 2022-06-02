@@ -48,16 +48,14 @@ export async function checkIsLoggedIn(to, from, next) {
 
 export async function checkAccountStatus(to, from, next) {
   const { GAAccount } = await store.dispatch("substrate/getGAAccount")
-
+  
   if (!GAAccount) {
     next("/genetic-analyst/registration")
   } else {
     if (GAAccount.verificationStatus !== "Verified") {
-      if (GAAccount.stakeStatus === "Unstaked") {
-        next({ name: "ga-registration" })
-      } else {
-        next({ name: "ga-dashboard-verification" })
-      }
+      if (from.name === "ga-registration-service") next() 
+      else if (GAAccount.stakeStatus === "Unstaked") next({ name: "ga-registration" })
+      else next({ name: "ga-dashboard-verification" })
     } else {
       next()
     }

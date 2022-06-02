@@ -14,6 +14,8 @@
       outlined
       block
       validate-on-blur
+      :error="errorDoc && !document.title"
+      :rules="$options.rules.document.title"
     )
     ui-debio-input(
       variant="small"
@@ -23,6 +25,8 @@
       outlined
       block
       validate-on-blur
+      :error="errorDoc && !document.issuer"
+      :rules="$options.rules.document.issuer"
     )
     v-row
       v-col
@@ -36,6 +40,8 @@
           close-on-select
           validate-on-blur
           block
+          :error="errorDoc && !document.month"
+          :rules="$options.rules.document.month"
         )
       v-col
         ui-debio-dropdown(
@@ -48,6 +54,8 @@
           close-on-select
           validate-on-blur
           block
+          :error="errorDoc && !document.year"
+          :rules="$options.rules.document.year"
         )
     ui-debio-textarea(
       variant="small"
@@ -57,6 +65,7 @@
       validate-on-blur
       outlined
       block
+      :rules="$options.rules.document.description"
     )
 
     div.text-label Add supporting document (.pdf, .doc, .jpg, .png - Maximum fle size is 2MB)
@@ -100,6 +109,7 @@
 <script>
 import errorMessages from "@/common/constants/error-messages"
 import {uploadFile, getFileUrl} from "@/common/lib/pinata-proxy"
+import rulesHandler from "@/common/constants/rules"
 
 const documentFormat = ["image/jpg", "image/png", "application/pdf", "application/msword"]
 
@@ -117,6 +127,7 @@ export default {
       supportingDocument: null /* eslint-disable camelcase */
     },
     uploading: false,
+    errorDoc: false,
     errorFileMessage: "",
     selectMonths: [
       "January",
@@ -171,8 +182,46 @@ export default {
     }
   },
 
+  rules: {
+    document: {
+      title: [
+        rulesHandler.FIELD_REQUIRED,
+        rulesHandler.ENGLISH_ALPHABET,
+        rulesHandler.MAX_CHARACTER(50)
+      ],
+      issuer: [
+        rulesHandler.FIELD_REQUIRED,
+        rulesHandler.ENGLISH_ALPHABET,
+        rulesHandler.MAX_CHARACTER(50)
+      ],
+      month: [
+        rulesHandler.FIELD_REQUIRED
+      ],
+      year: [
+        rulesHandler.FIELD_REQUIRED
+      ],
+      description: [
+        rulesHandler.MAX_CHARACTER(255),
+        rulesHandler.ENGLISH_ALPHABET
+      ],
+      file: [
+        rulesHandler.FIELD_REQUIRED,
+        rulesHandler.FILE_SIZE(2000000),
+        rulesHandler.DEFAULT_IMAGE && rulesHandler.DEFAULT_ACCEPT_DOCUMENTS
+      ]
+    }
+  },
+
   methods: {
     handleSubmit() {
+      const { title, issuer, month, year, supportingDocument } = this.document
+      
+      if (!title || !issuer || !month || !year || !supportingDocument) {
+        console.log("error")
+        this.errorDoc = true
+        return 
+      }
+
       this.onSubmit(this.document)
       this.handleClose()
     },
@@ -204,6 +253,8 @@ export default {
         return (this.errorFileMessage = errorMessages.FILE_SIZE(2))
 
       this.uploading = true
+      this.errorFileMessage = ""
+
       const dataFile = await this.setupFileReader(file)
       const result = await uploadFile({
         title: dataFile.name,

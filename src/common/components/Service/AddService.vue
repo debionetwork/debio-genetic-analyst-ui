@@ -66,7 +66,7 @@
         :rules="$options.rules.service.duration"
       )
 
-      div.text-label Result Sample (.pdf, .doc, .jpg, .png - Maximum fle size is 2MB)
+      div.text-label Result Sample (.pdf, .doc, .jpg, .png - Maximum file size is 2MB)
       v-row
         v-col.file-wrapper(class="pr-2")
           ui-debio-input(
@@ -146,7 +146,6 @@
 import {mapState} from "vuex"
 import errorMessages from "@/common/constants/error-messages"
 import {uploadFile, getFileUrl} from "@/common/lib/pinata-proxy"
-// import {createGeneticAnalystServiceFee} from "@/common/lib/polkadot-provider/command/genetic-analyst/services"
 import rulesHandler from "@/common/constants/rules"
 
 const documentFormat = [
@@ -247,17 +246,7 @@ export default {
     }
   },
 
-  // async created() {
-  //   await this.getServiceTxWeight()
-  // },
-
   methods: {
-    // async getServiceTxWeight() {
-    //   const getTxWeight = await createGeneticAnalystServiceFee(this.api, this.wallet, this.service)
-
-    //   this.txWeight = `${this.web3.utils.fromWei(String(getTxWeight.partialFee), "ether")}`
-    // },
-    
     handleSubmit() {
       if (serviceValidation(this.service)) {
         this.error = true
@@ -287,6 +276,7 @@ export default {
         return (this.errorFileMessage = errorMessages.FILE_SIZE(2))
 
       this.loading = true
+      this.errorFileMessage = ""
       const dataFile = await this.setupFileReader(file)
       const result = await uploadFile({
         title: dataFile.name,
