@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount, config } from "@vue/test-utils"
+import { createLocalVue, shallowMount } from "@vue/test-utils"
 import GAInformationRegistration from "@/views/Dashboard/GeneticAnalyst/Registration/AccountInformation"
 import Vuex from "vuex"
 
