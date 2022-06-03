@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount, config } from "@vue/test-utils"
+import { createLocalVue, shallowMount } from "@vue/test-utils"
 import GAEditService from "@/views/Dashboard/GeneticAnalyst/Services/EditService"
 import Vuex from "vuex"
 
@@ -16,10 +16,6 @@ describe("Genetic Analysis Edit Service", () => {
   })
 
   it("Should render", () => {
-    // GAEditService.created = {
-    //   getData: jest.fn("ID"),
-    //   getTxWeight: jest.fn()
-    // }
     GAEditService.methods = {
       cancelEdit: jest.fn(),
       goToServicePage: jest.fn(),
