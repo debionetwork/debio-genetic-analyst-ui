@@ -186,7 +186,6 @@ export default {
 
   watch: { 
     data: function(newVal) {
-      console.log("newVal", newVal)
       this.service = newVal
     },
 

@@ -102,7 +102,6 @@ export default {
 
   computed: {
     ...mapState({
-      lastEventData: (state) => state.substrate.lastEventData,
       api: (state) => state.substrate.api,
       wallet: (state) => state.substrate.wallet
     }),
@@ -202,11 +201,6 @@ export default {
       }
       this.submitLoading = false
     },
-
-    // async goToDashboard() {
-    //   await this.$store.dispatch("substrate/getGAAccount")
-    //   this.$router.push({ name: "ga-dashboard"})
-    // },
 
     clearForm() {
       this.service = {
