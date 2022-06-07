@@ -14,7 +14,7 @@
       outlined
       block
       validate-on-blur
-      :error="errorDoc && !document.title"
+      :error="isDirty.document && isDirty.document.title"
       :rules="$options.rules.document.title"
     )
     ui-debio-input(
@@ -25,7 +25,7 @@
       outlined
       block
       validate-on-blur
-      :error="errorDoc && !document.issuer"
+      :error="isDirty.document && isDirty.document.issuer"
       :rules="$options.rules.document.issuer"
     )
     v-row
@@ -40,7 +40,7 @@
           close-on-select
           validate-on-blur
           block
-          :error="errorDoc && !document.month"
+          :error="isDirty.document && isDirty.document.month"
           :rules="$options.rules.document.month"
         )
       v-col
@@ -54,7 +54,7 @@
           close-on-select
           validate-on-blur
           block
-          :error="errorDoc && !document.year"
+          :error="isDirty.document && isDirty.document.year"
           :rules="$options.rules.document.year"
         )
     ui-debio-textarea(
@@ -65,6 +65,7 @@
       validate-on-blur
       outlined
       block
+      :error="isDirty.document && isDirty.document.description"
       :rules="$options.rules.document.description"
     )
 
@@ -73,7 +74,7 @@
       v-col.file-wrapper(class="pr-2")
         ui-debio-input(
           variant="small"
-          v-model="document.file.name"
+          v-model="file.name"
           label=""
           outlined
           block
@@ -101,7 +102,6 @@
       color="secondary"
       block
       @click="handleSubmit"
-      :disabled="disabled || uploading"
     ) Submit
 
 </template>
@@ -110,11 +110,13 @@
 import errorMessages from "@/common/constants/error-messages"
 import {uploadFile, getFileUrl} from "@/common/lib/pinata-proxy"
 import rulesHandler from "@/common/constants/rules"
+import { validateForms } from "@/common/lib/validate"
 
 const documentFormat = ["image/jpg", "image/png", "application/pdf", "application/msword"]
 
 export default {
   name: "GACertificateDialog",
+  mixins: [validateForms],
 
   data: () => ({
     document: {
@@ -122,12 +124,11 @@ export default {
       issuer: "",
       month: "",
       year: "",
-      description: "",
-      file: {name: ""},
-      supportingDocument: null /* eslint-disable camelcase */
+      description: ""
     },
+    file: {name: ""},
+    supportingDocument: null, /* eslint-disable camelcase */
     uploading: false,
-    errorDoc: false,
     errorFileMessage: "",
     selectMonths: [
       "January",
@@ -154,7 +155,15 @@ export default {
 
   watch: { 
     data: function(newVal) {
-      this.document = newVal
+      this.document = {
+        title: newVal.title,
+        issuer: newVal.issuer,
+        month: newVal.month,
+        year: newVal.year,
+        description: newVal.description
+      }
+      this.file = newVal.file
+      this.supportingDocument = newVal.supportingDocument
     }
   },
 
@@ -173,11 +182,10 @@ export default {
         title,
         issuer,
         month,
-        year,
-        supportingDocument
+        year
       } = this.document
 
-      if (!title || !issuer || !month || !year || !supportingDocument ) return true
+      if (!title || !issuer || !month || !year || !this.supportingDocument ) return true
       return false
     }
   },
@@ -203,26 +211,29 @@ export default {
       description: [
         rulesHandler.MAX_CHARACTER(255),
         rulesHandler.ENGLISH_ALPHABET
-      ],
-      file: [
-        rulesHandler.FIELD_REQUIRED,
-        rulesHandler.FILE_SIZE(2000000),
-        rulesHandler.DEFAULT_IMAGE && rulesHandler.DEFAULT_ACCEPT_DOCUMENTS
       ]
     }
   },
 
   methods: {
     handleSubmit() {
-      const { title, issuer, month, year, supportingDocument } = this.document
+      this._touchForms("document")
       
-      if (!title || !issuer || !month || !year || !supportingDocument) {
-        console.log("error")
-        this.errorDoc = true
-        return 
+      const isDocumentValid = Object.values(this.isDirty?.document).every(v => v !== null && v === false)
+      
+      if (!isDocumentValid) {
+        if (!this.supportingDocument) this.errorFileMessage = errorMessages.REQUIRED
+
+        return
+      }
+      
+      const document = {
+        ...this.document,
+        file: this.file,
+        supportingDocument: this.supportingDocument
       }
 
-      this.onSubmit(this.document)
+      this.onSubmit(document)
       this.handleClose()
     },
 
@@ -262,8 +273,8 @@ export default {
         file: dataFile
       })
       const link = getFileUrl(result.IpfsHash)
-      this.document.supportingDocument = link
-      this.document.file = file
+      this.supportingDocument = link
+      this.file = file
       this.uploading = false
     },
 

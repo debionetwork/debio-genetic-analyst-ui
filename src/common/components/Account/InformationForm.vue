@@ -13,7 +13,6 @@
           ref="input-file" 
           accept=".png, .jpg" 
           @change="onAvatarChange" 
-          :rules="$options.rules.profile.profileImage"
         )
         ui-debio-button(
           color="primary"
@@ -21,7 +20,7 @@
           :loading="isProfileLoading"
           :disabled="isProfileLoading || submitLoading"
         ) Upload
-        span.text-error(v-if="error && !profile.profileImage") This field is required
+        span.text-error(v-if="error && !profileImage") This field is required
         span.text-error(v-else-if="errorProfile") {{errorProfile}}
     
     span.text-title Basic Information
@@ -29,24 +28,24 @@
     v-row
       v-col
         ui-debio-input(
-          :error="error && !profile.firstName"
-          :rules="$options.rules.profile.name"
+          :error="isDirty.info && isDirty.info.firstName"
+          :rules="$options.rules.info.firstName"
           variant="small"
           label="First Name"
           placeholder="Add First Name"
-          v-model="profile.firstName"
+          v-model="info.firstName"
           outlined
           block
           validate-on-blur
         )
       v-col
         ui-debio-input(
-          :error="error && !profile.lastName"
-          :rules="$options.rules.profile.name"
+          :error="isDirty.info && isDirty.info.lastName"
+          :rules="$options.rules.info.lastName"
           variant="small"
           label="Last Name"
           placeholder="Add Last Name"
-          v-model="profile.lastName"
+          v-model="info.lastName"
           outlined
           block
           validate-on-blur
@@ -54,20 +53,22 @@
 
     label.text-label Sex 
     v-radio-group.ga-account__radio-input(
-      v-model="profile.gender"
+      :error="isDirty.info && isDirty.info.gender"
+      :rules="$options.rules.info.gender"
+      v-model="info.gender"
       row
     )
       v-radio(label="Male" value="Male")
       v-radio(label="Female" value="Female")
-    span.text-error(v-if="error && !profile.gender") This field is required
+    //- span.text-error(v-if="error && !profile.gender") This field is required
 
     ui-debio-input(
-      :rules="$options.rules.profile.date"
-      :error="error && !profile.dateOfBirth"
+      :error="isDirty.info && isDirty.info.dateOfBirth"
+      :rules="$options.rules.info.dateOfBirth"
       variant="small"
       label="Date of Birth"
       placeholder="Add Date of Birth"
-      v-model="profile.dateOfBirth"
+      v-model="info.dateOfBirth"
       outlined
       block
       validate-on-blur
@@ -76,24 +77,24 @@
     )
 
     ui-debio-input(
-      :error="error && !profile.email"
-      :rules="$options.rules.profile.email"
+      :error="isDirty.info && isDirty.info.email"
+      :rules="$options.rules.info.email"
       variant="small"
       label="Email"
       placeholder="Add Email"
-      v-model="profile.email"
+      v-model="info.email"
       outlined
       block
       validate-on-blur
     )
 
     ui-debio-input(
-      :error="error && !profile.phoneNumber"
-      :rules="$options.rules.profile.phoneNumber"
+      :error="isDirty.info && isDirty.info.phoneNumber"
+      :rules="$options.rules.info.phoneNumber"
       variant="small"
       label="Phone"
       placeholder="Add Phone Number"
-      v-model="profile.phoneNumber"
+      v-model="info.phoneNumber"
       outlined
       block
       validate-on-blur
@@ -161,12 +162,12 @@
 
     ui-debio-dropdown(
       :items="categories"
-      :rules="$options.rules.profile.date"
-      :error="error && !profile.specialization && !profile.specialization != 'Other'"
+      :error="isDirty.info && isDirty.info.specialization"
+      :rules="$options.rules.info.specialization"
       variant="small"
       label="Specialization"
       placeholder="Select Specialization"
-      v-model="profile.specialization"
+      v-model="info.specialization"
       item-text="category"
       item-value="category"
       outlined
@@ -177,7 +178,7 @@
 
     ui-debio-input(
       v-if="profile.specialization == 'Other'"
-      :error="error && (!profile.specifyOther && profile.specialization == 'Other')"
+      :error="isDirty.profile && isDirty.profile.specifyOther && profile.specialization === 'Other'"
       :rules="$options.rules.profile.name"
       variant="small"
       label="Specify Others"
@@ -189,29 +190,29 @@
     )
 
     div.ga-account__space-between(
-      v-for="(experience, idx) in profile.experiences"
+      v-for="(experience, idx) in experiences"
       :key="idx"
     )
       ui-debio-input(
-        :error="error && !profile.experiences[idx]"
-        :rules="$options.rules.profile.experience"
+        :error-messages="experiences[idx].error"
+        :error="!experiences[idx].title"
         variant="small"
         label="Experience"
         placeholder="Add Experience"
-        v-model="profile.experiences[idx].title"
+        v-model="experiences[idx].title"
         outlined
         block
         validate-on-blur
       )
       v-icon.ga-account__icon-experience(
         color="#C400A5"
-        v-if="profile.experiences.length > 1"
+        v-if="experiences.length > 1"
         @click="removeExperience(idx)"
       ) mdi-close-circle-outline
 
     label.text-secondary(
       @click="addExperience"
-      v-if="profile.experiences.length < 10"
+      v-if="experiences.length < 10"
     ) + Add Experience
 
     div.ga-account__space-between
@@ -294,8 +295,8 @@
       color="secondary"
       height="2.5rem"
       :loading="isLoading || submitLoading"
-      :disabled="isLoading || disable || submitLoading"
       @click="handleSubmit"
+      :disabled="disable"
       block
     ) Next
 
@@ -320,6 +321,7 @@ import {getSpecializationCategory} from "@/common/lib/api"
 import {registerGeneticAnalystFee} from "@/common/lib/polkadot-provider/command/genetic-analyst"
 import {createQualificationFee} from "@/common/lib/polkadot-provider/command/genetic-analyst/qualification"
 import { fileTextIcon, pencilIcon, trashIcon } from "@debionetwork/ui-icons"
+import { validateForms } from "@/common/lib/validate"
 import rulesHandler from "@/common/constants/rules"
 import CertificationDialog from "@/common/components/Dialog/CertificateDialog"
 import InsufficientDialog from "@/common/components/Dialog/InsufficientBalanceDialog"
@@ -338,6 +340,7 @@ const initialData = {
 
 export default {
   name: "GAForm",
+  mixins: [validateForms],
 
   data: () => ({
     fileTextIcon,
@@ -351,18 +354,20 @@ export default {
     showUnstakeDialog: false,
     showInsufficientDialog: false,
     isLoading: false,
-    profile: {
-      profileImage: "",
+    info: {
       firstName: "",
       lastName: "",
       gender: "",
-      dateOfBirth: null,
       email: "",
       phoneNumber: "",
-      specialization: null,
+      dateOfBirth: null,
+      specialization: ""
+    },
+    profileImage: "",
+    experiences: [{title: "", error: ""}],
+    profile: {
       specifyOther: "",
       availabilityStatus: "",
-      experiences: [{title: ""}],
       certification: [],
       qualificationId: null
     },
@@ -391,32 +396,56 @@ export default {
     }),
 
     computeAvatar() {
-      return this.profile.profileImage
-        ? this.profile.profileImage
+      return this.profileImage
+        ? this.profileImage
         : require("@/assets/image-placeholder.png")
     },
 
     disable() {
-      const valid = formValidation(this.profile)
-      
-      return valid
+      const {
+        firstName,
+        lastName,
+        gender,
+        email,
+        phoneNumber,
+        dateOfBirth,
+        specialization
+      } = this.info
+      const experienceValidation = this.experiences.length === 1 && this.experiences.find(value => value.title === "")
+
+      if (!this.profileImage || !firstName || !lastName || !gender || !dateOfBirth || !email || !phoneNumber || !specialization || experienceValidation) {
+        return true
+      }
+      return false
     }
   },
 
   rules: {
     profile: {
-      name: [
-        rulesHandler.FIELD_REQUIRED,
-        rulesHandler.MAX_CHARACTER(50),
-        rulesHandler.ENGLISH_ALPHABET
-      ],
       experience: [
         rulesHandler.FIELD_REQUIRED,
         rulesHandler.MAX_CHARACTER(100),
         rulesHandler.ENGLISH_ALPHABET
       ],
-      date: [
+      specialization: [
         rulesHandler.FIELD_REQUIRED
+      ],
+      profileImage: [
+        rulesHandler.FIELD_REQUIRED,
+        rulesHandler.FILE_SIZE(2000000),
+        rulesHandler.DEFAULT_IMAGE
+      ]
+    },
+    info: {
+      firstName: [
+        rulesHandler.FIELD_REQUIRED,
+        rulesHandler.MAX_CHARACTER(50),
+        rulesHandler.ENGLISH_ALPHABET
+      ],
+      lastName: [
+        rulesHandler.FIELD_REQUIRED,
+        rulesHandler.MAX_CHARACTER(50),
+        rulesHandler.ENGLISH_ALPHABET
       ],
       email:  [
         rulesHandler.FIELD_REQUIRED,
@@ -429,10 +458,14 @@ export default {
         val => /^[0-9]+$/.test(val) || "Phone number is invalid",
         rulesHandler.MAX_CHARACTER(12)
       ],
-      profileImage: [
-        rulesHandler.FIELD_REQUIRED,
-        rulesHandler.FILE_SIZE(2000000),
-        rulesHandler.DEFAULT_IMAGE
+      gender: [
+        rulesHandler.FIELD_REQUIRED
+      ],
+      dateOfBirth: [
+        rulesHandler.FIELD_REQUIRED
+      ],
+      specialization: [
+        rulesHandler.FIELD_REQUIRED
       ]
     }
   },
@@ -469,17 +502,17 @@ export default {
     },
 
     addExperience() {
-      const experiences = this.profile.experiences
+      const experiences = this.experiences
       experiences.push({title: ""})
 
-      this.profile.experiences = experiences
+      this.experiences = experiences
     },
 
     removeExperience(idx) {
-      const experiences = this.profile.experiences
+      const experiences = this.experiences
       experiences.splice(idx, 1)
 
-      this.profile.experiences = experiences
+      this.experiences = experiences
     },
 
     onSubmitCertificate(data) {
@@ -507,10 +540,29 @@ export default {
     },
 
     handleSubmit() {
-      if (formValidation(this.profile)) return this.error = true
+      this._touchForms("info")
+      const isInfoValid = Object.values(this.isDirty?.info).every(v => v !== null && v === false)
+      const experiences = experienceValidation(this.experiences)
+      const isExpError = experiences.filter(v => v.error)
+      
+      this.experiences = experiences
+      
+      if (!isInfoValid || !this.profileImage || isExpError.length > 0) {
+        this.error = true
+
+        return
+      }
+
+      const data = {
+        profileImage: this.profileImage,
+        experiences: this.experiences,
+        ...this.info,
+        ...this.profile
+      }
+      
       if (this.walletBalance < this.txWeight) return this.showInsufficientDialog = true
 
-      this.onSubmit(this.profile)
+      this.onSubmit(data)
     },
 
     handleChooseFile() {
@@ -535,7 +587,7 @@ export default {
       })
       const link = getFileUrl(result.IpfsHash)
 
-      this.profile.profileImage = link
+      this.profileImage = link
       this.isProfileLoading = false
       this.errorProfile = ""
     },
@@ -558,27 +610,35 @@ export default {
   }
 }
 
-function formValidation(data) {
-  const {
-    profileImage,
-    firstName,
-    lastName,
-    gender,
-    dateOfBirth,
-    email,
-    phoneNumber,
-    specialization,
-    specifyOther,
-    experiences
-  } = data
-  const experienceValidation = experiences.length === 1 && experiences.find(value => value.title === "")
-  const _specialization = specialization == "Other" ? specifyOther : specialization
+function experienceValidation(data) {
+  const experiences = []
+  for (const experience of data) {
+    if (rulesHandler.FIELD_REQUIRED(experience.title) !== true) {
+      experiences.push({
+        ...experience, 
+        error: rulesHandler.FIELD_REQUIRED(experience.title)
+      })
+    } else if (rulesHandler.ENGLISH_ALPHABET(experience.title) !== true) {
+      experiences.push({
+        ...experience, 
+        error: rulesHandler.ENGLISH_ALPHABET(experience.title)
+      })
+    } else if (experience.title.length > 100) {
+      experiences.push({
+        ...experience, 
+        error: errorMessages.MAX_CHARACTER(100)
+      })
 
-  if (!profileImage || !firstName || !lastName || !gender || !dateOfBirth || !email || !phoneNumber || !_specialization || experienceValidation) {
-    return true
+    } else {
+      experiences.push({
+        title: experience.title
+      })
+    }
   }
-  return false
+  
+  return experiences
 }
+
 </script>
 
 <style lang="sass" scoped>

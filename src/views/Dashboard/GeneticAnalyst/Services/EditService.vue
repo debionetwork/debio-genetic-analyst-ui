@@ -123,10 +123,15 @@ export default {
         testResultSample,
         totalPrice
       } = value
+      const price = this.web3.utils.toWei(String(totalPrice), "ether")
 
       const dataToSend = {
         name,
-        pricesByCurrency: [{currency, totalPrice}],
+        pricesByCurrency: [{
+          currency, 
+          totalPrice: price,
+          priceComponents: [{component: "Main Price", value: price}]
+        }],
         expectedDuration: {duration, durationType},
         description,
         testResultSample
