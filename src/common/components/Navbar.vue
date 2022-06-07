@@ -127,8 +127,7 @@ import {
 
 import localStorage from "@/common/lib/local-storage"
 import { generalDebounce } from "@/common/lib/utils"
-import { queryAccountBalance } from "@debionetwork/polkadot-provider"
-import { queryEthAdressByAccountId } from "@debionetwork/polkadot-provider"
+import { queryAccountBalance, queryEthAdressByAccountId } from "@debionetwork/polkadot-provider"
 import { getBalanceDAI } from "@/common/lib/metamask/wallet"
 import { startApp } from "@/common/lib/metamask"
 import { handleSetWallet } from "@/common/lib/wallet"
@@ -168,6 +167,8 @@ export default {
     activeBalance: 0,
     ethAccount: null,
     loading: false,
+    activeMetamaskAddress: null,
+    ethRegisterAddress: null,
     menus: [
       {
         id: 1,
@@ -237,17 +238,32 @@ export default {
     lastEventData() {
       if(this.lastEventData) {
         this.fetchWalletBalance()
+        this.checkMetamaskAddress()
+        this.loading = false
       }
+    },
+
+    metamaskWalletAddress() {
+      if (this.metamaskWalletAddress.currentAccount === this.metamaskWalletAddress.accountList[0]) {
+        this.loginStatus = true
+        this.getActiveMenu()
+        return
+      }
+      this.loginStatus = false
     }
   },
 
   methods: {
     ...mapMutations({
       setWalletBalance: "substrate/SET_WALLET_BALANCE",
-      setMetamaskAddress: "metamask/SET_WALLET_ADDRESS",
       setMetamaskBalance: "metamask/SET_WALLET_BALANCE",
       clearWallet: "metamask/CLEAR_WALLET"
     }),
+
+    async getDaiBalance (address) {
+      return await getBalanceDAI(address)
+    },
+
 
     handleNotificationRead(notif) {
       notif.read = true
@@ -287,8 +303,8 @@ export default {
       if (selectedMenu.type === "metamask" && !this.loginStatus) return
 
       if (selectedMenu.type === "metamask") {
-        this.walletAddress = this.metamaskWalletAddress
-        this.activeBalance = await getBalanceDAI(this.metamaskWalletAddress)
+        this.walletAddress = this.activeMetamaskAddress
+        this.activeBalance = await getBalanceDAI(this.activeMetamaskAddress)
       }
 
       selectedMenu.active = true
@@ -325,24 +341,25 @@ export default {
     },
 
     async checkMetamaskAddress() {
-      if (this.metamaskWalletAddress === "") {
-        const ethRegisterAddress = await queryEthAdressByAccountId(
-          this.api,
-          this.wallet.address
-        )
+      this.loginStatus = false
+      this.ethRegisterAddress = await queryEthAdressByAccountId(this.api, this.wallet.address)
 
-        if (ethRegisterAddress !== null) {
-          const balance = await getBalanceDAI(ethRegisterAddress)
-          this.setMetamaskAddress(ethRegisterAddress)
-          this.setMetamaskBalance(balance)
-          this.loginStatus = true
-        }
+      if (!this.ethRegisterAddress) {
+        this.loginStatus = false
+        return
       }
 
-      if (this.metamaskWalletAddress) {
+      const accountDetail = await startApp()
+      if (accountDetail.currentAccount === this.ethRegisterAddress ) {
+        this.activeMetamaskAddress = this.ethRegisterAddress
+        this.metamaskBalance = await this.getDaiBalance(this.activeMetamaskAddress)
+        this.setMetamaskBalance(this.metamaskBalance)
         this.loginStatus = true
+        this.getActiveMenu()
       }
 
+      this.activeMetamaskAddress = ""
+      this.loginStatus = false
     },
 
     async connectToMetamask() {
@@ -356,12 +373,12 @@ export default {
         return
       }
 
-      const account = await handleSetWallet("metamask", this.metamaskWalletAddress)
+      const account = await handleSetWallet("metamask", this.ethRegisterAddress)
+      this.metamasBalance = await getBalanceDAI(this.ethRegisterAddress)
       const accountId = localStorage.getAddress()
       const ethAddress = account[0].address
 
       await this.$store.dispatch("wallet/walletBinding", {accountId, ethAddress})
-      this.setMetamaskAddress(ethAddress)
       this.loading = false
       this.loginStatus = true
       this.menus.find(menu => menu.type === "metamask").active = true
