@@ -440,7 +440,7 @@ export default {
 
         const serviceData = await queryGeneticAnalystServicesByHashId(this.api, data.serviceId)
         const analystData = await queryGeneticAnalystByAccountId(this.api, data.sellerId)
-        const analysisData = await queryGeneticAnalysisByGeneticAnalysisTrackingId(this.api, data.geneticAnalysisdTrackingId)
+        const analysisData = await queryGeneticAnalysisByGeneticAnalysisTrackingId(this.api, data.geneticAnalysisTrackingId)
         const geneticData = await queryGeneticDataById(this.api, data.geneticDataId)
 
         const geneticLinkName = await getIpfsMetaData(JSON.parse(geneticData.reportLink)[0].split("/").pop())
@@ -482,7 +482,7 @@ export default {
           const txWeight = await submitGeneticAnalysisFee(
             this.api,
             this.wallet,
-            this.orderDataDetails.geneticAnalysisdTrackingId,
+            this.orderDataDetails.geneticAnalysisTrackingId,
             this.document.recordLink,
             this.document.description
           )
@@ -540,7 +540,7 @@ export default {
 
       try {
         this.isLoading = true
-        await processGeneticAnalysis(this.api, this.wallet, this.orderDataDetails.geneticAnalysisdTrackingId, "InProgress")
+        await processGeneticAnalysis(this.api, this.wallet, this.orderDataDetails.geneticAnalysisTrackingId, "InProgress")
         await this.calculateDocumentFee()
 
         this.orderAccepted = true
@@ -569,7 +569,7 @@ export default {
         await rejectGeneticAnalysis(
           this.api,
           this.wallet,
-          this.orderDataDetails.geneticAnalysisdTrackingId,
+          this.orderDataDetails.geneticAnalysisTrackingId,
           this.rejectionTitle,
           this.rejectionDesc
         )
@@ -593,7 +593,7 @@ export default {
     },
 
     async calculateRejectFee() {
-      const txWeight = await rejectGeneticAnalysisFee(this.api, this.wallet, this.orderDataDetails.geneticAnalysisdTrackingId, this.rejectionTitle, this.rejectionDesc)
+      const txWeight = await rejectGeneticAnalysisFee(this.api, this.wallet, this.orderDataDetails.geneticAnalysisTrackingId, this.rejectionTitle, this.rejectionDesc)
       this.txWeight = "Calculating..."
       this.txWeight = `${Number(this.web3.utils.fromWei(String(txWeight.partialFee), "ether")).toFixed(4)} DBIO`
     },
@@ -602,7 +602,7 @@ export default {
       const txWeight = await submitGeneticAnalysisFee(
         this.api,
         this.wallet,
-        this.orderDataDetails.geneticAnalysisdTrackingId,
+        this.orderDataDetails.geneticAnalysisTrackingId,
         this.document.recordLink,
         this.document.description
       )
@@ -663,12 +663,12 @@ export default {
         await submitGeneticAnalysis(
           this.api,
           this.wallet,
-          this.orderDataDetails.geneticAnalysisdTrackingId,
+          this.orderDataDetails.geneticAnalysisTrackingId,
           this.document.recordLink,
           this.document.description
         )
 
-        await processGeneticAnalysis(this.api, this.wallet, this.orderDataDetails.geneticAnalysisdTrackingId, "ResultReady")
+        await processGeneticAnalysis(this.api, this.wallet, this.orderDataDetails.geneticAnalysisTrackingId, "ResultReady")
         this.isUploading = false
       } catch (e) {
         this.isUploading = false
