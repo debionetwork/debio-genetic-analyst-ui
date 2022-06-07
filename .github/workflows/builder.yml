@@ -21,7 +21,7 @@ jobs:
       environment: ${{ steps.build-info.outputs.environment }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Compute build info
@@ -67,9 +67,12 @@ jobs:
     needs:
       - compute-build-info
     environment: ${{ needs.compute-build-info.outputs.environment }}
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: create .env file
