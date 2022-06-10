@@ -24,7 +24,7 @@ jobs:
       latest_tag: ${{ steps.build-info.outputs.latest_tag }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Compute build info
@@ -48,7 +48,7 @@ jobs:
     steps:
       - name: Checkout code
         if: "${{ env.DEPLOY == 'true' }}"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Deploy
@@ -88,56 +88,6 @@ jobs:
               --set-string nodeSelector.pool=general
             kubectl rollout status deployment/debio-genetic-analyst-ui
 
-  deploy-alpha-release:
-    if: "github.event.release.prerelease && contains(needs.compute-build-info.outputs.latest_tag, 'alpha')"
-    runs-on: ubuntu-20.04
-    needs: [compute-build-info]
-    environment: staging
-    env:
-      DEPLOY: ${{ secrets.STG_DEPLOY }}
-    steps:
-      - name: Checkout code
-        if: "${{ env.DEPLOY == 'true' }}"
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: Deploy
-        if: "${{ env.DEPLOY == 'true' }}"
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          script: |
-            ./connect.sh
-            helm repo add debio https://charts.debio.network
-            helm repo update
-            helm upgrade debio-genetic-analyst-ui debio/debio-genetic-analyst-ui \
-              --install \
-              --set-string image.repository=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ github.repository }} \
-              --set-string image.tag=${{ needs.compute-build-info.outputs.latest_tag }} \
-              --set-string imagePullSecrets[0].name=gcr-auth \
-              --set ingress.enabled=true \
-              --set-string ingress.className=nginx \
-              --set-string ingress.annotations."cert-manager\.io/cluster-issuer"=letsencrypt \
-              --set-string ingress.annotations."nginx\.ingress\.kubernetes\.io/limit-rps"="100" \
-              --set-string ingress.hosts[0].host=${{ secrets.INGRESS_HOST }} \
-              --set-string ingress.hosts[0].paths[0].path=/ \
-              --set-string ingress.hosts[0].paths[0].pathType=ImplementationSpecific \
-              --set-string ingress.tls[0].secretName=debio-genetic-analyst-ui-tls \
-              --set-string ingress.tls[0].hosts[0]=${{ secrets.INGRESS_HOST }} \
-              --set-string resources.requests.cpu=100m \
-              --set-string resources.requests.memory=128Mi \
-              --set-string resources.limits.cpu=300m \
-              --set-string resources.limits.memory=256Mi \
-              --set replicaCount=1 \
-              --set autoscaling.enabled=true \
-              --set autoscaling.minReplicas=1 \
-              --set autoscaling.maxReplicas=11 \
-              --set-string nodeSelector.pool=general
-            kubectl rollout status deployment/debio-genetic-analyst-ui
-
   deploy-beta-release:
     if: "github.event.release.prerelease && contains(needs.compute-build-info.outputs.latest_tag, 'beta')"
     runs-on: ubuntu-20.04
@@ -148,7 +98,7 @@ jobs:
     steps:
       - name: Checkout code
         if: "${{ env.DEPLOY == 'true' }}"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Deploy
@@ -198,7 +148,7 @@ jobs:
     steps:
       - name: Checkout code
         if: "${{ env.DEPLOY == 'true' }}"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Deploy
@@ -248,7 +198,7 @@ jobs:
     steps:
       - name: Checkout code
         if: "${{ env.DEPLOY == 'true' }}"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Deploy

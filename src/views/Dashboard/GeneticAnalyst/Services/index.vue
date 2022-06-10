@@ -59,7 +59,7 @@
 
         template(slot="cta")
           ui-debio-card(
-            :to="{ name: 'customer-add-genetic-data'}"
+            :to="{ name: 'ga-add-services'}"
             title="Add Services"
             sub-title="Add Genetic Services"
             tiny-card 
@@ -95,7 +95,8 @@
 
           template(v-slot:[`item.action`]="{ item }")
             .ga-services__action
-              ui-debio-icon(:icon="pencilIcon" size="16" role="button" stroke)
+              router-link(:to="{ name: 'ga-edit-service', params: { id: item.id, item } }")
+                ui-debio-icon(:icon="pencilIcon" size="16" role="button" stroke)
               ui-debio-icon(:icon="trashIcon" size="16" role="button" stroke @click="showDialog(item.id)")
 
 
@@ -183,7 +184,9 @@ export default {
       if (e !== null) {
         const dataEvent = JSON.parse(e.data.toString())
         if (dataEvent[1] === this.wallet.address) {
-          if (e.method === "GeneticAnalystServiceDeleted") {
+          const toRefetch = ["GeneticAnalystServiceDeleted", "GeneticAnalystServiceUpdated", "GeneticAnalystServiceCreated"]
+
+          if (toRefetch.includes(e.method)) {
             this.getServiceList()
             this.showModal = false
             this.isLoading = false

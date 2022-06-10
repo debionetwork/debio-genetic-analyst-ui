@@ -1,4 +1,6 @@
-import { checkIsLoggedIn } from "@/common/lib/route-guard"
+import { checkIsLoggedIn, checkAccountStatus } from "@/common/lib/route-guard"
+import registrationRoutes from "./registration"
+import store from "@/store/index"
 
 export default [
   {
@@ -19,24 +21,47 @@ export default [
         path: "/",
         name: "ga-dashboard",
         meta: { pageHeader: "Home" },
-        component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Home")
+        component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Home"),
+        beforeEnter: checkAccountStatus
+      },
+      {
+        path: "/",
+        name: "ga-dashboard-verification",
+        meta: { pageHeader: "Home" },
+        component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Home/Unverified"),
+        beforeEnter: (to, from, next) => {
+          if (store.state.substrate.GAAccount.verificationStatus === "Verified") next({ name: "ga-dashboard" })
+          else next()
+        }
       },
       {
         path: "my-account",
         name: "ga-account",
-        meta: { pageHeader: "My Account"},
+        meta: { pageHeader: "My Account" },
         component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Account")
       },
       {
-        path: "my-services",
+        path: "services",
         name: "ga-services",
         meta: { pageHeader: "My Services" },
         component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Services")
       },
       {
+        path: "service/add",
+        name: "ga-add-services",
+        meta: { pageHeader: "Add Services", parent: "ga-services" },
+        component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Services/AddService")
+      },
+      {
+        path: "service/edit/:id",
+        name: "ga-edit-service",
+        meta: { pageHeader: "Edit Service", parent: "ga-services" },
+        component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Services/EditService")
+      },
+      {
         path: "orders",
         name: "ga-orders",
-        meta: { pageHeader: "Orders"},
+        meta: { pageHeader: "Orders" },
         component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Orders")
       },
       {
@@ -44,7 +69,8 @@ export default [
         name: "ga-order-details",
         meta: { pageHeader: "Details", parent: "ga-orders" },
         component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Orders/Details")
-      }
+      },
+      ...registrationRoutes
     ]
   }
 ]
