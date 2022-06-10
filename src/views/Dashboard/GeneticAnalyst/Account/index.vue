@@ -628,7 +628,7 @@ export default {
       const accountId = localStorage.getAddress()
       let profileData = this.profile
       const analystData = await queryGeneticAnalystByAccountId(this.api, accountId)
-      console.log("analystData", analystData)
+      
       if (analystData) {
         profileData = {
           ...profileData,
