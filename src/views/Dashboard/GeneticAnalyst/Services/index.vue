@@ -214,10 +214,8 @@ export default {
   },
 
   async mounted() {
-    this.isLoading = true
-    await this.getServiceList()
     await this.getGAOrders()
-    this.isLoading = false
+    await this.getServiceList()
   }, 
 
   methods: {

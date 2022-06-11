@@ -121,8 +121,8 @@
               color="secondary"
               width="auto"
               height="40px"
-              :disabled="stakingStatus != 'Staked'"
-              @click="showUnstakeDialog = true"
+              :disabled="stakingStatus != 'Staked' || isLoading"
+              @click="hasActiveOrder ? showActiveOrder = true : showUnstakeDialog = true"
               block
             ) Unstake
                 
@@ -148,7 +148,7 @@
             width="125px"
             height="35px"
             :outlined="profile.availabilityStatus !== 'Available' || stakingStatus != 'Staked'"
-            :disabled="stakingStatus != 'Staked'"
+            :disabled="stakingStatus != 'Staked' || isLoading"
             @click="handleAvailability('Available')"
           ) Available
           ui-debio-button(
@@ -156,7 +156,7 @@
             width="135px"
             height="35px"
             :outlined="profile.availabilityStatus !== 'Unavailable' || stakingStatus != 'Staked'"
-            :disabled="stakingStatus != 'Staked'"
+            :disabled="stakingStatus != 'Staked' || isLoading"
             @click="handleAvailability('Unavailable')"
             style="margin-left: 10px;"
           ) Unavailable
@@ -407,6 +407,15 @@
       @close="showUnstakeDialog = false"
       @click="handleUnstake"
     )
+
+    WarningDialog(
+      :show="showActiveOrder"
+      title="Unfinished Order"
+      btnMessage="Go to Dashboard"
+      message="You still have active orders to complete. Resume any pending orders before continuing with this process."
+      @close="showActiveOrder = false"
+      @submit="goToDashboard"
+    )
 </template>
 
 <script>
@@ -414,12 +423,14 @@ import Kilt from "@kiltprotocol/sdk-js"
 import CryptoJS from "crypto-js"
 import { u8aToHex } from "@polkadot/util"
 import { queryGeneticAnalystByAccountId } from "@debionetwork/polkadot-provider"
-import { getAddElectronicMedicalRecordFee } from "@debionetwork/polkadot-provider"
+// import { getAddElectronicMedicalRecordFee } from "@debionetwork/polkadot-provider"
 import { updateGeneticAnalyst,  updateGeneticAnalystAvailabilityStatus, unstakeGeneticAnalyst } from "@debionetwork/polkadot-provider"
 import { updateQualification } from "@debionetwork/polkadot-provider"
 import { queryGeneticAnalystQualificationsByHashId } from "@debionetwork/polkadot-provider"
+import {registerGeneticAnalystFee} from "@/common/lib/polkadot-provider/command/genetic-analyst"
+import {createQualificationFee} from "@/common/lib/polkadot-provider/command/genetic-analyst/qualification"
 import { uploadFile, getFileUrl, getIpfsMetaData } from "@/common/lib/pinata-proxy"
-import { getSpecializationCategory } from "@/common/lib/api"
+import { getSpecializationCategory, GAGetOrders } from "@/common/lib/api"
 import { fileTextIcon, pencilIcon, trashIcon } from "@debionetwork/ui-icons"
 import { mapState } from "vuex"
 import { validateForms } from "@/common/lib/validate"
@@ -428,6 +439,7 @@ import rulesHandler from "@/common/constants/rules"
 import errorMessage from "@/common/constants/error-messages"
 import SuccessDialog from "@/common/components/Dialog/SuccessDialogGeneral"
 import ConfirmationDialog from "./ConfirmationDialog.vue"
+import WarningDialog from "@/common/components/Dialog/WarningDialog"
 import errorMessages from "@/common/constants/error-messages"
 
 const initialData = {
@@ -446,7 +458,7 @@ export default {
   name: "GAAccount",
   mixins: [validateForms],
 
-  components: { SuccessDialog, ConfirmationDialog },
+  components: { SuccessDialog, ConfirmationDialog, WarningDialog },
 
   data: () => ({
     fileTextIcon,
@@ -466,6 +478,8 @@ export default {
     clearFile: false,
     loadingDoc: false,
     isLoading: false,
+    showActiveOrder: false,
+    hasActiveOrder: false,
     orderLists: [],
     profile: {
       profileImage: "",
@@ -587,8 +601,12 @@ export default {
 
   async created() {
     if (this.mnemonicData) this.initialDataKey()
+    this.isLoading = true
     await this.getAccountData()
     await this.getSpecialization()
+    await this.getActiveOrders()
+    await this.getTxWeight()
+    this.isLoading = false
   },
 
 
@@ -599,9 +617,30 @@ export default {
       this.secretKey = u8aToHex(cred.boxKeyPair.secretKey)
     },
 
+    async getActiveOrders() {
+      const orders = await GAGetOrders()
+      this.hasActiveOrder = orders?.data?.some(order => order._source.status === "Paid")
+    },
+
+    async getTxWeight() {
+      const qualification = {
+        experience: [],
+        certification: []
+      }
+
+      const getTxWeightProfile = await registerGeneticAnalystFee(this.api, this.wallet, this.profile)
+      const getTxWeightQualification = await createQualificationFee(this.api, this.wallet, qualification)
+
+      const txWeightProfile = `${this.web3.utils.fromWei(String(getTxWeightProfile.partialFee), "ether")}`
+      const txWeightQualification = `${this.web3.utils.fromWei(String(getTxWeightQualification.partialFee), "ether")}`
+
+      const txWeight = Number(txWeightProfile) + Number(txWeightQualification)
+      this.txWeight = txWeight
+    },
+
     async getSpecialization() {
       const categories = await getSpecializationCategory()
-
+      
       this.categories = categories;
     },
 
@@ -660,15 +699,6 @@ export default {
             this.profile.certification = certifications
           }
         }
-
-        this.txWeight = "Calculating..."
-
-        const txWeight = await getAddElectronicMedicalRecordFee(this.api, this.wallet, this.profile)
-        const unstakeTxWeight = await getAddElectronicMedicalRecordFee(this.api, this.wallet, this.stakingStatus)
-
-
-        this.txWeight = `${this.web3.utils.fromWei(String(txWeight.partialFee), "ether")}`
-        this.unstakeTxWeight = `${this.web3.utils.fromWei(String(unstakeTxWeight.partialFee), "ether")}`
       }
     },
 
@@ -747,6 +777,11 @@ export default {
     },
 
     async handleAvailability(value) {
+      if (value === "Unavailable" && this.hasActiveOrder) {
+        this.showActiveOrder = true
+        return
+      }
+
       const accountId = localStorage.getAddress()
       this.profile.availabilityStatus = value
       const status = {Unavailable: value === "Unavailable" ? 1 : 0, Available: value === "Available" ? 1 : 0}
@@ -887,6 +922,10 @@ export default {
 
     limitChar(value) {
       return value.length > 32 ? `${value.substring(0, 32)}...` : value
+    },
+
+    goToDashboard() {
+      this.$router.push({ name: "ga-dashboard"})
     }
   }
 }
