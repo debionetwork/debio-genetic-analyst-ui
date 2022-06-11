@@ -7,6 +7,15 @@
         :message="error ? error.message : ''"
         @close="error = null"
       )
+      
+      WarningDialog(
+        :show="showActiveOrder"
+        title="Unfinished Order"
+        btnMessage="Go to Dashboard"
+        message="You still have active orders to complete. Resume any pending orders before continuing with this process."
+        @close="showActiveOrder = false"
+        @submit="goToDashboard"
+      )
 
       ui-debio-modal.ga-services__modal-card(
         :show="showModal"
@@ -71,7 +80,7 @@
 
 
       .ga-services__table
-        ui-debio-data-table(:headers="headers" :items="items")
+        ui-debio-data-table(:headers="headers" :items="items" :loading="isLoading")
           template(slot="prepend")
             .ga-services__text
               h2.ga-services__table-title My Services
@@ -121,9 +130,14 @@ import {
   deleteGeneticAnalystService, 
   deleteGeneticAnalystServiceFee 
 } from "@debionetwork/polkadot-provider"
+import { GAGetOrders } from "@/common/lib/api"
+
+import WarningDialog from "@/common/components/Dialog/WarningDialog"
 
 export default {
   name: "GAServices",
+
+  components: {WarningDialog},
 
   data: () => ({
     geneticAnalystIllustration,
@@ -136,10 +150,12 @@ export default {
     serviceId: "",
 
     showModal: false,
+    showActiveOrder: false,
     cardBlock: false,
     isLoading: false,
     serviceList: [],
     items: [],
+    orders: [],
     headers: [
       {
         text: "Service Name",
@@ -198,7 +214,10 @@ export default {
   },
 
   async mounted() {
+    this.isLoading = true
     await this.getServiceList()
+    await this.getGAOrders()
+    this.isLoading = false
   }, 
 
   methods: {
@@ -229,6 +248,12 @@ export default {
       }
     },
 
+    async getGAOrders() {
+      const orders = await GAGetOrders()
+      
+      this.orders = orders
+    },
+
     formatPrice(price) {
       return this.web3.utils.fromWei(String(price.replaceAll(",", "")), "ether")
     },
@@ -239,7 +264,18 @@ export default {
       await this.getDeleteServiceFee()
     },
 
-    async onDelete() {
+    onDelete() {
+      const activeOrder = this.orders?.data?.filter(order => order._source.status === "Paid")
+      const isActiveOrder = activeOrder?.some(order => order._source.service_id === this.serviceId)
+      
+      if (isActiveOrder) {
+        this.showActiveOrder = true
+      } else {
+        this.deleteService()
+      }
+    },
+  
+    async deleteService() {
       try{
         this.isLoading = true
         await deleteGeneticAnalystService(this.api, this.wallet, this.serviceId)
@@ -248,6 +284,11 @@ export default {
         this.showModal = false
         this.isLoading = false
       }
+    },
+
+    goToDashboard() {
+      this.$router.push({ name: "dashboard"})
+      this.showActiveOrder = false
     }
   }
 }
