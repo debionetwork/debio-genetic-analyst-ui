@@ -77,6 +77,7 @@ describe("Genetic Analyst Services Dashboard", () => {
     gaServices.methods = {
       getDeleteServiceFee: jest.fn(),
       getServiceList: jest.fn(),
+      getGAOrders: jest.fn(),
       onDelete: jest.fn()
     }
 
@@ -163,10 +164,12 @@ describe("Genetic Analyst Services Dashboard", () => {
     // Arrange
     const gaServices = _.cloneDeep(GAServices)
     gaServices.getServiceList = jest.fn()
+    gaServices.getGAOrders = jest.fn()
 
     // Assert
     expect(await gaServices.mounted()).toBeUndefined()
     expect(gaServices.getServiceList).toBeCalledTimes(1)
+    expect(gaServices.getGAOrders).toBeCalledTimes(1)
   })
 
   it("methods.getDeleteServiceFee should return", async () => {
