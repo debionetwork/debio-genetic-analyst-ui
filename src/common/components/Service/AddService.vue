@@ -164,7 +164,7 @@ export default {
     currency: [{currency: "DBIO"}],
     service: {
       name: "",
-      currency: "",
+      currency: "DBIO",
       totalPrice: "",
       duration: "",
       description: ""
@@ -274,7 +274,7 @@ export default {
         testResultSample: this.testResultSample,
         file: this.file
       }
-      console.log("service", service)
+      
       this.onSubmit(service)
     },
     
