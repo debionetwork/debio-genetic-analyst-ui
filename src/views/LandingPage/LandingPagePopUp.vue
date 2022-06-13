@@ -13,7 +13,7 @@
   }
   .pop-up-title{
     color: $color-primary;
-    font-family: Roboto;
+    font-family: "Roboto", sans-serif;
     line-height: 150%;
     font-weight: 500;
     font-size: 25px;
@@ -50,7 +50,7 @@
   }
   & > .password-field {
       width: 504px;
-      font-family: Raleway;
+      font-family: "Raleway", sans-serif;
       font-style: normal;
       font-weight: normal;
       font-size: 18px;
@@ -70,7 +70,7 @@
   }
   .v-file-input {
       width: 488px;
-      font-family: Raleway;
+      font-family: "Raleway", sans-serif;
       font-style: normal;
       font-weight: 500;
       font-size: 18px;
@@ -80,7 +80,7 @@
       width: 504px;
       height: 63px;
       /* body-text-1 */
-      font-family: Raleway;
+      font-family: "Raleway", sans-serif;
       font-style: normal;
       font-weight: normal;
       font-size: 18px;
@@ -93,7 +93,7 @@
   .v-btn:not(.mnemonic-list-item) {
     width: 506px;
     height: 53px !important;
-    font-family: Raleway;
+    font-family: "Raleway", sans-serif;
     font-style: normal;
     font-weight: 600;
     font-size: 20px !important;
@@ -107,7 +107,7 @@
   }
   .button{
     .v-btn__content{
-      font-family: Raleway;
+      font-family: "Raleway", sans-serif;
     }
   }
 }
