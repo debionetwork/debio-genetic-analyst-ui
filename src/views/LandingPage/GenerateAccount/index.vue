@@ -28,7 +28,7 @@
 
 <template lang="pug">
   LandingPagePopUp(:previous='previous')
-    template(v-slot:header) Genetrate an Account
+    template(v-slot:header) Generate an Account
     template(v-slot:main)
       h3.m1 Generate an account to use our features on the AppChain
       p You will receive 12 words as mnemonic phrase that allow you to recover an account.
