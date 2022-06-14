@@ -11,8 +11,6 @@
     ui-debio-modal(
       :show="showModalReject"
       title="Reject Order"
-      cta-title="Submit"
-      :cta-action="handleSubmitRejection"
       :cta-outlined="false"
       @onClose="handleHideModalReject"
     )
@@ -20,6 +18,7 @@
         :error="isDirty.rejectionTitle && isDirty.rejectionTitle"
         :rules="$options.rules.rejectionTitle"
         variant="small"
+        :disabled="isLoading"
         label="Title"
         placeholder="Add Title"
         v-model="rejectionTitle"
@@ -32,6 +31,7 @@
         :error="isDirty.rejectionDesc && isDirty.rejectionDesc"
         :rules="$options.rules.rejectionDesc"
         variant="small"
+        :disabled="isLoading"
         label="Reason"
         placeholder="Add Description"
         v-model="rejectionDesc"
@@ -40,6 +40,13 @@
         block
         @change="handleRejectionDesc"
       )
+      ui-debio-button(
+        block
+        slot="cta"
+        color="secondary"
+        :loading="isLoading"
+        @click="handleSubmitRejection"
+      ) Submit
 
       .upload-section
         .upload-section__tx-details.d-flex.justify-space-between.background--primary(@mouseleave="handleShowTooltip")
@@ -377,6 +384,11 @@ export default {
       immediate: true,
       handler: generalDebounce(async function(val) {
         if (val?.section === "geneticAnalysisOrders" || val?.section === "geneticAnalysis") await this.prepareData(this.$route.params.id)
+        if (val?.method === "GeneticAnalysisRejected") {
+          this.isLoading = false
+          this.showModalReject = false
+          this.orderRejected = true
+        }
         if (val?.method === "GeneticAnalysisResultReady") {
           this.isUploading = false
           this.step = 3
@@ -569,6 +581,7 @@ export default {
 
     async handleSubmitRejection() {
       try {
+        this.isLoading = true
         await rejectGeneticAnalysis(
           this.api,
           this.wallet,
@@ -576,10 +589,8 @@ export default {
           this.rejectionTitle,
           this.rejectionDesc
         )
-
-        this.showModalReject = false
-        this.orderRejected = true
       } catch (e) {
+        this.isLoading = false
         this.orderRejected = false
         console.error(e);
       } finally {
