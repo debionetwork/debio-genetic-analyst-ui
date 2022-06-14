@@ -69,7 +69,8 @@ export default {
         phoneNumber,
         profileImage,
         specialization,
-        specifyOther
+        specifyOther,
+        profileLink
       } = value
       const _experiences = experiences.filter(value => value != "")
       const _specialization = specialization == "Other" ? specifyOther : specialization
@@ -96,7 +97,8 @@ export default {
             email,
             phoneNumber,
             specialization: _specialization,
-            profileImage
+            profileImage,
+            profileLink
           }
         )
 

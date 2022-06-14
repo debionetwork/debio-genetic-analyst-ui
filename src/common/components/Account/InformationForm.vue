@@ -89,6 +89,18 @@
     )
 
     ui-debio-input(
+      :error="isDirty.info && isDirty.info.profileLink"
+      :rules="$options.rules.info.profileLink"
+      variant="small"
+      label="Linkedin URL"
+      placeholder="Add Linkedin"
+      v-model="info.profileLink"
+      outlined
+      block
+      validate-on-blur
+    )
+
+    ui-debio-input(
       :error="isDirty.info && isDirty.info.phoneNumber"
       :rules="$options.rules.info.phoneNumber"
       variant="small"
@@ -359,6 +371,7 @@ export default {
       lastName: "",
       gender: "",
       email: "",
+      profileLink: "",
       phoneNumber: "",
       dateOfBirth: null,
       specialization: ""
@@ -466,6 +479,12 @@ export default {
       ],
       specialization: [
         rulesHandler.FIELD_REQUIRED
+      ],
+      profileLink: [
+        rulesHandler.FIELD_REQUIRED,
+        rulesHandler.ENGLISH_ALPHABET,
+        rulesHandler.MAX_CHARACTER(255),
+        rulesHandler.WEBSITE
       ]
     }
   },
