@@ -377,7 +377,10 @@ export default {
       immediate: true,
       handler: generalDebounce(async function(val) {
         if (val?.section === "geneticAnalysisOrders" || val?.section === "geneticAnalysis") await this.prepareData(this.$route.params.id)
-        if (val?.method === "GeneticAnalysisResultReady") this.step = 3
+        if (val?.method === "GeneticAnalysisResultReady") {
+          this.isUploading = false
+          this.step = 3
+        }
       }, 100)
     },
 
@@ -669,7 +672,6 @@ export default {
         )
 
         await processGeneticAnalysis(this.api, this.wallet, this.orderDataDetails.geneticAnalysisTrackingId, "ResultReady")
-        this.isUploading = false
       } catch (e) {
         this.isUploading = false
         console.error(e)
