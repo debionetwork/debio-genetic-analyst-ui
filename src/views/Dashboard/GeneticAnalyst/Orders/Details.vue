@@ -384,12 +384,18 @@ export default {
       immediate: true,
       handler: generalDebounce(async function(val) {
         if (val?.section === "geneticAnalysisOrders" || val?.section === "geneticAnalysis") await this.prepareData(this.$route.params.id)
-        if (val?.method === "GeneticAnalysisRejected") {
+        if (
+          val?.method === "GeneticAnalysisRejected" ||
+          val?.method === "GeneticAnalysisOrderRefunded"
+        ) {
           this.isLoading = false
-          this.showModalReject = false
+          this.handleHideModalReject()
           this.orderRejected = true
         }
-        if (val?.method === "GeneticAnalysisResultReady") {
+        if (
+          val?.method === "GeneticAnalysisResultReady" ||
+          val?.method === "GeneticAnalysisOrderFulfilled"
+        ) {
           this.isUploading = false
           this.step = 3
         }
