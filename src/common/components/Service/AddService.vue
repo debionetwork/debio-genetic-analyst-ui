@@ -192,7 +192,8 @@ export default {
         name: newVal.name,
         totalPrice: newVal.totalPrice,
         duration: newVal.duration,
-        description: newVal.description
+        description: newVal.description,
+        currency: newVal.currency
       },
       this.durationType = newVal.durationType
       this.testResultSample = newVal.testResultSample
