@@ -91,11 +91,12 @@ export default {
     async getData(id) {
       const data = await queryGeneticAnalystServicesByHashId(this.api, id)
       const testResultLink = await getIpfsMetaData(data?.info?.testResultSample.split("/").pop())
-
+      const totalPrice = String(this.web3.utils.fromWei(String(data?.info?.pricesByCurrency[0].totalPrice.replaceAll(",", "") || 0), "ether"))
+      
       const service = {
         name: data?.info?.name,
         currency: data?.info?.pricesByCurrency[0].currency,
-        totalPrice: data?.info?.pricesByCurrency[0].totalPrice,
+        totalPrice: totalPrice,
         duration: data?.info?.expectedDuration.duration,
         durationType: data?.info?.expectedDuration.durationType,
         description: data?.info?.description,
