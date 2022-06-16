@@ -122,7 +122,7 @@
               width="auto"
               height="40px"
               :disabled="stakingStatus != 'Staked' || isLoading"
-              @click="hasActiveOrder ? showActiveOrder = true : showUnstakeDialog = true"
+              @click="onUnstake"
               block
             ) Unstake
                 
@@ -423,7 +423,6 @@ import Kilt from "@kiltprotocol/sdk-js"
 import CryptoJS from "crypto-js"
 import { u8aToHex } from "@polkadot/util"
 import { queryGeneticAnalystByAccountId } from "@debionetwork/polkadot-provider"
-// import { getAddElectronicMedicalRecordFee } from "@debionetwork/polkadot-provider"
 import { updateGeneticAnalyst,  updateGeneticAnalystAvailabilityStatus, unstakeGeneticAnalyst } from "@debionetwork/polkadot-provider"
 import { updateQualification } from "@debionetwork/polkadot-provider"
 import { queryGeneticAnalystQualificationsByHashId } from "@debionetwork/polkadot-provider"
@@ -800,6 +799,10 @@ export default {
       } catch (error) {
         console.error(error)
       }
+    },
+
+    onUnstake() {
+      this.hasActiveOrder ? this.showActiveOrder = true : this.showUnstakeDialog = true
     },
 
     addExperience(){
