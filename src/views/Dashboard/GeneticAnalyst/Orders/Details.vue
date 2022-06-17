@@ -94,7 +94,7 @@
               :aria-label="orderDataDetails.analysis_info.fileName"
               role="button"
               @click="handleDownloadFile(orderDataDetails.analysis_info.reportLink, orderDataDetails.analysis_info.fileName)"
-            ) {{ orderDataDetails.analysis_info.fileName }}
+            ) {{ orderDataDetails.analysis_info.fileName }} {{ orderDataDetails.analysis_info.fileSize }}
 
             p(v-if="hilightDescription")
               | {{ readMore ? hilightDescription : hilightDescription.substr(0, 130) }}
@@ -154,7 +154,7 @@
                 :aria-label="orderDataDetails.document.fileName"
                 role="button"
                 @click="handleDownloadFile(orderDataDetails.document.reportLink, orderDataDetails.document.fileName)"
-              ) {{ orderDataDetails.document.fileName }}
+              ) {{ orderDataDetails.document.fileName }} {{ orderDataDetails.document.fileSize }}
 
               .order-details__actions.d-flex.justify-space-between(v-if="orderDataDetails.analysis_info.status !== 'Rejected' && step === 1")
                 ui-debio-button(
@@ -471,11 +471,13 @@ export default {
           ...data,
           analysis_info: {
             ...analysisData,
-            fileName: analystReportDocument.rows[0].metadata.name
+            fileName: analystReportDocument.rows[0].metadata.name,
+            fileSize: this.formatBytes(geneticLinkName.rows[0].size)
           },
           document: {
             ...geneticData,
-            fileName: geneticLinkName.rows[0].metadata.name
+            fileName: geneticLinkName.rows[0].metadata.name,
+            fileSize: this.formatBytes(analystReportDocument.rows[0].size)
           },
           createdAt: new Date(+data.createdAt.replaceAll(",", "")).toLocaleString("en-GB", {
             day: "numeric",
@@ -649,7 +651,6 @@ export default {
             decryptedArrays = [...decryptedArrays, ...(decryptedFile ? decryptedFile : [])]
           }
 
-
           const unit8Arr = new Uint8Array(decryptedArrays)
           await downloadDocumentFile(unit8Arr, computeFileName, fileType)
         } else {
@@ -776,6 +777,19 @@ export default {
       } else {
         this.showTooltip = false
       }
+    },
+
+    formatBytes(bytes, decimals = 2) {
+      if (bytes === 0 || !bytes) return "(0 Bytes)"
+
+      const k = 1024
+      const dm = decimals < 0 ? 0 : decimals
+      const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
+
+      const indexSizes = Math.floor(Math.log(bytes) / Math.log(k))
+      const computeValue = parseFloat((bytes / Math.pow(k, indexSizes)).toFixed(dm))
+
+      return `(${computeValue} ${sizes[indexSizes]})`
     }
   }
 }
