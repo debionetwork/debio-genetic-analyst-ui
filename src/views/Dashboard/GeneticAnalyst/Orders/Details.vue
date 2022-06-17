@@ -88,13 +88,15 @@
               p {{ orderDataDetails.analysis_info.rejectedTitle }}
               p.order-section__subtitle Reason of rejection
 
-            p.order-section__result-file(
-              v-if="step === 3 && !rejectedOrder"
-              :title="`Download ${orderDataDetails.analysis_info.fileName}`"
-              :aria-label="orderDataDetails.analysis_info.fileName"
-              role="button"
-              @click="handleDownloadFile(orderDataDetails.analysis_info.reportLink, orderDataDetails.analysis_info.fileName)"
-            ) {{ orderDataDetails.analysis_info.fileName }} {{ orderDataDetails.analysis_info.fileSize }}
+            .d-flex
+              p.order-section__result-file(
+                v-if="step === 3 && !rejectedOrder"
+                :title="`Download ${orderDataDetails.analysis_info.fileName}`"
+                :aria-label="orderDataDetails.analysis_info.fileName"
+                role="button"
+                @click="handleDownloadFile(orderDataDetails.analysis_info.reportLink, orderDataDetails.analysis_info.fileName)"
+              ) {{ orderDataDetails.analysis_info.fileName }}
+              span.ml-2 {{ orderDataDetails.analysis_info.fileSize }}
 
             p(v-if="hilightDescription")
               | {{ readMore ? hilightDescription : hilightDescription.substr(0, 130) }}
