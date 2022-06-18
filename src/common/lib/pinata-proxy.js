@@ -1,7 +1,12 @@
 import Kilt from "@kiltprotocol/sdk-js"
 import axios from "axios"
 import store from "@/store"
-import { uploadFile as pinataIpfsUploadFile, downloadJson, getIpfsMetaData as pinataIpfsGetIpfsMetadata, downloadDocumentFileInBrowser } from "@debionetwork/pinata-ipfs"
+import {
+  getIpfsMetaData as pinataIpfsGetIpfsMetadata,
+  uploadFile as pinataIpfsUploadFile,
+  downloadDocumentFileInBrowser,
+  downloadJson
+} from "@debionetwork/pinata-ipfs"
 
 const pinataJwtKey = process.env.VUE_APP_PINATA_JWT_KEY
 
@@ -12,6 +17,7 @@ export const uploadFile = val => {
       keyvalues: {
         required: process.env.VUE_APP_PINATA_REQUIRED_DOCUMENT,
         type: val.type,
+        fileSize: val.size,
         date: +new Date()
       }
     },

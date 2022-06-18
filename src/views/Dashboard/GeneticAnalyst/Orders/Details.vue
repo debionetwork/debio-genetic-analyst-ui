@@ -474,12 +474,12 @@ export default {
           analysis_info: {
             ...analysisData,
             fileName: analystReportDocument.rows[0].metadata.name,
-            fileSize: this.formatBytes(geneticLinkName.rows[0].size)
+            fileSize: this.formatBytes(analystReportDocument.rows[0].metadata?.keyvalues?.fileSize || analystReportDocument.rows[0].size)
           },
           document: {
             ...geneticData,
             fileName: geneticLinkName.rows[0].metadata.name,
-            fileSize: this.formatBytes(analystReportDocument.rows[0].size)
+            fileSize: this.formatBytes(geneticLinkName.rows[0].metadata?.keyvalues?.fileSize || geneticLinkName.rows[0].size)
           },
           createdAt: new Date(+data.createdAt.replaceAll(",", "")).toLocaleString("en-GB", {
             day: "numeric",
@@ -680,7 +680,8 @@ export default {
         await this.upload({
           encryptedFileChunks: dataFile.chunks,
           fileName: dataFile.fileName,
-          fileType: dataFile.fileType
+          fileType: dataFile.fileType,
+          fileSize: dataFile.fileSize
         })
 
         await submitGeneticAnalysis(
@@ -702,12 +703,14 @@ export default {
       const context = this
       const fr = new FileReader()
       const { file } = this.document
+
       return new Promise((resolve, reject) => {
         fr.onload = async function() {
           try {
             const encrypted = await context.encrypt({
               text: fr.result,
               fileType: file.type,
+              fileSize: file.size,
               fileName: file.name
             })
 
@@ -722,7 +725,7 @@ export default {
       })
     },
 
-    async encrypt({ text, fileType, fileName }) {
+    async encrypt({ text, fileType, fileName, fileSize }) {
       const context = this
       const arrChunks = []
       let chunksAmount
@@ -746,9 +749,10 @@ export default {
 
             if (arrChunks.length === chunksAmount) {
               resolve({
-                fileName: fileName,
-                chunks: arrChunks,
-                fileType: fileType
+                fileName,
+                fileType,
+                fileSize,
+                chunks: arrChunks
               })
             }
           }
@@ -758,13 +762,14 @@ export default {
       })
     },
 
-    async upload({ encryptedFileChunks, fileType, fileName }) {
+    async upload({ encryptedFileChunks, fileType, fileName, fileSize }) {
       const data = JSON.stringify(encryptedFileChunks)
       const blob = new Blob([data], { type: fileType })
 
       const result = await uploadFile({
         title: fileName,
         type: fileType,
+        size: fileSize,
         file: blob
       })
 
