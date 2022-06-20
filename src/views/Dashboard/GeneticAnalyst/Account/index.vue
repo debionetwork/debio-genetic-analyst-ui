@@ -802,7 +802,8 @@ export default {
     },
 
     onUnstake() {
-      this.hasActiveOrder ? this.showActiveOrder = true : this.showUnstakeDialog = true
+      if (this.hasActiveOrder) this.showActiveOrder = true
+      else this.showUnstakeDialog = true
     },
 
     addExperience(){

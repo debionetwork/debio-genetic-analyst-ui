@@ -295,11 +295,8 @@ export default {
           order._source.status === "Paid"
       )
       
-      if (isActiveOrder) {
-        this.showActiveOrder = true
-      } else {
-        this.deleteService()
-      }
+      if (isActiveOrder) this.showActiveOrder = true
+      else this.deleteService() 
     },
 
     async deleteService() {
@@ -315,7 +312,6 @@ export default {
 
     goToDashboard() {
       this.$router.push({name: "dashboard"})
-      this.showActiveOrder = false
     }
   }
 }
