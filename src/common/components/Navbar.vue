@@ -2,7 +2,7 @@
   .navbar(@mouseleave.prevent="handleHideDropdown(computeMouseLeave)")
     .navbar__wrapper
       .navbar__breadcrumbs(@mouseenter.prevent="handleHideDropdown(computeMouseLeave)")
-        ui-debio-breadcrumbs(v-if="!error")
+        ui-debio-breadcrumbs(v-if="!error" base-router="genetic-analyst")
 
       .navbar__user-menu(ref="menu" :class="{ 'navbar__user-menu--settings': !!getActiveMenu && getActiveMenu.type === 'settings' }")
         template(v-for="(menu, idx) in menus")

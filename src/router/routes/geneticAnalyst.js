@@ -5,13 +5,6 @@ import store from "@/store/index"
 export default [
   {
     path: "/",
-    name: "dashboard",
-    beforeEnter: checkIsLoggedIn,
-    redirect: { name: "ga-dashboard" },
-    component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Layout")
-  },
-  {
-    path: "/genetic-analyst",
     component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Layout"),
     beforeEnter: checkIsLoggedIn,
     name: "genetic-analyst",
