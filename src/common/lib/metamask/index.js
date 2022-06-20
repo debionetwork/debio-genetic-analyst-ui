@@ -18,8 +18,8 @@ export async function handleChainChanged(newChainId) {
 
 export async function connectToMetamask() {
   try {
-    let accounts = await window.ethereum.request({ method: "eth_requestAccounts" })
-    let currentAccount = await handleAccountsChanged(accounts, null)
+    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" })
+    const currentAccount = await handleAccountsChanged(accounts, null)
 
     window.ethereum.on("accountsChanged", (accounts) => {
       store.commit("metamask/SET_WALLET_ADDRESS", { currentAccount: currentAccount, accountList: accounts })
@@ -27,7 +27,7 @@ export async function connectToMetamask() {
     })
 
     
-    let network = await window.ethereum.request({ method: "eth_chainId"})
+    const network = await window.ethereum.request({ method: "eth_chainId"})
     window.ethereum.on("chainChanged", handleChainChanged)
 
     return { currentAccount: currentAccount, accountList: accounts, network }
