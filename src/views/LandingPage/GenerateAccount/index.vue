@@ -18,9 +18,6 @@
       font-family: "Raleway", sans-serif;
     }
 }
-.mt20{
-  margin-top: 20px;
-}
 .link{
   text-decoration: none;
 }
@@ -30,7 +27,7 @@
   LandingPagePopUp(:previous='previous')
     template(v-slot:header) Generate an Account
     template(v-slot:main)
-      h3.m1 Generate an account to use our features on the AppChain
+      h3 Generate an account to use our features on the AppChain
       p You will receive 12 words as mnemonic phrase that allow you to recover an account.
       p Make sure you save the mnemonic phrase by writing it down and putting it somewhere safe
       v-checkbox(v-model="agreeConditions"): template(v-slot:label): div#checkboxLabel I understand DeBio 
@@ -45,7 +42,7 @@
               href="https://docs.debio.network/legal/terms-and-condition"
               @click.stop
             ) Terms and Condition
-      .button.mt20
+      .button
         v-btn(elevation='0' color='primary' :disabled="!agreeConditions" @click="generateMnemonic") Continue
 </template>
 

@@ -120,7 +120,7 @@
                 :aria-label="orderDataDetails.service_info.expectedDuration"
               ) {{ orderDataDetails.service_info.expectedDuration }}
 
-            .service-details__detail.d-flex.mt-5
+            .service-details__detail.mt-5
               ui-debio-avatar.service-details__avatar.mr-4(
                 :src="computeAvatar"
                 :alt="orderDataDetails.analyst_info.name"
@@ -241,7 +241,6 @@ import {
   processGeneticAnalysis,
   rejectGeneticAnalysis,
   submitGeneticAnalysis,
-  queryGeneticAnalysisOrderById,
   queryGeneticAnalysisByGeneticAnalysisTrackingId,
   queryGeneticDataById,
   queryGeneticAnalystByAccountId,
@@ -453,7 +452,7 @@ export default {
 
     async prepareData(id) {
       try {
-        const data = await queryGeneticAnalysisOrderById(this.api, id)
+        const data = (await this.api.query.geneticAnalysisOrders.geneticAnalysisOrders(id)).toHuman()
 
         // Prevent continue requests if the order doesn't exist on the data records
         if (!data) {
@@ -466,7 +465,7 @@ export default {
         const analysisData = await queryGeneticAnalysisByGeneticAnalysisTrackingId(this.api, data.geneticAnalysisTrackingId)
         const geneticData = await queryGeneticDataById(this.api, data.geneticDataId)
 
-        const geneticLinkName = await getIpfsMetaData(JSON.parse(geneticData.reportLink)[0].split("/").pop())
+        const geneticLinkName = await getIpfsMetaData(JSON.parse(data.geneticLink)[0].split("/").pop())
         const analystReportDocument = await getIpfsMetaData(analysisData.reportLink.split("/").pop())
 
         this.orderDataDetails = {
@@ -478,6 +477,7 @@ export default {
           },
           document: {
             ...geneticData,
+            reportLink: data.geneticLink,
             fileName: geneticLinkName.rows[0].metadata.name,
             fileSize: this.formatBytes(geneticLinkName.rows[0].metadata?.keyvalues?.fileSize || geneticLinkName.rows[0].size)
           },
@@ -926,6 +926,13 @@ export default {
       color: #444444
 
   .service-details
+    &__detail
+      display: grid
+      grid-template-columns: 0fr 1fr
+
+      .ui-debio-avatar__image
+        width: 100%
+
     &__description
       width: 280px
       font-size: 14px

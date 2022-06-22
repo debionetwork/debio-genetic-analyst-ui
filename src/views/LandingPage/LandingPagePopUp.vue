@@ -88,7 +88,7 @@
       /* or 27px */
       display: flex;
       align-items: center;
-      margin-bottom: 50px;
+      margin-bottom: 10px;
   }
   .v-btn:not(.mnemonic-list-item) {
     width: 506px;
