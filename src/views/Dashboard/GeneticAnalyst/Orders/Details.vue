@@ -85,7 +85,7 @@
             v-if="rejectedOrder || (step === 3 && orderDataDetails.analysis_info.status !== 'Rejected')"
           )
             template(v-if="step === 1 && rejectedOrder")
-              p {{ orderDataDetails.analysis_info.rejectedTitle }}
+              p {{ orderDataDetails.analysis_info.rejectedTitle || "-" }}
               p.order-section__subtitle Reason of rejection
 
             .d-flex
@@ -95,8 +95,7 @@
                 :aria-label="orderDataDetails.analysis_info.fileName"
                 role="button"
                 @click="handleDownloadFile(orderDataDetails.analysis_info.reportLink, orderDataDetails.analysis_info.fileName)"
-              ) {{ orderDataDetails.analysis_info.fileName }}
-              span.ml-2 {{ orderDataDetails.analysis_info.fileSize }}
+              ) {{ orderDataDetails.analysis_info.fileName }} {{ orderDataDetails.analysis_info.fileSize }}
 
             p(v-if="hilightDescription")
               | {{ readMore ? hilightDescription : hilightDescription.substr(0, 130) }}
@@ -502,7 +501,7 @@ export default {
           }
         }
 
-        if (this.orderDataDetails?.analysis_info?.status === "Rejected") this.hilightDescription = this.orderDataDetails.analysis_info.rejectedDescription
+        if (this.orderDataDetails?.analysis_info?.status === "Rejected") this.hilightDescription = this.orderDataDetails.analysis_info.rejectedDescription || "-"
         if (this.orderDataDetails?.analysis_info?.status === "InProgress") {
           const txWeight = await submitGeneticAnalysisFee(
             this.api,
