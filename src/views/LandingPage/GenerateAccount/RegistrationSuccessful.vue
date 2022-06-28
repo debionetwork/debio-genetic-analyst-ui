@@ -8,7 +8,7 @@
     h2 {
         width: 337px;
         height: 76px;
-        font-family: Roboto;
+        font-family: "Roboto" sans-serif;
         font-style: normal;
         font-weight: 500;
         font-size: 25px;
@@ -22,8 +22,8 @@
 <template lang="pug">
      LandingPagePopUp
         template(v-slot:main): div.pop-up-main
-            img(src='@/assets/check-circle.png')
-            h2 Your account has been successfully created.
+            img(src='@/assets/check-circle-primary.png')
+            h2 {{ text }}
             v-btn.white--text(elevation='0' color='primary' @click="onContinue") Continue
 </template>
 
@@ -38,6 +38,12 @@ export default {
   methods: {
     onContinue() {
       this.$router.push({ name: "ga-dashboard" })
+    }
+  },
+  computed: {
+    text() {
+      if(this.$route.params.flag === "changed") return "Your password is successfully changed."
+      return "Your account has been successfully created."
     }
   }
 }

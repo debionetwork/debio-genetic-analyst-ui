@@ -27,7 +27,7 @@ const generateAccountRoutes = [
     component: () => import(/* webpackChunkName */ "@/views/LandingPage/GenerateAccount/SetPassword")
   },
   {
-    path: "/generate",
+    path: "/generate/:flag?",
     name: "registration-successful",
     meta: { pageHeader: "Success", parent: "generate-account" },
     component: () => import(/* webpackChunkName */ "@/views/LandingPage/GenerateAccount/RegistrationSuccessful")
