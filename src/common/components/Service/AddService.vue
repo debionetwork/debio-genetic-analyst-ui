@@ -247,8 +247,7 @@ export default {
       ],
       totalPrice: [
         rulesHandler.FIELD_REQUIRED,
-        val => /^[0-9]+$/.test(val) || "Service price is invalid",
-        rulesHandler.MAX_CHARACTER(4)
+        val => /^\d+(\.\d{1,4})?$/.test(val) || "Service price is invalid"
       ],
       duration: [
         rulesHandler.FIELD_REQUIRED,
