@@ -9,3 +9,9 @@ export async function stakeGeneticAnalystFee(api, pair) {
     .stakeGeneticAnalyst()
     .paymentInfo(pair)
 }
+
+export async function unstakeGeneticAnalystFee(api, pair) {
+  return api.tx.geneticAnalysts
+    .unstakeGeneticAnalyst()
+    .paymentInfo(pair)
+}

@@ -122,7 +122,7 @@
             ui-debio-input(
               :error="false"
               variant="small"
-              placeholder="50,000 DBIO"
+              :placeholder="stakeAmount"
               disabled
               outlined
               block
@@ -134,6 +134,7 @@
               width="auto"
               height="40px"
               :disabled="stakingStatus != 'Staked' || isLoading"
+              :loading="unstakeLoading"
               @click="onUnstake"
               block
             ) Unstake
@@ -161,6 +162,7 @@
             height="35px"
             :outlined="profile.availabilityStatus !== 'Available' || stakingStatus != 'Staked'"
             :disabled="stakingStatus != 'Staked' || isLoading"
+            :loading="loadingAvailability"
             @click="handleAvailability('Available')"
           ) Available
           ui-debio-button(
@@ -169,6 +171,7 @@
             height="35px"
             :outlined="profile.availabilityStatus !== 'Unavailable' || stakingStatus != 'Staked'"
             :disabled="stakingStatus != 'Staked' || isLoading"
+            :loading="loadingAvailability"
             @click="handleAvailability('Unavailable')"
             style="margin-left: 10px;"
           ) Unavailable
@@ -438,7 +441,7 @@ import { queryGeneticAnalystByAccountId } from "@debionetwork/polkadot-provider"
 import { updateGeneticAnalyst,  updateGeneticAnalystAvailabilityStatus, unstakeGeneticAnalyst } from "@debionetwork/polkadot-provider"
 import { updateQualification } from "@debionetwork/polkadot-provider"
 import { queryGeneticAnalystQualificationsByHashId } from "@debionetwork/polkadot-provider"
-import {registerGeneticAnalystFee} from "@/common/lib/polkadot-provider/command/genetic-analyst"
+import {registerGeneticAnalystFee, unstakeGeneticAnalystFee} from "@/common/lib/polkadot-provider/command/genetic-analyst"
 import {createQualificationFee} from "@/common/lib/polkadot-provider/command/genetic-analyst/qualification"
 import { uploadFile, getFileUrl, getIpfsMetaData } from "@/common/lib/pinata-proxy"
 import { getSpecializationCategory, GAGetOrders } from "@/common/lib/api"
@@ -489,6 +492,8 @@ export default {
     clearFile: false,
     loadingDoc: false,
     isLoading: false,
+    loadingAvailability: false,
+    unstakeLoading: false,
     showActiveOrder: false,
     hasActiveOrder: false,
     orderLists: [],
@@ -517,6 +522,7 @@ export default {
     editId: null,
     txWeight: null,
     unstakeTxWeight: null,
+    stakeAmount: "",
     selectMonths: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
   }),
 
@@ -648,12 +654,15 @@ export default {
 
       const getTxWeightProfile = await registerGeneticAnalystFee(this.api, this.wallet, this.profile)
       const getTxWeightQualification = await createQualificationFee(this.api, this.wallet, qualification)
+      const getTxWeightUnstake = await unstakeGeneticAnalystFee(this.api, this.wallet)
 
       const txWeightProfile = `${this.web3.utils.fromWei(String(getTxWeightProfile.partialFee), "ether")}`
       const txWeightQualification = `${this.web3.utils.fromWei(String(getTxWeightQualification.partialFee), "ether")}`
+      const txWeightUnstake = `${this.web3.utils.fromWei(String(getTxWeightUnstake.partialFee), "ether")}`
 
       const txWeight = Number(txWeightProfile) + Number(txWeightQualification)
       this.txWeight = txWeight
+      this.unstakeTxWeight = txWeightUnstake
     },
 
     async getSpecialization() {
@@ -687,9 +696,12 @@ export default {
           year: "numeric",
           month: "numeric"
         })
+        const stakeAmount = String(this.web3.utils.fromWei(String(analystData?.stakeAmount?.replaceAll(",", "") || 0), "ether"))
+        
         this.profile = profileData
         this.profile.dateOfBirth = _dateOfBirth
         this.stakingStatus = analystData?.stakeStatus
+        this.stakeAmount = `${stakeAmount} DBIO`
 
         if (analystData.qualifications.length) {
           const qualificationId = analystData.qualifications[0]
@@ -797,28 +809,34 @@ export default {
     },
 
     async handleAvailability(value) {
+      this.loadingAvailability = true
       if (value === "Unavailable" && this.hasActiveOrder) {
         this.showActiveOrder = true
         return
       }
 
-      const accountId = localStorage.getAddress()
       this.profile.availabilityStatus = value
-      const status = {Unavailable: value === "Unavailable" ? 1 : 0, Available: value === "Available" ? 1 : 0}
 
       try {
-        await updateGeneticAnalystAvailabilityStatus(this.api, this.wallet, accountId, status)
+        await updateGeneticAnalystAvailabilityStatus(this.api, this.wallet, value)
+        this.loadingAvailability = false
       } catch (error) {
         console.error(error)
+        this.loadingAvailability = false
       }
     },
 
     async handleUnstake() {
+      this.unstakeLoading = true
+      this.showUnstakeDialog = false
+      
       try {
         await unstakeGeneticAnalyst(this.api, this.wallet)
-        this.isSuccess = true
+        this.getAccountData()
+        this.unstakeLoading = false
       } catch (error) {
         console.error(error)
+        this.unstakeLoading = false
       }
     },
 
