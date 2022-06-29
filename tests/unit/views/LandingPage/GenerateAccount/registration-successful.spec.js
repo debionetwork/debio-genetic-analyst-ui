@@ -1,5 +1,6 @@
 import { shallowMount } from "@vue/test-utils"
 import Vuetify from "vuetify"
+import VueRouter from "vue-router"
 import RegistrationSuccessful from "@/views/LandingPage/GenerateAccount/RegistrationSuccessful"
 
 describe("Registration Successful Page", () => {
@@ -8,6 +9,7 @@ describe("Registration Successful Page", () => {
   beforeEach(() => {
     localVue = require("vue")
     localVue.use(Vuetify)
+    localVue.use(VueRouter)
   })
 
   afterEach(() => {
@@ -17,6 +19,7 @@ describe("Registration Successful Page", () => {
   it("Should render", () => {
     const wrapper = shallowMount(RegistrationSuccessful, {
       localVue,
+      router: new VueRouter(),
       vuetify: new Vuetify()
     })
       

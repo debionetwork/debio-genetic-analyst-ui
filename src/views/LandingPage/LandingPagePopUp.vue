@@ -59,7 +59,7 @@
   h3 {
       width: 504px;
       height: 60px;
-      font-family: Raleway;
+      font-family: "Raleway", sans-serif;
       font-style: normal;
       font-weight: 600;
       font-size: 20px;
