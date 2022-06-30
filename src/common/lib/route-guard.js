@@ -26,7 +26,7 @@ export async function checkIsLoggedIn(to, from, next) {
   if (to.path == "/sign-in" || to.path == "/generate") {
     if (isLoggedIn) {
       await dispatchGetAccount(wallet, address, () => {
-        next("/genetic-analyst")
+        next("/")
       })
       return address
     }

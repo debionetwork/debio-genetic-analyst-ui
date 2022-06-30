@@ -11,7 +11,7 @@ export default [
     redirect: { name: "ga-dashboard" },
     children: [
       {
-        path: "/",
+        path: "",
         name: "ga-dashboard",
         meta: { pageHeader: "Home" },
         component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Home"),
