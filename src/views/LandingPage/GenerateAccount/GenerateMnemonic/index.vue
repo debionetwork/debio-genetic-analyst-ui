@@ -38,7 +38,7 @@
             MnemonicList(:mnemonicCollection="mnemonicCollection")
             div.copy-text 
                 img(src='@/assets/copy.png' v-on:click="copyText")
-                div(v-on:click="copyText") Copy this mnemonic phrase to the clipboard
+                div(v-on:click="copyText") Copy this mnemonic phrase to the clipboard, you’ll be asked to fill in these phrase in the next page
             v-btn.white--text(elevation='0' color='primary' @click="verifyMnemonic") Continue
             v-snackbar(
                 v-model="snackbar"
