@@ -437,12 +437,17 @@
 import Kilt from "@kiltprotocol/sdk-js"
 import CryptoJS from "crypto-js"
 import { u8aToHex } from "@polkadot/util"
-import { queryGeneticAnalystByAccountId } from "@debionetwork/polkadot-provider"
-import { updateGeneticAnalyst,  updateGeneticAnalystAvailabilityStatus, unstakeGeneticAnalyst } from "@debionetwork/polkadot-provider"
-import { updateQualification } from "@debionetwork/polkadot-provider"
-import { queryGeneticAnalystQualificationsByHashId } from "@debionetwork/polkadot-provider"
-import {registerGeneticAnalystFee, unstakeGeneticAnalystFee} from "@/common/lib/polkadot-provider/command/genetic-analyst"
-import {createQualificationFee} from "@/common/lib/polkadot-provider/command/genetic-analyst/qualification"
+import {
+  updateGeneticAnalyst,
+  updateGeneticAnalystAvailabilityStatus,
+  unstakeGeneticAnalyst,
+  queryGeneticAnalystByAccountId,
+  queryGeneticAnalystQualificationsByHashId,
+  updateQualification,
+  unstakeGeneticAnalystFee
+} from "@debionetwork/polkadot-provider"
+import { registerGeneticAnalystFee } from "@/common/lib/polkadot-provider/command/genetic-analyst"
+import { createQualificationFee } from "@/common/lib/polkadot-provider/command/genetic-analyst/qualification"
 import { uploadFile, getFileUrl, getIpfsMetaData } from "@/common/lib/pinata-proxy"
 import { getSpecializationCategory, GAGetOrders } from "@/common/lib/api"
 import { fileTextIcon, pencilIcon, trashIcon } from "@debionetwork/ui-icons"
@@ -667,7 +672,7 @@ export default {
 
     async getSpecialization() {
       const categories = await getSpecializationCategory()
-      
+
       this.categories = categories;
     },
 
@@ -675,7 +680,7 @@ export default {
       const accountId = localStorage.getAddress()
       let profileData = this.profile
       const analystData = await queryGeneticAnalystByAccountId(this.api, accountId)
-      
+
       if (analystData) {
         profileData = {
           ...profileData,
@@ -697,7 +702,7 @@ export default {
           month: "numeric"
         })
         const stakeAmount = String(this.web3.utils.fromWei(String(analystData?.stakeAmount?.replaceAll(",", "") || 0), "ether"))
-        
+
         this.profile = profileData
         this.profile.dateOfBirth = _dateOfBirth
         this.stakingStatus = analystData?.stakeStatus
@@ -712,19 +717,19 @@ export default {
           if (qualification.info.experience.length) {
             this.profile.experiences = qualification.info.experience
           }
-          
+
           if (qualification.info.certification.length) {
             let certifications = []
             for (const cert of qualification.info.certification) {
               const {rows} = await getIpfsMetaData(cert.supportingDocument?.split("/").pop())
-              
+
               const _certificate = {
-                ...cert, 
+                ...cert,
                 file: {
                   name: rows[0].metadata.name ?? "Supporting Document File"
                 }
               }
-              
+
               certifications.push(_certificate)
             }
             this.profile.certification = certifications

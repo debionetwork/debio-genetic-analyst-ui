@@ -1,15 +1,6 @@
 const WorkerPlugin = require("worker-plugin")
 
 module.exports = {
-  chainWebpack: config => {
-    config.module
-      .rule("mjs$")
-      .test(/\.mjs$/)
-      .include
-      .add(/node_modules/)
-      .end()
-      .type("javascript/auto")
-  },
   "transpileDependencies": [
     "vuetify",
     "eslint-loader"
@@ -26,6 +17,20 @@ module.exports = {
     },
     module: {
       rules: [
+        {
+          test: /\.js$/,
+          loader: require.resolve("@open-wc/webpack-import-meta-loader"),
+        },
+        {
+          test: /\.(c|m)?js$/,
+          use: {
+            loader: "babel-loader",
+            options: {
+              compact: false,
+              presets: ["@babel/preset-env"]
+            }
+          }
+        },
         {
           test: /\.mjs$/,
           include: /node_modules/,
