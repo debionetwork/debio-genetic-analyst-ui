@@ -5,6 +5,7 @@ module.exports = {
     "vuetify",
     "eslint-loader"
   ],
+  parallel: false,
   configureWebpack: {
     output: {
       globalObject: "this"
