@@ -49,8 +49,7 @@
 <script>
 import {mapState, mapGetters} from "vuex"
 import {alertTriangleIcon} from "@debionetwork/ui-icons"
-import {stakeGeneticAnalystFee} from "@/common/lib/polkadot-provider/command/genetic-analyst"
-import {queryGeneticAnalystMinimumStakeAmount} from "@debionetwork/polkadot-provider"
+import {stakeGeneticAnalystFee, queryGeneticAnalystMinimumStakeAmount} from "@debionetwork/polkadot-provider"
 
 export default {
   name: "DeleteServiceDialog",

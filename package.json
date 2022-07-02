@@ -13,7 +13,7 @@
     "@babel/runtime": "^7.12.5",
     "@bit/joshk.vue-spinners-css.spinner-loader": "^1.1.5",
     "@debionetwork/pinata-ipfs": "0.0.3",
-    "@debionetwork/polkadot-provider": "0.0.12-beta.5",
+    "@debionetwork/polkadot-provider": "^0.0.12-beta.6",
     "@debionetwork/ui-components": "0.0.8",
     "@debionetwork/ui-icons": "0.0.2",
     "@kiltprotocol/sdk-js": "^0.21.0",
@@ -76,5 +76,12 @@
     "worker-plugin": "^5.0.0",
     "jest-serializer-vue": "^2.0.2",
     "vue-jest": "^3.0.7"
-  }
+  },
+  "browserslist": [
+    ">0.2%",
+    "not ie <= 99",
+    "not android <= 4.4.4",
+    "not dead",
+    "not op_mini all"
+  ]
 }

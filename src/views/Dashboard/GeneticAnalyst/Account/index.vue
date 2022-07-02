@@ -444,10 +444,10 @@ import {
   queryGeneticAnalystByAccountId,
   queryGeneticAnalystQualificationsByHashId,
   updateQualification,
-  unstakeGeneticAnalystFee
+  unstakeGeneticAnalystFee,
+  createQualificationFee,
+  registerGeneticAnalystFee
 } from "@debionetwork/polkadot-provider"
-import { registerGeneticAnalystFee } from "@/common/lib/polkadot-provider/command/genetic-analyst"
-import { createQualificationFee } from "@/common/lib/polkadot-provider/command/genetic-analyst/qualification"
 import { uploadFile, getFileUrl, getIpfsMetaData } from "@/common/lib/pinata-proxy"
 import { getSpecializationCategory, GAGetOrders } from "@/common/lib/api"
 import { fileTextIcon, pencilIcon, trashIcon } from "@debionetwork/ui-icons"
