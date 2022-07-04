@@ -4,10 +4,8 @@ import { u8aToHex } from "@polkadot/util" // u8aToString, stringToU8a
 import keyring from "@polkadot/ui-keyring"
 import { Keyring } from "@polkadot/keyring"
 import localStorage from "@/common/lib/local-storage"
-import masterConfigEvent from "./event-types.json"
 import { ApiPromise, WsProvider } from "@polkadot/api"
-import { processEvent } from "@debionetwork/polkadot-provider"
-import { queryGeneticAnalystByAccountId } from "@debionetwork/polkadot-provider"
+import { queryGeneticAnalystByAccountId, processEvent, eventTypes } from "@debionetwork/polkadot-provider"
 
 const {
   cryptoWaitReady
@@ -150,7 +148,9 @@ export default {
         // Example of how to subscribe to events via storage
         api.query.system.events((events) => {
           events.forEach((record) => {
-            const { event } = record
+            const { event, phase } = record
+            if (!phase.isFinalization) return
+
             if (allowedSections.includes(event.section)) {
               if (event.method === "OrderPaid") localStorage.removeLocalStorageByName("lastOrderStatus")
               commit("SET_LAST_EVENT", event)
@@ -266,7 +266,7 @@ export default {
     async getListNotification({ commit }, { address, role }) {
       try {
         //localStorage.removeLocalStorageByName("LOCAL_NOTIFICATION_BY_ADDRESS_" + address + "_" + role, null);
-        commit("SET_CONFIG_EVENT", masterConfigEvent)
+        commit("SET_CONFIG_EVENT", eventTypes)
         const listNotificationJson = localStorage.getLocalStorageByName("LOCAL_NOTIFICATION_BY_ADDRESS_" + address + "_" + role)
         let listNotification = []
         if (listNotificationJson != null && listNotificationJson != "") {
@@ -278,7 +278,7 @@ export default {
         console.error(err)
       }
     },
-    async addListNotification({ commit, state }, { address, event, role }) {
+    async addListNotification({ commit }, { address, event, role }) {
       try {
         const storageName = "LOCAL_NOTIFICATION_BY_ADDRESS_" + address + "_" + role
         const listNotificationJson = localStorage.getLocalStorageByName(storageName)
@@ -289,9 +289,9 @@ export default {
         }
 
         // If event section defined then process event
-        if (state.configEvent["role"][role][event.section] && state.configEvent["role"][role][event.section][event.method]) {
-          const { statusAdd, message, data, params } = await processEvent(state, address, event, role)
-          const route = state.configEvent["role"][role][event.section][event.method].route
+        if (eventTypes["role"][role][event.section] && eventTypes["role"][role][event.section][event.method]) {
+          const { statusAdd, message, data, params } = await processEvent(address, event, role, store)
+          const route = eventTypes["role"][role][event.section][event.method].route
           const dateSet = new Date()
           const timestamp = dateSet.getTime().toString()
           const notifDate = dateSet.toLocaleString("en-US", {
