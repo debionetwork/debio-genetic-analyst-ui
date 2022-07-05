@@ -148,8 +148,7 @@ export default {
         // Example of how to subscribe to events via storage
         api.query.system.events((events) => {
           events.forEach((record) => {
-            const { event, phase } = record
-            if (!phase.isFinalization) return
+            const { event } = record
 
             if (allowedSections.includes(event.section)) {
               if (event.method === "OrderPaid") localStorage.removeLocalStorageByName("lastOrderStatus")
