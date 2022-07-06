@@ -71,7 +71,6 @@ jobs:
               --set ingress.enabled=true \
               --set-string ingress.className=nginx \
               --set-string ingress.annotations."cert-manager\.io/cluster-issuer"=letsencrypt \
-              --set-string ingress.annotations."nginx\.ingress\.kubernetes\.io/limit-rps"="100" \
               --set-string ingress.hosts[0].host=${{ secrets.INGRESS_HOST }} \
               --set-string ingress.hosts[0].paths[0].path=/ \
               --set-string ingress.hosts[0].paths[0].pathType=ImplementationSpecific \
@@ -81,9 +80,9 @@ jobs:
               --set-string resources.requests.memory=128Mi \
               --set-string resources.limits.cpu=300m \
               --set-string resources.limits.memory=256Mi \
-              --set replicaCount=1 \
+              --set replicaCount=2 \
               --set autoscaling.enabled=true \
-              --set autoscaling.minReplicas=1 \
+              --set autoscaling.minReplicas=2 \
               --set autoscaling.maxReplicas=11 \
               --set-string nodeSelector.pool=general
             kubectl rollout status deployment/debio-genetic-analyst-ui
@@ -128,7 +127,6 @@ jobs:
               --set ingress.enabled=true \
               --set-string ingress.className=nginx \
               --set-string ingress.annotations."cert-manager\.io/cluster-issuer"=letsencrypt \
-              --set-string ingress.annotations."nginx\.ingress\.kubernetes\.io/limit-rps"="100" \
               --set-string ingress.hosts[0].host=${{ secrets.INGRESS_HOST }} \
               --set-string ingress.hosts[0].paths[0].path=/ \
               --set-string ingress.hosts[0].paths[0].pathType=ImplementationSpecific \
@@ -138,9 +136,9 @@ jobs:
               --set-string resources.requests.memory=128Mi \
               --set-string resources.limits.cpu=300m \
               --set-string resources.limits.memory=256Mi \
-              --set replicaCount=2 \
+              --set replicaCount=3 \
               --set autoscaling.enabled=true \
-              --set autoscaling.minReplicas=2 \
+              --set autoscaling.minReplicas=3 \
               --set autoscaling.maxReplicas=11 \
               --set-string nodeSelector.pool=general
             kubectl rollout status deployment/debio-genetic-analyst-ui
@@ -185,7 +183,6 @@ jobs:
               --set ingress.enabled=true \
               --set-string ingress.className=nginx \
               --set-string ingress.annotations."cert-manager\.io/cluster-issuer"=letsencrypt \
-              --set-string ingress.annotations."nginx\.ingress\.kubernetes\.io/limit-rps"="10" \
               --set-string ingress.hosts[0].host=${{ secrets.INGRESS_HOST }} \
               --set-string ingress.hosts[0].paths[0].path=/ \
               --set-string ingress.hosts[0].paths[0].pathType=ImplementationSpecific \
@@ -195,9 +192,9 @@ jobs:
               --set-string resources.requests.memory=128Mi \
               --set-string resources.limits.cpu=300m \
               --set-string resources.limits.memory=256Mi \
-              --set replicaCount=2 \
+              --set replicaCount=3 \
               --set autoscaling.enabled=true \
-              --set autoscaling.minReplicas=2 \
+              --set autoscaling.minReplicas=3 \
               --set autoscaling.maxReplicas=11 \
               --set-string nodeSelector.pool=general
             kubectl rollout status deployment/debio-genetic-analyst-ui
