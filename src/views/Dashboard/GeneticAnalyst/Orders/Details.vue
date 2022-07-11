@@ -143,7 +143,7 @@
             .order-details__wrapper
               span.order-details__hash(:title="orderDataDetails.id" :aria-label="orderDataDetails.id") {{ orderDataDetails.id }}
               .order-details__date.mb-4.mt-4
-                b.order-details__date-label Date: 
+                b.order-details__date-label Date:
                 span.order-details__date-detail {{ orderDataDetails.createdAt }}
 
               b.order-details__name(
@@ -237,9 +237,9 @@ import { u8aToHex } from "@polkadot/util"
 import { chevronLeftIcon, timerIcon, alertIcon } from "@debionetwork/ui-icons"
 import { validateForms } from "@/common/lib/validate"
 import {
-  processGeneticAnalysis,
-  rejectGeneticAnalysis,
-  submitGeneticAnalysis,
+  // processGeneticAnalysis, TODO: Please use polkadot instead of hardcode
+  // rejectGeneticAnalysis, TODO: Please use polkadot instead of hardcode
+  // submitGeneticAnalysis, TODO: Please use polkadot instead of hardcode
   queryGeneticAnalysisByGeneticAnalysisTrackingId,
   queryGeneticDataById,
   queryGeneticAnalystByAccountId,
@@ -564,7 +564,11 @@ export default {
 
       try {
         this.isLoading = true
-        await processGeneticAnalysis(this.api, this.wallet, this.orderDataDetails.geneticAnalysisTrackingId, "InProgress")
+        // TODO: Please use polkadot instead of hardcode
+        await this.api.tx.geneticAnalysis
+          .processGeneticAnalysis(this.orderDataDetails.geneticAnalysisTrackingId, "InProgress")
+          .signAndSend(this.wallet, { nonce: -1 })
+        // await processGeneticAnalysis(this.api, this.wallet, this.orderDataDetails.geneticAnalysisTrackingId, "InProgress")
         await this.calculateDocumentFee()
 
         this.orderAccepted = true
@@ -591,13 +595,17 @@ export default {
     async handleSubmitRejection() {
       try {
         this.isLoading = true
-        await rejectGeneticAnalysis(
-          this.api,
-          this.wallet,
-          this.orderDataDetails.geneticAnalysisTrackingId,
-          this.rejectionTitle,
-          this.rejectionDesc
-        )
+        // TODO: Please use polkadot instead of hardcode
+        await this.api.tx.geneticAnalysis
+          .rejectGeneticAnalysis(this.orderDataDetails.geneticAnalysisTrackingId, this.rejectionTitle, this.rejectionDesc)
+          .signAndSend(this.wallet, { nonce: -1 })
+        // await rejectGeneticAnalysis(
+        //   this.api,
+        //   this.wallet,
+        //   this.orderDataDetails.geneticAnalysisTrackingId,
+        //   this.rejectionTitle,
+        //   this.rejectionDesc
+        // )
       } catch (e) {
         this.isLoading = false
         this.orderRejected = false
@@ -682,16 +690,24 @@ export default {
           fileType: dataFile.fileType,
           fileSize: dataFile.fileSize
         })
+        // await submitGeneticAnalysis(
+        //   this.api,
+        //   this.wallet,
+        //   this.orderDataDetails.geneticAnalysisTrackingId,
+        //   this.document.recordLink,
+        //   this.document.description
+        // )
 
-        await submitGeneticAnalysis(
-          this.api,
-          this.wallet,
-          this.orderDataDetails.geneticAnalysisTrackingId,
-          this.document.recordLink,
-          this.document.description
-        )
+        // TODO: Please use polkadot instead of hardcode
+        await this.api.tx.geneticAnalysis
+          .submitGeneticAnalysis(this.orderDataDetails.geneticAnalysisTrackingId, this.document.recordLink, this.document.description)
+          .signAndSend(this.wallet, { nonce: -1 })
 
-        await processGeneticAnalysis(this.api, this.wallet, this.orderDataDetails.geneticAnalysisTrackingId, "ResultReady")
+        // TODO: Please use polkadot instead of hardcode
+        await this.api.tx.geneticAnalysis
+          .processGeneticAnalysis(this.orderDataDetails.geneticAnalysisTrackingId, "ResultReady")
+          .signAndSend(this.wallet, { nonce: -1 })
+        // await processGeneticAnalysis(this.api, this.wallet, this.orderDataDetails.geneticAnalysisTrackingId, "ResultReady")
       } catch (e) {
         this.isUploading = false
         console.error(e)
