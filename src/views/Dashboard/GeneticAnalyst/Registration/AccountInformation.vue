@@ -74,11 +74,7 @@ export default {
       } = value
       const _experiences = experiences.filter(value => value != "")
       const _specialization = specialization == "Other" ? specifyOther : specialization
-      const _dateOfBirth = new Date(+dateOfBirth).toLocaleString("fr-CA", {
-        day: "numeric",
-        year: "numeric",
-        month: "numeric"
-      })
+      const _dateOfBirth = new Date(dateOfBirth)
       const qualification = {
         experience: _experiences,
         certification: certification
@@ -93,7 +89,7 @@ export default {
             firstName,
             lastName,
             gender,
-            dateOfBirth: _dateOfBirth,
+            dateOfBirth: _dateOfBirth.getTime(),
             email,
             phoneNumber,
             specialization: _specialization,
