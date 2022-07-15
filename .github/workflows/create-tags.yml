@@ -19,9 +19,6 @@ jobs:
   create-tags:
     runs-on: ubuntu-latest
     environment: mainnet
-    permissions:
-      contents: "read"
-      id-token: "write"
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
