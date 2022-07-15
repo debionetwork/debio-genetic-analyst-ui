@@ -171,6 +171,7 @@
           a(
             href="https://docs.debio.network/"
             target="_blank"
+            rel="noreferrer noopener nofollow"
             style="text-decoration: none"
           )
             div
@@ -186,6 +187,7 @@
           a.mt-3.d-block(
             href="https://docs.debio.network/legal/terms-and-condition"
             target="_blank"
+            rel="noreferrer noopener nofollow"
             style="text-decoration: none"
           )
             div
@@ -226,10 +228,6 @@ export default {
   },
 
   methods: {
-    openHref(href){
-      window.open(href, "_blank").focus()
-    },
-
     customClass(active) {
       if (active) {
         return "font-weight-bold sidebar-text primary--text activeButton"
