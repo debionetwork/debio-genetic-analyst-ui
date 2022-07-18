@@ -79,6 +79,7 @@ jobs:
         shell: bash
         run: |
           tee -a .env <<EOF
+          VUE_APP_VERSION=$npm_package_version
           VUE_APP_RECAPTCHA_SITE_KEY=${{ secrets.VUE_APP_RECAPTCHA_SITE_KEY }}
           VUE_APP_ROLE=${{ secrets.VUE_APP_ROLE }}
           VUE_APP_DEBIO_USE_TOKEN_NAME=${{ secrets.VUE_APP_DEBIO_USE_TOKEN_NAME }}
