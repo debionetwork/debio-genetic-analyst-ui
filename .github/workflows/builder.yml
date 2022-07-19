@@ -19,6 +19,7 @@ jobs:
       latest_tag: ${{ steps.build-info.outputs.latest_tag }}
       pre_release: ${{ steps.build-info.outputs.pre_release }}
       environment: ${{ steps.build-info.outputs.environment }}
+      package_version: ${{ steps.build-info.outputs.package_version }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -62,6 +63,9 @@ jobs:
           echo "::set-output name=pre_release::$PRE_RELEASE"
           echo "::set-output name=environment::$ENVIRONMENT"
 
+          PACKAGE_VERSION=$(grep version package.json | sed 's/.*"version": "\(.*\)".*/\1/')
+          echo "::set-output name=package_version::$PACKAGE_VERSION"
+
   build:
     runs-on: ubuntu-20.04
     needs:
@@ -79,7 +83,7 @@ jobs:
         shell: bash
         run: |
           tee -a .env <<EOF
-          VUE_APP_VERSION=$npm_package_version
+          VUE_APP_VERSION=${{ needs.compute-build-info.outputs.package_version }}
           VUE_APP_RECAPTCHA_SITE_KEY=${{ secrets.VUE_APP_RECAPTCHA_SITE_KEY }}
           VUE_APP_ROLE=${{ secrets.VUE_APP_ROLE }}
           VUE_APP_DEBIO_USE_TOKEN_NAME=${{ secrets.VUE_APP_DEBIO_USE_TOKEN_NAME }}
