@@ -1,8 +1,14 @@
 {
-  "name": "debio-genetic-analyst-web-app",
+  "name": "debio-genetic-analyst-ui",
   "version": "1.0.5",
   "private": true,
   "license": "AGPL-3.0",
+  "author": "DeBio Dev Team <debio_dev@blocksphere.id>",
+  "homepage": "https://www.debio.network",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/debionetwork/debio-genetic-analyst-ui.git"
+  },
   "scripts": {
     "install:hooks": ".maintain/install-hooks.sh",
     "serve": "vue-cli-service serve",
