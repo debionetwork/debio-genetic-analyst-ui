@@ -12,25 +12,6 @@
       ui-debio-icon(:icon="cableErrorIcon" fill size="100")
       h6.modal-error__title Aw, Snap!
       p.modal-error__subtitle An Internal error occured during your request! try again later!
-    
-    ui-debio-modal.modal-switch-network(
-      :show-title="false"
-      :showCta="true"
-      :show="switchNetwork"
-      class="font-weight-bold"
-      disable-dismiss
-    )
-      h6.modal-switch-network__title Wrong Network
-      p.modal-switch-network__subtitle You need to connect your Metamask to 
-        b {{ networkName }}  
-        | to use this app, currently you are connected to 
-        b {{ currentNetwork }}
-      ui-debio-button(
-        slot="cta"
-        color="secondary"
-        width="427"
-        @click="toChangeNetwork"
-      ) Switch to {{ networkName }}
 
     ui-debio-modal.font-weight-bold(
       :show="showModalPassword"
@@ -120,7 +101,6 @@ import maintenancePageLayout from "@/views/Dashboard/maintenancePageLayout"
 import errorMessage from "@/common/constants/error-messages"
 import localStorage from "@/common/lib/local-storage"
 import VueRouter from "@/router"
-import { startApp, handleSwitchChain } from "@/common/lib/metamask"
 
 export default {
   name: "MainPage",
@@ -148,15 +128,7 @@ export default {
       { text: "My Account", disabled: false, active: false, route: "ga-account", icon: userIcon },
       { text: "My Services", disabled: false, active: false, route: "ga-services", icon: fileTextIcon },
       { text: "Orders", disabled: false, active: false, route: "ga-orders", icon: boxIcon }
-    ],
-    metamask: null,
-    role: null,
-    networkName: "",
-    currentNetwork: "",
-    network: {
-      "Ethereum Mainnet": "0x1",
-      "Rinkeby Test Network": "0x4"
-    }
+    ]
   }),
 
   computed: {
@@ -207,7 +179,6 @@ export default {
   async mounted() {
     if (!this.mnemonicData) this.showModalPassword = true
     if (this.$route.meta.maintenance) this.pageError = true
-    await this.checkMetamask()
     await this.getAccount()
     await this.getListNotification()
   },
@@ -235,29 +206,6 @@ export default {
         role: "customer"
       })
     },
-
-    async checkMetamask(){
-      this.metamask = await startApp()
-      this.role = process.env.VUE_APP_ROLE
-
-      if (this.role === "development") {
-        this.networkName = "Rinkeby Test Network"
-        if (this.metamask?.network === this.network[this.networkName]) return
-        this.switchNetwork = true
-        this.metamask?.network === "0x1" ? this.currentNetwork = "Ethereum Mainnet" : this.currentNetwork = "other Network"
-        return
-      }
-
-      this.networkName = "Ethereum Mainnet"
-      if (this.metamask?.network === this.network[this.networkName]) return
-      this.switchNetwork = true
-      this.metamask?.network === "0x4" ? this.currentNetwork = "Rinkeby Test Network" : this.currentNetwork = "other Network"
-    },
-
-    async toChangeNetwork() {
-      await handleSwitchChain(this.network[this.networkName])
-    },
-
 
     goToRequestTestPage() {
       this.$router.push({ name: "customer-request-test" })
@@ -389,17 +337,5 @@ export default {
       text-align: center
       color: #595959
       @include body-text-3-opensans
-  .modal-switch-network
-    width: 523px
-    gap: 1rem
-    border-radius: 10px
 
-    &__title
-      @include body-text-2-opensans
-
-    &__subtitle 
-      max-width: 427px
-      text-align: center
-      color: #595959
-      @include body-text-3-opensans
 </style>
