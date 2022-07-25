@@ -127,7 +127,7 @@ export default {
       { text: "Dashboard", disabled: false, active: false, route: "ga-dashboard", icon: gridIcon },
       { text: "My Account", disabled: false, active: false, route: "ga-account", icon: userIcon },
       { text: "My Services", disabled: false, active: false, route: "ga-services", icon: fileTextIcon },
-      { text: "Orders", disabled: false, active: false, route: "ga-orders", icon: boxIcon }
+      { text: "Order History", disabled: false, active: false, route: "ga-orders", icon: boxIcon }
     ]
   }),
 
