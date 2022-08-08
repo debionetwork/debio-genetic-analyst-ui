@@ -158,7 +158,7 @@ export default {
   watch: {
     $route(val) {
       const query = VueRouter?.history?.current?.query
-      
+
       if (val.meta.maintenance) this.pageError = true
       else this.pageError = null
 
@@ -170,7 +170,7 @@ export default {
         this.$store.dispatch("substrate/addListNotification", {
           address: this.wallet.address,
           event: event,
-          role: "customer"
+          role: "analyst"
         });
       }
     }
