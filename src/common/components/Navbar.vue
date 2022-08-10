@@ -401,6 +401,10 @@ export default {
       this.loginStatus = false
       this.menus.find(menu => menu.type === "metamask").active = false
       this.$router.push({ name: "sign-in"})
+      const accounts = Object.keys(window.localStorage).filter((v) =>
+        /account:/.test(v)
+      )
+      window.localStorage.removeItem(accounts[0])
     }
   }
 }
