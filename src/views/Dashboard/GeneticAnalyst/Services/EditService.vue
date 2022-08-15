@@ -82,6 +82,16 @@ export default {
     })
   },
 
+  watch: {
+    $route: {
+      deep: true,
+      immediate: true,
+      handler: async function (val) {
+        await this.getData(val.params.id)
+      }
+    }
+  },
+
   async created() {
     await this.getData(this.$route.params.id)
     await this.getTxWeight()

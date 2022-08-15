@@ -30,6 +30,7 @@ const defaultState = {
   hospitalAccount: null,
   isHospitalAccountExist: false,
   lastEventData: null,
+  lastBlockData: null,
   localListNotification: [],
   configEvent: null,
   mnemonicData: null,
@@ -91,6 +92,9 @@ export default {
     SET_LAST_EVENT(state, event) {
       state.lastEventData = event
     },
+    SET_LAST_BLOCK(state, event) {
+      state.lastBlockData = event
+    },
     SET_LIST_NOTIFICATION(state, event) {
       state.localListNotification = event
     },
@@ -145,14 +149,18 @@ export default {
           "geneticAnalystServices"
         ]
 
+        const { block } = (await api.rpc.chain.getBlock()).toHuman()
+
         // Example of how to subscribe to events via storage
         api.query.system.events((events) => {
           events.forEach((record) => {
             const { event } = record
 
+
             if (allowedSections.includes(event.section)) {
               if (event.method === "OrderPaid") localStorage.removeLocalStorageByName("lastOrderStatus")
               commit("SET_LAST_EVENT", event)
+              commit("SET_LAST_BLOCK", block?.header?.number ?? null)
             }
           })
         })
@@ -277,7 +285,7 @@ export default {
         console.error(err)
       }
     },
-    async addListNotification({ commit }, { address, event, role }) {
+    async addListNotification({ commit }, { address, event, block, role }) {
       try {
         const storageName = "LOCAL_NOTIFICATION_BY_ADDRESS_" + address + "_" + role
         const listNotificationJson = localStorage.getLocalStorageByName(storageName)
@@ -289,7 +297,7 @@ export default {
 
         // If event section defined then process event
         if (eventTypes["role"][role][event.section] && eventTypes["role"][role][event.section][event.method]) {
-          const { statusAdd, message, data, params } = await processEvent(address, event, role, store)
+          const { statusAdd, message, params } = await processEvent(address, event, role, store)
           const route = eventTypes["role"][role][event.section][event.method].route
           const dateSet = new Date()
           const timestamp = dateSet.getTime().toString()
@@ -305,11 +313,11 @@ export default {
             listNotification.push({
               message: message,
               timestamp: timestamp,
-              data: data,
               route: route,
               params: params,
               read: false,
-              notifDate: notifDate
+              notifDate: notifDate,
+              block
             })
           }
         }

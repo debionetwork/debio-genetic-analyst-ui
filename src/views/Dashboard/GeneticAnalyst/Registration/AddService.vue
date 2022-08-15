@@ -230,7 +230,7 @@ export default {
           }]
         })
       });
-      
+
       try {
         await stakeGeneticAnalyst(this.api, this.wallet)
         await bulkCreateGeneticAnalystService(this.api, this.wallet, services)

@@ -134,6 +134,7 @@ export default {
   computed: {
     ...mapState({
       lastEventData: (state) => state.substrate.lastEventData,
+      lastBlockData: (state) => state.substrate.lastBlockData,
       wallet: (state) => state.substrate.wallet,
       localListNotification: (state) => state.substrate.localListNotification,
       mnemonicData: (state) => state.substrate.mnemonicData
@@ -158,7 +159,7 @@ export default {
   watch: {
     $route(val) {
       const query = VueRouter?.history?.current?.query
-      
+
       if (val.meta.maintenance) this.pageError = true
       else this.pageError = null
 
@@ -170,7 +171,8 @@ export default {
         this.$store.dispatch("substrate/addListNotification", {
           address: this.wallet.address,
           event: event,
-          role: "customer"
+          block: this.lastBlockData,
+          role: "analyst"
         });
       }
     }
