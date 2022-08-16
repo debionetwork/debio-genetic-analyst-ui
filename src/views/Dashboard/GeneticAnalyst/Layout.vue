@@ -134,6 +134,7 @@ export default {
   computed: {
     ...mapState({
       lastEventData: (state) => state.substrate.lastEventData,
+      lastBlockData: (state) => state.substrate.lastBlockData,
       wallet: (state) => state.substrate.wallet,
       localListNotification: (state) => state.substrate.localListNotification,
       mnemonicData: (state) => state.substrate.mnemonicData
@@ -174,6 +175,7 @@ export default {
         this.$store.dispatch("substrate/addListNotification", {
           address: this.wallet.address,
           event: event,
+          block: this.lastBlockData,
           role: "analyst"
         })
       }
@@ -226,6 +228,14 @@ export default {
 
     signOut() {
       this.$router.push({name: "landing-page"})
+      const accounts = Object.keys(window.localStorage).filter((v) =>
+        /account:/.test(v)
+      )
+
+      accounts.forEach((a) => {
+        window.localStorage.removeItem(a)
+      })
+
       localStorage.clear()
       this.clearAuth()
       this.clearWallet()

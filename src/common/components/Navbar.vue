@@ -279,6 +279,13 @@ export default {
       this.ethAccount = null
       this.loginStatus = false
       this.$router.push({ name: "sign-in"})
+      const accounts = Object.keys(window.localStorage).filter((v) =>
+        /account:/.test(v)
+      )
+
+      accounts.forEach((a) => {
+        window.localStorage.removeItem(a)
+      })
     }
   }
 }

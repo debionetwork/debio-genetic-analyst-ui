@@ -106,7 +106,8 @@ export default {
     
     ...mapState({
       substrateApi: (state) => state.substrate.api,
-      isLoading: (state) => state.substrate.isLoadingWallet
+      isLoading: (state) => state.substrate.isLoadingWallet,
+      wallet: (state) => state.substrate.wallet
     }),
 
     sitekey() {
@@ -136,6 +137,18 @@ export default {
         if (!result.success) {
           throw("Mnemonic registration failed!")
         }
+
+        const accounts = Object.keys(window.localStorage).filter((v) =>
+          /account:/.test(v)
+        )
+        
+        accounts.forEach((a) => {
+          const detail = JSON.parse(window.localStorage.getItem(a))
+          if (detail.address !== this.wallet.address) {
+            window.localStorage.removeItem(a)
+          }
+        })
+        
         this.$router.push({name: "registration-successful", params: { flag: "changed"}})
       } 
       catch (err) {

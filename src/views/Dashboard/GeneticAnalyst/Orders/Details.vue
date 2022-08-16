@@ -479,13 +479,13 @@ export default {
           ...data,
           analysis_info: {
             ...analysisData,
-            fileName: analystReportDocument.rows[0]?.metadata?.name || "Unknown File Name",
+            fileName: analystReportDocument.rows[0]?.metadata?.name || analysisData.geneticLink.split("/").pop(),
             fileSize: this.formatBytes(analystReportDocument.rows[0]?.metadata?.keyvalues?.fileSize || analystReportDocument?.rows[0]?.size || 0)
           },
           document: {
             ...geneticData,
             reportLink: data.geneticLink,
-            fileName: geneticLinkName.rows[0]?.metadata?.name || "Unknown File Name",
+            fileName: geneticLinkName.rows[0]?.metadata?.name || data.geneticLink.split("/").pop(),
             fileSize: this.formatBytes(geneticLinkName.rows[0]?.metadata?.keyvalues?.fileSize || geneticLinkName?.rows[0]?.size || 0)
           },
           createdAt: new Date(+data.createdAt.replaceAll(",", "")).toLocaleString("en-GB", {
