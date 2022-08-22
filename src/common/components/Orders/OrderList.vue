@@ -128,7 +128,7 @@ export default {
     ...mapState({
       lastEventData: (state) => state.substrate.lastEventData,
       api: (state) => state.substrate.api,
-      web3: (state) => state.metamask.web3
+      web3: (state) => state.web3Store.web3
     })
   },
 

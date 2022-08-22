@@ -53,12 +53,6 @@ export default {
   getters: {
     getWeb3(state) {
       return state.web3
-    },
-    getWalletAddress(state) {
-      return state.metamaskWalletAddress
-    },
-    getWalletBalance(state) {
-      return state.metamaskWalletBalance
     }
   }
 }

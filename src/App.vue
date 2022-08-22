@@ -77,7 +77,7 @@ export default {
 
   methods: {
     ...mapActions({
-      initWeb3: "metamask/initWeb3"
+      initWeb3: "web3Store/initWeb3"
     }),
 
     formatTitle(val) {

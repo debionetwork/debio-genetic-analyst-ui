@@ -121,7 +121,7 @@ export default {
   computed: {
     ...mapState({
       api: (state) => state.substrate.api,
-      web3: (state) => state.metamask.web3,
+      web3: (state) => state.web3Store.web3,
       wallet: (state) => state.substrate.wallet
     }),
 

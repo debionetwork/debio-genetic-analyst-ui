@@ -1,7 +1,7 @@
 import Vue from "vue"
 import Vuex from "vuex"
 import auth from "./auth"
-import metamask from "./metamask"
+import web3Store from "./web3Store"
 import testRequest from "./test-request"
 import substrate from "./substrate"
 import lab from "./lab"
@@ -17,7 +17,7 @@ Vue.config.devtools = true
 export default new Vuex.Store({
   modules: {
     auth,
-    metamask,
+    web3Store,
     testRequest,
     substrate,
     lab,
