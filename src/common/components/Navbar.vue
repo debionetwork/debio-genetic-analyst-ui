@@ -131,11 +131,10 @@ import { queryAccountBalance, queryEthAdressByAccountId } from "@debionetwork/po
 import { getBalanceDAI } from "@/common/lib/metamask/wallet"
 import { startApp } from "@/common/lib/metamask"
 import { handleSetWallet } from "@/common/lib/wallet"
-
+import { setReadNotification } from "@/common/lib/api"
 
 export default {
   name: "Navbar",
-
 
   props: {
     notifications: { type: Array, default: () => [] },
@@ -265,13 +264,9 @@ export default {
     },
 
 
-    handleNotificationRead(notif) {
+    async handleNotificationRead(notif) {
       notif.read = true
-      this.$store.dispatch("substrate/updateDataListNotification", {
-        address: this.wallet.address,
-        role: "customer",
-        data: this.notifications
-      })
+      await setReadNotification(notif.id)
     },
 
     async handleCopy(text) {

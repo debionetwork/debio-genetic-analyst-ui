@@ -205,7 +205,7 @@ export default {
     async getListNotification() {
       await this.$store.dispatch("substrate/getListNotification", {
         address: this.wallet.address,
-        role: "customer"
+        role: "analyst"
       })
     },
 
