@@ -136,9 +136,7 @@ export default {
     balance: 0,
     walletAddress: "",
     activeBalance: 0,
-    ethAccount: null,
     loading: false,
-    ethRegisterAddress: null,
     menus: [
       {
         id: 1,
@@ -276,7 +274,6 @@ export default {
     signOut () {
       localStorage.clear()
       this.clearAuth
-      this.ethAccount = null
       this.loginStatus = false
       this.$router.push({ name: "sign-in"})
       const accounts = Object.keys(window.localStorage).filter((v) =>
