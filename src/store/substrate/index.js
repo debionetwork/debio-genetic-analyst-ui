@@ -141,7 +141,6 @@ export default {
           "rewards",
           "orders",
           "geneticTesting",
-          "balances",
           "electronicMedicalRecord",
           "geneticData",
           "geneticAnalysisOrders",
@@ -151,27 +150,34 @@ export default {
         ]
 
         const { block } = (await api.rpc.chain.getBlock()).toHuman()
-        const newBlock = parseInt(block?.header?.number?.replaceAll(",", ""))
-        let lastBlock = 0
 
-        const notifications = JSON.parse(localStorage.getLocalStorageByName(
-          `LOCAL_NOTIFICATION_BY_ADDRESS_${localStorage.getAddress()}_analyst`
-        ))
+        const getNotificationList = async () => {
+          const newBlock = parseInt(block?.header?.number?.replaceAll(",", ""))
+          let lastBlock = 0
 
-        if (notifications?.length) lastBlock = parseInt((notifications[notifications.length-1].block).replaceAll(",", ""))
+          const notifications = JSON.parse(localStorage.getLocalStorageByName(
+            `LOCAL_NOTIFICATION_BY_ADDRESS_${localStorage.getAddress()}_analyst`
+          ))
 
-        if (newBlock > lastBlock) await getUnlistedNotification(newBlock)
+          if (notifications?.length) lastBlock = parseInt((notifications[notifications.length-1].block).replaceAll(",", ""))
+
+          if (newBlock > lastBlock) await getUnlistedNotification(newBlock)
+        }
+
+        await getNotificationList()
 
         // Example of how to subscribe to events via storage
-        api.query.system.events((events) => {
+        api.query.system.events(async (events) => {
           for (const record of events) {
             const { event } = record
 
-            if (!allowedSections.includes(event.section)) return
+            if (allowedSections.includes(event.section)) {
+              const { block } = (await api.rpc.chain.getBlock()).toHuman()
+              await getNotificationList()
 
-            if (event.method === "OrderPaid") localStorage.removeLocalStorageByName("lastOrderStatus")
-            commit("SET_LAST_EVENT", event)
-            commit("SET_LAST_BLOCK", block?.header?.number ?? null)
+              commit("SET_LAST_EVENT", event)
+              commit("SET_LAST_BLOCK", block?.header?.number ?? null)
+            }
           }
         })
 

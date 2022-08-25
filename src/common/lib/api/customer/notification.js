@@ -9,8 +9,8 @@ export const getNotifications = async ({ to_id, end_block, from }) => {
   return data
 }
 
-export const setReadNotification = async (id) => {
-  const { data } = await apiClientRequest.put(`/notification/set-read/${id}`)
+export const setReadNotification = async (ids) => {
+  const { data } = await apiClientRequest.put("/notification/set-read-many/", { ids })
 
   return data
 }

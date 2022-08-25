@@ -100,6 +100,7 @@ import Navbar from "@/common/components/Navbar.vue"
 import maintenancePageLayout from "@/views/Dashboard/maintenancePageLayout"
 import errorMessage from "@/common/constants/error-messages"
 import localStorage from "@/common/lib/local-storage"
+import { getUnlistedNotification } from "@/common/lib/notification"
 import VueRouter from "@/router"
 
 export default {
@@ -166,14 +167,11 @@ export default {
       if (query.error) this.showModalError = true
     },
 
-    lastEventData(event) {
-      if (event !== null) {
-        this.$store.dispatch("substrate/addListNotification", {
-          address: this.wallet.address,
-          event: event,
-          block: this.lastBlockData,
-          role: "analyst"
-        });
+    lastEventData: {
+      handler: async function (event) {
+        if (event === null) return
+
+        await getUnlistedNotification(parseInt(this.lastBlockData.replaceAll(",", "")))
       }
     }
   },

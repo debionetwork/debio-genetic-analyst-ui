@@ -23,7 +23,6 @@ export async function getUnlistedNotification (end_block) {
 
   for (const event of data) {
     const { id, block_number, read, created_at, description, entity, reference_id } = event
-    if(end_block === parseInt(block_number)) return
 
     const dateSet = new Date(created_at)
     const timestamp = dateSet.getTime().toString()
