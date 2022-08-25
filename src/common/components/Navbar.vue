@@ -133,6 +133,8 @@ import { startApp } from "@/common/lib/metamask"
 import { handleSetWallet } from "@/common/lib/wallet"
 import { setReadNotification } from "@/common/lib/api"
 
+let timeout
+
 export default {
   name: "Navbar",
 
@@ -158,7 +160,7 @@ export default {
     searchQuery: "",
     contentHover: false,
     loginStatus: false,
-    debounce: null,
+    notifReads: [],
     arrowPosition: "",
     showMetamaskDialog: false,
     balance: 0,
@@ -265,8 +267,14 @@ export default {
 
 
     async handleNotificationRead(notif) {
+      clearTimeout(timeout)
+      if (notif.read) return
+
       notif.read = true
-      await setReadNotification(notif.id)
+      this.notifReads.push(notif.id)
+      timeout = setTimeout(async () => {
+        await setReadNotification(this.notifReads)
+      }, 2000)
     },
 
     async handleCopy(text) {
