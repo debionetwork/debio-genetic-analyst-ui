@@ -3,7 +3,7 @@
     .ga-dashboard__wrapper
       ui-debio-banner.ga-dashboard(
         title="Genetic Analyst"
-        subtitle="Povide service for customer who have been tested in previous years can get interpretation that leads to improved maintenance."
+        subtitle="Provide service for customer who have been tested previously can get interpretation that leads to improved maintenance."
         gradient-color="tertiary"
         with-decoration
       )
@@ -21,8 +21,9 @@
             size="25"
             stroke
           )
-          span(v-if="GAAccount.verificationStatus === 'Unverified'") Your verification submission is being reviewed by Daogenic
-          span(v-else) Your account has been {{ GAAccount.verificationStatus.toLowerCase() }}
+          template(v-if="GAAccount")
+            span(v-if="GAAccount.verificationStatus === 'Unverified'") Your verification submission is being reviewed by Daogenic
+            span(v-else) Your account has been {{ GAAccount.verificationStatus.toLowerCase() }}
 </template>
 
 <script>

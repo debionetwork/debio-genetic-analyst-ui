@@ -69,13 +69,10 @@ import { queryGeneticAnalystByAccountId, queryGeneticAnalysisByGeneticAnalysisTr
 import { generalDebounce } from "@/common/lib/utils"
 import { geneticAnalystIllustration, eyeIcon, alertIcon, searchIcon } from "@debionetwork/ui-icons"
 import { mapState } from "vuex"
-
-import metamaskDispatchAction from "@/common/lib/metamask/mixins/metamaskServiceHandler"
 import localStorage from "@/common/lib/local-storage";
 
 export default {
   name: "OrderList",
-  mixins: [metamaskDispatchAction],
 
   data: () => ({
     geneticAnalystIllustration,
@@ -86,6 +83,7 @@ export default {
     searchQuery: "",
     verificationStatus: null,
     cardBlock: false,
+    isLoading: false,
     orderLists: [],
     headers: [
       {
@@ -130,7 +128,7 @@ export default {
     ...mapState({
       lastEventData: (state) => state.substrate.lastEventData,
       api: (state) => state.substrate.api,
-      web3: (state) => state.metamask.web3
+      web3: (state) => state.web3Store.web3
     })
   },
 
@@ -145,7 +143,7 @@ export default {
     },
 
     searchQuery: generalDebounce(async function (newVal) {
-      await this.metamaskDispatchAction(this.getOrdersData, newVal)
+      await this.getOrdersData(newVal)
     }, 500)
   },
 
@@ -167,7 +165,7 @@ export default {
 
     async getGAByTrackingId(trackingId) {
       const analysisData = await queryGeneticAnalysisByGeneticAnalysisTrackingId(this.api, trackingId)
-      
+
       return analysisData
     },
 
@@ -175,13 +173,13 @@ export default {
       this.isLoading = true
       let orderLists = []
       let orders = []
-      
+
       try {
         const orderData = await GAGetOrders(keyword)
-        
+
         for (const order of orderData.data) {
           const sourceData = order._source
-          
+
           const formatedPrice = `
             ${Number(this.web3.utils.fromWei(String(sourceData.service_info?.prices_by_currency[0]?.total_price.replaceAll(",", "") || 0), "ether")).toFixed(4)} 
             ${sourceData?.currency}
@@ -196,32 +194,32 @@ export default {
               month: "short"
             })
           }
-          
+
           if (this.filter.orderStatus.includes(sourceData.status)) orders.push(data)
         }
       } catch (e) {
         console.error(e);
-      } 
-      
+      }
+
       for(const item of orders) {
         let _item = item
         let status = item.status
         const analysisData = await this.getGAByTrackingId(_item.genetic_analysis_tracking_id).catch(() => null)
-        
+
         const GENETIC_STATUS = {
           REGISTERED: "Open",
           INPROGRESS: "In Progress",
           REJECTED: "Rejected",
           RESULTREADY: "Done"
         }
-        
+
         if (analysisData) {
           status = GENETIC_STATUS[analysisData.status.toUpperCase()]
-          
+
           if (this.filter.trackingStatus.includes(status)) orderLists.push({..._item, status})
         }
       }
-      
+
       this.orderLists = orderLists
       this.isLoading = false
     }

@@ -12,25 +12,6 @@
       ui-debio-icon(:icon="cableErrorIcon" fill size="100")
       h6.modal-error__title Aw, Snap!
       p.modal-error__subtitle An Internal error occured during your request! try again later!
-    
-    ui-debio-modal.modal-switch-network(
-      :show-title="false"
-      :showCta="true"
-      :show="switchNetwork"
-      class="font-weight-bold"
-      disable-dismiss
-    )
-      h6.modal-switch-network__title Wrong Network
-      p.modal-switch-network__subtitle You need to connect your Metamask to 
-        b {{ networkName }}  
-        | to use this app, currently you are connected to 
-        b {{ currentNetwork }}
-      ui-debio-button(
-        slot="cta"
-        color="secondary"
-        width="427"
-        @click="toChangeNetwork"
-      ) Switch to {{ networkName }}
 
     ui-debio-modal.font-weight-bold(
       :show="showModalPassword"
@@ -100,7 +81,7 @@
 </template>
 
 <script>
-import { mapActions, mapMutations, mapState } from "vuex"
+import { mapActions, mapState } from "vuex"
 import store from "@/store"
 import { validateForms } from "@/common/lib/validate"
 import {
@@ -120,7 +101,6 @@ import maintenancePageLayout from "@/views/Dashboard/maintenancePageLayout"
 import errorMessage from "@/common/constants/error-messages"
 import localStorage from "@/common/lib/local-storage"
 import VueRouter from "@/router"
-import { startApp, handleSwitchChain } from "@/common/lib/metamask"
 
 export default {
   name: "MainPage",
@@ -147,21 +127,14 @@ export default {
       { text: "Dashboard", disabled: false, active: false, route: "ga-dashboard", icon: gridIcon },
       { text: "My Account", disabled: false, active: false, route: "ga-account", icon: userIcon },
       { text: "My Services", disabled: false, active: false, route: "ga-services", icon: fileTextIcon },
-      { text: "Orders", disabled: false, active: false, route: "ga-orders", icon: boxIcon }
-    ],
-    metamask: null,
-    role: null,
-    networkName: "",
-    currentNetwork: "",
-    network: {
-      "Ethereum Mainnet": "0x1",
-      "Rinkeby Test Network": "0x4"
-    }
+      { text: "Order History", disabled: false, active: false, route: "ga-orders", icon: boxIcon }
+    ]
   }),
 
   computed: {
     ...mapState({
       lastEventData: (state) => state.substrate.lastEventData,
+      lastBlockData: (state) => state.substrate.lastBlockData,
       wallet: (state) => state.substrate.wallet,
       localListNotification: (state) => state.substrate.localListNotification,
       mnemonicData: (state) => state.substrate.mnemonicData
@@ -186,20 +159,25 @@ export default {
   watch: {
     $route(val) {
       const query = VueRouter?.history?.current?.query
-      
+
       if (val.meta.maintenance) this.pageError = true
       else this.pageError = null
 
       if (query.error) this.showModalError = true
     },
 
-    lastEventData(event) {
-      if (event !== null) {
+    lastEventData: {
+      handler: async function (event) {
+        if (event === null) return
+
+        if (event.method === "GeneticAnalystUpdateVerificationStatus") await this.getAccount()
+
         this.$store.dispatch("substrate/addListNotification", {
           address: this.wallet.address,
           event: event,
-          role: "customer"
-        });
+          block: this.lastBlockData,
+          role: "analyst"
+        })
       }
     }
   },
@@ -207,7 +185,6 @@ export default {
   async mounted() {
     if (!this.mnemonicData) this.showModalPassword = true
     if (this.$route.meta.maintenance) this.pageError = true
-    await this.checkMetamask()
     await this.getAccount()
     await this.getListNotification()
   },
@@ -217,10 +194,6 @@ export default {
   },
 
   methods: {
-    ...mapMutations({
-      clearWallet: "metamask/CLEAR_WALLET"
-    }),
-
     ...mapActions({
       clearAuth: "auth/clearAuth"
     }),
@@ -235,29 +208,6 @@ export default {
         role: "customer"
       })
     },
-
-    async checkMetamask(){
-      this.metamask = await startApp()
-      this.role = process.env.VUE_APP_ROLE
-
-      if (this.role === "development") {
-        this.networkName = "Rinkeby Test Network"
-        if (this.metamask?.network === this.network[this.networkName]) return
-        this.switchNetwork = true
-        this.metamask?.network === "0x1" ? this.currentNetwork = "Ethereum Mainnet" : this.currentNetwork = "other Network"
-        return
-      }
-
-      this.networkName = "Ethereum Mainnet"
-      if (this.metamask?.network === this.network[this.networkName]) return
-      this.switchNetwork = true
-      this.metamask?.network === "0x4" ? this.currentNetwork = "Rinkeby Test Network" : this.currentNetwork = "other Network"
-    },
-
-    async toChangeNetwork() {
-      await handleSwitchChain(this.network[this.networkName])
-    },
-
 
     goToRequestTestPage() {
       this.$router.push({ name: "customer-request-test" })
@@ -278,6 +228,14 @@ export default {
 
     signOut() {
       this.$router.push({name: "landing-page"})
+      const accounts = Object.keys(window.localStorage).filter((v) =>
+        /account:/.test(v)
+      )
+
+      accounts.forEach((a) => {
+        window.localStorage.removeItem(a)
+      })
+
       localStorage.clear()
       this.clearAuth()
       this.clearWallet()
@@ -302,15 +260,16 @@ export default {
 
     async getAccount() {
       const { GAAccount } = await this.$store.dispatch("substrate/getGAAccount")
-      
-      if (!GAAccount || (GAAccount && GAAccount?.verificationStatus !== "Verified")) {
-        const navigation = []
-        this.navs.forEach(element => {
-          if (element["text"] !== "Dashboard") navigation.push({...element, disabled: true})
-          else navigation.push(element)
-        });
-        this.navs = navigation
+
+      const formatNavs = (status) => {
+        this.navs = this.navs.map(element => {
+          if (element["text"] !== "Dashboard") return { ...element, disabled: status }
+          else return element
+        })
       }
+
+      if (!GAAccount || (GAAccount && GAAccount?.verificationStatus !== "Verified")) formatNavs(true)
+      else if(GAAccount?.verificationStatus === "Verified") formatNavs(false)
     }
   }
 }
@@ -389,17 +348,5 @@ export default {
       text-align: center
       color: #595959
       @include body-text-3-opensans
-  .modal-switch-network
-    width: 523px
-    gap: 1rem
-    border-radius: 10px
 
-    &__title
-      @include body-text-2-opensans
-
-    &__subtitle 
-      max-width: 427px
-      text-align: center
-      color: #595959
-      @include body-text-3-opensans
 </style>

@@ -304,7 +304,7 @@ export default {
   computed: {
     ...mapState({
       api: (state) => state.substrate.api,
-      web3: (state) => state.metamask.web3,
+      web3: (state) => state.web3Store.web3,
       mnemonicData: (state) => state.substrate.mnemonicData,
       lastEventData: (state) => state.substrate.lastEventData,
       wallet: (state) => state.substrate.wallet
@@ -377,6 +377,14 @@ export default {
   watch: {
     mnemonicData(val) {
       if (val) this.initialDataKey()
+    },
+
+    $route: {
+      deep: true,
+      immediate: true,
+      handler: async function (val) {
+        await this.prepareData(val.params.id)
+      }
     },
 
     lastEventData: {
@@ -471,14 +479,14 @@ export default {
           ...data,
           analysis_info: {
             ...analysisData,
-            fileName: analystReportDocument.rows[0].metadata.name,
-            fileSize: this.formatBytes(analystReportDocument.rows[0].metadata?.keyvalues?.fileSize || analystReportDocument.rows[0].size)
+            fileName: analystReportDocument.rows[0]?.metadata?.name || analysisData.geneticLink.split("/").pop(),
+            fileSize: this.formatBytes(analystReportDocument.rows[0]?.metadata?.keyvalues?.fileSize || analystReportDocument?.rows[0]?.size || 0)
           },
           document: {
             ...geneticData,
             reportLink: data.geneticLink,
-            fileName: geneticLinkName.rows[0].metadata.name,
-            fileSize: this.formatBytes(geneticLinkName.rows[0].metadata?.keyvalues?.fileSize || geneticLinkName.rows[0].size)
+            fileName: geneticLinkName.rows[0]?.metadata?.name || data.geneticLink.split("/").pop(),
+            fileSize: this.formatBytes(geneticLinkName.rows[0]?.metadata?.keyvalues?.fileSize || geneticLinkName?.rows[0]?.size || 0)
           },
           createdAt: new Date(+data.createdAt.replaceAll(",", "")).toLocaleString("en-GB", {
             day: "numeric",

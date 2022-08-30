@@ -191,7 +191,7 @@ export default {
       lastEventData: (state) => state.substrate.lastEventData,
       api: (state) => state.substrate.api,
       wallet: (state) => state.substrate.wallet,
-      web3: (state) => state.metamask.web3
+      web3: (state) => state.web3Store.web3
     })
   },
 
