@@ -81,7 +81,7 @@
 </template>
 
 <script>
-import { mapActions, mapMutations, mapState } from "vuex"
+import { mapActions, mapState } from "vuex"
 import store from "@/store"
 import { validateForms } from "@/common/lib/validate"
 import {
@@ -166,14 +166,18 @@ export default {
       if (query.error) this.showModalError = true
     },
 
-    lastEventData(event) {
-      if (event !== null) {
+    lastEventData: {
+      handler: async function (event) {
+        if (event === null) return
+
+        if (event.method === "GeneticAnalystUpdateVerificationStatus") await this.getAccount()
+
         this.$store.dispatch("substrate/addListNotification", {
           address: this.wallet.address,
           event: event,
           block: this.lastBlockData,
           role: "analyst"
-        });
+        })
       }
     }
   },
@@ -190,10 +194,6 @@ export default {
   },
 
   methods: {
-    ...mapMutations({
-      clearWallet: "metamask/CLEAR_WALLET"
-    }),
-
     ...mapActions({
       clearAuth: "auth/clearAuth"
     }),
@@ -260,15 +260,16 @@ export default {
 
     async getAccount() {
       const { GAAccount } = await this.$store.dispatch("substrate/getGAAccount")
-      
-      if (!GAAccount || (GAAccount && GAAccount?.verificationStatus !== "Verified")) {
-        const navigation = []
-        this.navs.forEach(element => {
-          if (element["text"] !== "Dashboard") navigation.push({...element, disabled: true})
-          else navigation.push(element)
-        });
-        this.navs = navigation
+
+      const formatNavs = (status) => {
+        this.navs = this.navs.map(element => {
+          if (element["text"] !== "Dashboard") return { ...element, disabled: status }
+          else return element
+        })
       }
+
+      if (!GAAccount || (GAAccount && GAAccount?.verificationStatus !== "Verified")) formatNavs(true)
+      else if(GAAccount?.verificationStatus === "Verified") formatNavs(false)
     }
   }
 }

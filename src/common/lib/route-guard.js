@@ -52,13 +52,11 @@ export async function checkAccountStatus(to, from, next) {
   if (!GAAccount) {
     next("/registration")
   } else {
-    if (GAAccount.verificationStatus !== "Verified") {
-      if (from.name === "ga-registration-service") next() 
-      else if (GAAccount.stakeStatus === "Unstaked") next({ name: "ga-registration" })
-      else next({ name: "ga-dashboard-verification" })
-    } else {
+    if (GAAccount.verificationStatus === "Verified") {
       next()
+    } else {
+      if (GAAccount.stakeStatus === "Unstaked" && GAAccount.verificationStatus === "Unverified") next({ name: "ga-registration" })
+      else next({ name: "ga-dashboard-verification" })
     }
   }
-
 }

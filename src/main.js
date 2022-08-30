@@ -66,8 +66,7 @@ Vue.filter("timestampToDateTime", function (val) {
 
 async function setupAppDependencies() {
   await store.dispatch("auth/initApp")
-  await store.dispatch("metamask/initWeb3")
-  store.dispatch("metamask/contracts/initContracts")
+  await store.dispatch("web3Store/initWeb3")
   return
 }
 
