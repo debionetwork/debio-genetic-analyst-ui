@@ -104,10 +104,8 @@ import {
 
 import localStorage from "@/common/lib/local-storage"
 import { generalDebounce } from "@/common/lib/utils"
-import { queryAccountBalance, queryEthAdressByAccountId } from "@debionetwork/polkadot-provider"
+import { queryAccountBalance } from "@debionetwork/polkadot-provider"
 import { getBalanceDAI } from "@/common/lib/metamask/wallet"
-import { startApp } from "@/common/lib/metamask"
-import { handleSetWallet } from "@/common/lib/wallet"
 import { setReadNotification } from "@/common/lib/api"
 
 let timeout
