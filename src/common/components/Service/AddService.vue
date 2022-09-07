@@ -56,7 +56,7 @@
 
       ui-debio-input(
         variant="small"
-        label="Expected Duration"
+        label="Maximum Duration"
         placeholder="In Days"
         outlined
         block
@@ -251,7 +251,7 @@ export default {
       ],
       duration: [
         rulesHandler.FIELD_REQUIRED,
-        val => /^[0-9]+$/.test(val) || "Expected duration is invalid",
+        val => /^[0-9]+$/.test(val) || "Maximum Duration is invalid",
         rulesHandler.MAX_CHARACTER(3)
       ]
     }

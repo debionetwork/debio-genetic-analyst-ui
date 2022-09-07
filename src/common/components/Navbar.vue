@@ -19,28 +19,6 @@
             stroke
           )
 
-          ui-debio-avatar.navbar__connect(
-            size="24"
-            v-else
-            :key="menu.id"
-            :option="!loginStatus"
-            option-text="Connect"
-            rounded
-            :active="menu.active"
-            rounded-type="circle"
-            border-size="2"
-            border-color="#5640A5"
-            :class="{ 'navbar__connect--logged': loginStatus }"
-            @optionClicked="connectToMetamask"
-          )
-            ui-debio-icon.navbar__connect-icon(
-              slot="icon"
-              :icon="metamaskFoxIcon"
-              view-box="0 0 100 100"
-              size="16"
-              @click.prevent="handleHover($event, idx)"
-              @mouseenter.prevent="handleHover($event, idx)"
-            )
         transition(name="fade" mode="out-in")
           .navbar__dropdown(v-if="!!getActiveMenu")
             .navbar__triangle
@@ -78,7 +56,7 @@
                         .settings-item__title(aria-label="Signout") Sign Out
                         ui-debio-icon.settings-item__icon(:icon="logoutIcon" size="24" stroke color="#C400A5")
 
-                section.navbar__dropdown-content(v-if="getActiveMenu.type === 'polkadot' || getActiveMenu.type === 'metamask'")
+                section.navbar__dropdown-content(v-if="getActiveMenu.type === 'polkadot'")
                   ui-debio-input(label="Your Address" :data-wallet="walletAddress" ref="polkadot" disabled :value="walletAddress" block)
                     ui-debio-icon(
                       slot="icon-append"
@@ -94,7 +72,7 @@
                     .navbar__balance-wrapper
                       .navbar__balance-type {{ getActiveMenu.currency }} Balance
                       .navbar__balance-amount
-                        ui-debio-icon(:icon="getActiveMenu.type === 'metamask' ? daiIcon : debioIcon" size="10")
+                        ui-debio-icon(:icon="debioIcon" size="10")
                         span {{ activeBalance }}
 
               template(slot="footer" v-if="getActiveMenu.action")
@@ -121,7 +99,6 @@ import {
   usersIcon,
   logoutIcon,
   polkadotIcon,
-  metamaskFoxIcon,
   copyIcon
 } from "@debionetwork/ui-icons"
 
@@ -154,7 +131,6 @@ export default {
     usersIcon,
     logoutIcon,
     polkadotIcon,
-    metamaskFoxIcon,
     searchIcon,
     copyIcon,
     searchQuery: "",
@@ -162,14 +138,10 @@ export default {
     loginStatus: false,
     notifReads: [],
     arrowPosition: "",
-    showMetamaskDialog: false,
     balance: 0,
     walletAddress: "",
     activeBalance: 0,
-    ethAccount: null,
     loading: false,
-    activeMetamaskAddress: null,
-    ethRegisterAddress: null,
     menus: [
       {
         id: 1,
@@ -191,15 +163,6 @@ export default {
         title: "Polkadot Wallet",
         currency: "DBIO",
         active: false
-      },
-      {
-        id: 4,
-        type: "metamask",
-        title: "Metamask Wallet",
-        currency: "DAI",
-        isAvatar: true,
-        action: "Disconnect Wallet",
-        active: false
       }
     ]
   }),
@@ -213,8 +176,6 @@ export default {
       walletBalance: (state) => state.substrate.walletBalance,
       api: (state) => state.substrate.api,
       wallet: (state) => state.substrate.wallet,
-      metamaskWalletAddress: (state) => state.metamask.metamaskWalletAddress,
-      metamaskWalletBalance: (state) => state.metamask.metamaskWalletBalance,
       lastEventData: (state) => state.substrate.lastEventData
     }),
 
@@ -230,41 +191,26 @@ export default {
   },
 
   async mounted () {
-    this.checkMetamaskAddress()
     this.fetchWalletBalance()
-
   },
 
   watch: {
-    lastEventData() {
-      if(this.lastEventData) {
-        this.fetchWalletBalance()
-        this.checkMetamaskAddress()
-        this.loading = false
-      }
-    },
+    lastEventData(val) {
+      if(!val) return
 
-    metamaskWalletAddress() {
-      if (this.metamaskWalletAddress.currentAccount === this.metamaskWalletAddress.accountList[0]) {
-        this.loginStatus = true
-        this.getActiveMenu()
-        return
-      }
-      this.loginStatus = false
+      this.fetchWalletBalance()
+      this.loading = false
     }
   },
 
   methods: {
     ...mapMutations({
-      setWalletBalance: "substrate/SET_WALLET_BALANCE",
-      setMetamaskBalance: "metamask/SET_WALLET_BALANCE",
-      clearWallet: "metamask/CLEAR_WALLET"
+      setWalletBalance: "substrate/SET_WALLET_BALANCE"
     }),
 
     async getDaiBalance (address) {
       return await getBalanceDAI(address)
     },
-
 
     async handleNotificationRead(notif) {
       clearTimeout(timeout)
@@ -297,17 +243,10 @@ export default {
     async handleHover(e, idx) {
       this.menus.forEach(menu => menu.active = false)
       const selectedMenu = this.menus[idx]
-      
+
       if (selectedMenu.type === "polkadot") {
         this.walletAddress = this.wallet.address
         this.activeBalance = Number(this.walletBalance).toFixed(3)
-      }
-
-      if (selectedMenu.type === "metamask" && !this.loginStatus) return
-
-      if (selectedMenu.type === "metamask") {
-        this.walletAddress = this.activeMetamaskAddress
-        this.activeBalance = await getBalanceDAI(this.activeMetamaskAddress)
       }
 
       selectedMenu.active = true
@@ -343,66 +282,10 @@ export default {
       }
     },
 
-    async checkMetamaskAddress() {
-      this.loginStatus = false
-      this.ethRegisterAddress = await queryEthAdressByAccountId(this.api, this.wallet.address)
-
-      if (!this.ethRegisterAddress) {
-        this.loginStatus = false
-        return
-      }
-
-      const accountDetail = await startApp()
-      if (accountDetail.currentAccount === this.ethRegisterAddress ) {
-        this.activeMetamaskAddress = this.ethRegisterAddress
-        this.metamaskBalance = await this.getDaiBalance(this.activeMetamaskAddress)
-        this.setMetamaskBalance(this.metamaskBalance)
-        this.loginStatus = true
-        this.getActiveMenu()
-      }
-
-      this.activeMetamaskAddress = ""
-      this.loginStatus = false
-    },
-
-    async connectToMetamask() {
-      this.loading = true
-      this.ethAccount = await startApp()
-
-      if (this.ethAccount.currentAccount === "no_install") {
-        window.open("https://metamask.io/download/", "_blank")
-        this.ethAccount = null
-        this.loading = false
-        return
-      }
-
-      const account = await handleSetWallet("metamask", this.ethRegisterAddress)
-      this.metamasBalance = await getBalanceDAI(this.ethRegisterAddress)
-      const accountId = localStorage.getAddress()
-      const ethAddress = account[0].address
-
-      await this.$store.dispatch("wallet/walletBinding", {accountId, ethAddress})
-      this.loading = false
-      this.loginStatus = true
-      this.menus.find(menu => menu.type === "metamask").active = true
-    },
-
-    disconnectWallet() {
-      this.loginStatus = false
-      this.menus.find(menu => menu.type === "metamask").active = false
-    },
-
-    handleDropdownAction(type) {
-      if (type === "metamask") this.disconnectWallet()
-    },
-
     signOut () {
       localStorage.clear()
       this.clearAuth
-      this.clearWallet()
-      this.ethAccount = null
       this.loginStatus = false
-      this.menus.find(menu => menu.type === "metamask").active = false
       this.$router.push({ name: "sign-in"})
       const accounts = Object.keys(window.localStorage).filter((v) =>
         /account:/.test(v)
@@ -470,12 +353,6 @@ export default {
         width: 2.75rem !important
         height: 2.75rem !important
 
-        .navbar__connect-icon
-          svg
-            width: 1.563rem !important
-            height: 1.563rem !important
-            animation: animateMetamask .3s infinite alternate !important
-
       &--logged:hover
           margin-left: unset !important
           width: 1.5rem !important
@@ -485,7 +362,7 @@ export default {
             width: unset !important
             height: unset !important
             animation: unset !important
-      
+
     &__dropdown
       position: absolute
       z-index: 9
@@ -566,10 +443,10 @@ export default {
 
         &::before
           opacity: 1
-        
+
         .notification-item__title
           color: #C400A5
-      
+
     &__title
       font-size: 0.75rem
       font-weight: 500
@@ -585,7 +462,7 @@ export default {
   .settings-item
     &:not(:last-of-type)
       border-bottom: solid 0.063rem #757274
-    
+
     &__wrapper
       position: relative
       height: 3.75rem
@@ -611,7 +488,7 @@ export default {
 
         &::before
           opacity: 1
-        
+
         .settings-item__title
           color: #5640A5
 
@@ -634,7 +511,7 @@ export default {
       right: -1px
       border-radius: 50%
       background: #FF56E0
-      
+
   .fade
     &-enter-active,
     &-leave-active
@@ -644,13 +521,4 @@ export default {
     &-leave-to
       transform: translateY(1.563rem)
       opacity: 0
-
-  @keyframes animateMetamask
-    0%
-      transform: rotate(-6deg)
-    50%
-      transform: translateY(0.063rem)
-    100%
-      transform: rotate(6deg)
-    
 </style>

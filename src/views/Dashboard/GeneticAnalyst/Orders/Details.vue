@@ -115,7 +115,7 @@
             .service-details__time.d-flex.align-center
               ui-debio-icon.mr-2(:icon="timerIcon" size="20" stroke color="#000000")
               span(
-                :title="`Expected Duration (${orderDataDetails.service_info.expectedDuration})`"
+                :title="`Maximum Duration (${orderDataDetails.service_info.expectedDuration})`"
                 :aria-label="orderDataDetails.service_info.expectedDuration"
               ) {{ orderDataDetails.service_info.expectedDuration }}
 
@@ -304,7 +304,7 @@ export default {
   computed: {
     ...mapState({
       api: (state) => state.substrate.api,
-      web3: (state) => state.metamask.web3,
+      web3: (state) => state.web3Store.web3,
       mnemonicData: (state) => state.substrate.mnemonicData,
       lastEventData: (state) => state.substrate.lastEventData,
       wallet: (state) => state.substrate.wallet

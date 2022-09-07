@@ -1,6 +1,6 @@
 import store from "@/store"
 
-const web3 = store.getters["metamask/getWeb3"]
+const web3 = store.getters["web3Store/getWeb3"]
 
 export async function fromEther(balance) {
   const formatedBalance = web3.utils.fromWei(String(balance), "ether")

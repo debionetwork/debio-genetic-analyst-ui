@@ -70,7 +70,7 @@ export default {
   computed: {
     ...mapState({
       api: (state) => state.substrate.api,
-      web3: (state) => state.metamask.web3,
+      web3: (state) => state.web3Store.web3,
       wallet: (state) => state.substrate.wallet,
       walletBalance: (state) => state.substrate.walletBalance
     }),
@@ -85,14 +85,16 @@ export default {
   },
 
   methods: {
+
     async getMinimumStakingAmount() {
       const minimumStaking = await queryGeneticAnalystMinimumStakeAmount(this.api)
       const getTxWeight = await this.getTxWeight()
       const txWeight = `${this.web3.utils.fromWei(String(getTxWeight.partialFee), "ether")}`
+      const minimum = minimumStaking.replaceAll(",", "")
       
-      this.sufficientBalance = this.walletBalance > (minimumStaking + Number(txWeight))
+      this.sufficientBalance = this.walletBalance > (Number(minimum) + Number(txWeight))
       this.txWeight = txWeight
-      this.minimumStaking = minimumStaking
+      this.minimumStaking = this.web3.utils.fromWei(minimum, "ether")
     },
 
     async getTxWeight() {
