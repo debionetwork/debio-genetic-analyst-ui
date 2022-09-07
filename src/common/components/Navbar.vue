@@ -205,10 +205,6 @@ export default {
       setWalletBalance: "substrate/SET_WALLET_BALANCE"
     }),
 
-    async getDaiBalance (address) {
-      return await getBalanceDAI(address)
-    },
-
     async handleNotificationRead(notif) {
       clearTimeout(timeout)
       if (notif.read) return
