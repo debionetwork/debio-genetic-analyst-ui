@@ -1,4 +1,5 @@
 import apiClientRequest from "@/common/lib/api"
+import getEnv from "../common/lib/utils/env"
 
 const defaultState = {
   resultMsg: null
@@ -15,7 +16,7 @@ export default {
   actions: {
     async walletBinding({commit}, data) {
       
-      const debioApiKey = process.env.VUE_APP_DEBIO_API_KEY
+      const debioApiKey = getEnv("VUE_APP_DEBIO_API_KEY")
       const result = await apiClientRequest.post("/substrate/wallet-binding", data, {
         headers: { "debio-api-key" : debioApiKey }
       })

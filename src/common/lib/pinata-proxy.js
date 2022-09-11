@@ -7,15 +7,16 @@ import {
   downloadDocumentFileInBrowser,
   downloadJson
 } from "@debionetwork/pinata-ipfs"
+import getEnv from "./utils/env"
 
-const pinataJwtKey = process.env.VUE_APP_PINATA_JWT_KEY
+const pinataJwtKey = getEnv("VUE_APP_PINATA_JWT_KEY")
 
 export const uploadFile = val => {
   const options = {
     pinataMetadata: {
       name: val.title,
       keyvalues: {
-        required: process.env.VUE_APP_PINATA_REQUIRED_DOCUMENT,
+        required: getEnv("VUE_APP_PINATA_REQUIRED_DOCUMENT"),
         type: val.type,
         fileSize: val.size,
         date: +new Date()
@@ -48,7 +49,7 @@ export const uploadFile = val => {
 }
 
 export const getFileUrl = cid => {
-  return `${process.env.VUE_APP_PINATA_GATEWAY}/${cid}`
+  return `${getEnv("VUE_APP_PINATA_GATEWAY")}/${cid}`
 }
 
 export const downloadFile = async (ipfsLink, withMetaData = false) => {

@@ -1,4 +1,5 @@
 import localStorage from "@/common/lib/local-storage"
+import getEnv from "../common/lib/utils/env"
 
 const defaultState = {
   role: null,
@@ -33,11 +34,11 @@ export default {
 
   actions: {
     async initApp({ commit }) {
-      const tokenName = process.env.VUE_APP_DEBIO_USE_TOKEN_NAME
-      const escrowETHAddress = process.env.VUE_APP_DEBIO_ESCROW_ETH_ADDRESS
-      const substrateWs = process.env.VUE_APP_DEBIO_SUBSTRATE_WS
-      const web3Rpc = process.env.VUE_APP_WEB3_RPC
-      // const labDashboardUrl = process.env.VUE_APP_DEBIO_FRONTEND_URL
+      const tokenName = getEnv("VUE_APP_DEBIO_USE_TOKEN_NAME")
+      const escrowETHAddress = getEnv("VUE_APP_DEBIO_ESCROW_ETH_ADDRESS")
+      const substrateWs = getEnv("VUE_APP_DEBIO_SUBSTRATE_WS")
+      const web3Rpc = getEnv("VUE_APP_WEB3_RPC")
+      // const labDashboardUrl = getEnv("VUE_APP_DEBIO_FRONTEND_URL")
 
       const configApp = {
         tokenName,

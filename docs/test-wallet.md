@@ -1,0 +1,8 @@
+Mnemonic:
+mushroom waste corn moral random two frown lab normal reflect cake shell
+
+Pub Key:
+939bc3ba5cc33913cc4a391bf635d38e7c0dfb936cbb64a19be0eeb76850a556facdeda0d35fa70b3264008634db26f9cf7e1bf3b25da1f0c67e3335c179a74f
+
+Priv Key:
+43ccc31b4fb51db59b44e9bc02d23e65c5e16ceaf5e60db284eb94aeddb918f7

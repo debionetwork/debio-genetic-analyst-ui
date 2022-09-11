@@ -90,8 +90,13 @@ prisma
 .github
 
 # Docs
+docs/
 README.md
 
 # Other
 .maintain
 !.maintain/docker/nginx/
+!.maintain/docker/entrypoint.sh
+
+# Environment File
+.env

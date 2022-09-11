@@ -206,6 +206,7 @@
 <script>
 
 import { bookIcon, alertIcon } from "@debionetwork/ui-icons"
+import getEnv from "@/common/lib/utils/env"
 
 export default {
   name: "NavigationDrawer",
@@ -224,7 +225,7 @@ export default {
   }),
 
   created() {
-    this.version = `v${process.env.VUE_APP_VERSION}`
+    this.version = `v${getEnv("VUE_APP_VERSION")}`
   },
 
   methods: {

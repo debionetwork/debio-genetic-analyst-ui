@@ -10,12 +10,13 @@ import VueCountdownTimer from "vuejs-countdown-timer"
 import * as Sentry from "@sentry/vue"
 import { Integrations } from "@sentry/tracing"
 import VueMixpanel from "vue-mixpanel"
+import getEnv from "./common/lib/utils/env"
 
 Vue.use(VueMixpanel, {
-  token: process.env.VUE_APP_MIXPANEL_TOKEN
+  token: getEnv("VUE_APP_MIXPANEL_TOKEN")
 })
 
-const SENTRY_DSN = process.env.VUE_APP_SENTRY_DSN
+const SENTRY_DSN = getEnv("VUE_APP_SENTRY_DSN")
 
 if (SENTRY_DSN) {
   Sentry.init({
