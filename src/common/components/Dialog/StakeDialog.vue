@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import {mapState, mapGetters} from "vuex"
+import {mapState} from "vuex"
 import {alertTriangleIcon} from "@debionetwork/ui-icons"
 import {stakeGeneticAnalystFee, queryGeneticAnalystMinimumStakeAmount} from "@debionetwork/polkadot-provider"
 
@@ -73,10 +73,6 @@ export default {
       web3: (state) => state.web3Store.web3,
       wallet: (state) => state.substrate.wallet,
       walletBalance: (state) => state.substrate.walletBalance
-    }),
-
-    ...mapGetters({
-      pair: "substrate/wallet"
     })
   },
 
@@ -89,17 +85,13 @@ export default {
     async getMinimumStakingAmount() {
       const minimumStaking = await queryGeneticAnalystMinimumStakeAmount(this.api)
       const getTxWeight = await this.getTxWeight()
-      const txWeight = `${this.web3.utils.fromWei(String(getTxWeight.partialFee), "ether")}`
-      const minimum = minimumStaking.replaceAll(",", "")
-      
-      this.sufficientBalance = this.walletBalance > (Number(minimum) + Number(txWeight))
-      this.txWeight = txWeight
-      this.minimumStaking = this.web3.utils.fromWei(minimum, "ether")
+      this.txWeight = `${this.web3.utils.fromWei(String(getTxWeight.partialFee), "ether")}`
+      this.minimumStaking = this.web3.utils.fromWei(String(minimumStaking, "ether"))
+      this.sufficientBalance = this.walletBalance > (Number(this.minimumStaking) + Number(this.txWeight))
     },
 
     async getTxWeight() {
-      const txWeight = await stakeGeneticAnalystFee(this.api, this.pair)
-
+      const txWeight = await stakeGeneticAnalystFee(this.api, this.wallet.address)
       return txWeight
     },
 
