@@ -18,8 +18,6 @@ jobs:
       revision_tag: ${{ steps.build-info.outputs.revision_tag }}
       latest_tag: ${{ steps.build-info.outputs.latest_tag }}
       pre_release: ${{ steps.build-info.outputs.pre_release }}
-      environment: ${{ steps.build-info.outputs.environment }}
-      package_version: ${{ steps.build-info.outputs.package_version }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -33,7 +31,6 @@ jobs:
           REVISION_TAG=$SHA_SHORT
           LATEST_TAG=latest-pre-alpha
           PRE_RELEASE=true
-          ENVIRONMENT=development
 
           if [[ $GITHUB_REF =~ refs/tags/ ]] ;
           then
@@ -45,73 +42,25 @@ jobs:
             then
                 LATEST_TAG=latest
                 PRE_RELEASE=false
-                ENVIRONMENT=mainnet
             else
                 SUFFIX=$(tmp=${TAG#$VERSION-} ; echo $tmp | sed -r 's/[0-9]//g' )
                 LATEST_TAG=latest-$SUFFIX
-
-                if [[ $TAG =~ [0-9].[0-9].[0-9]-alpha* ]] ; then
-                    ENVIRONMENT=staging
-                elif [[ $TAG =~ [0-9].[0-9].[0-9]-beta* ]] ; then
-                    ENVIRONMENT=testnet
-                fi
             fi
           fi
           echo "::set-output name=sha_short::$SHA_SHORT"
           echo "::set-output name=revision_tag::$REVISION_TAG"
           echo "::set-output name=latest_tag::$LATEST_TAG"
           echo "::set-output name=pre_release::$PRE_RELEASE"
-          echo "::set-output name=environment::$ENVIRONMENT"
-
-          PACKAGE_VERSION=$(grep version package.json | sed 's/.*"version": "\(.*\)".*/\1/')
-          echo "::set-output name=package_version::$PACKAGE_VERSION"
 
   build:
     runs-on: ubuntu-20.04
     needs:
       - compute-build-info
-    environment: ${{ needs.compute-build-info.outputs.environment }}
-    permissions:
-      contents: 'read'
-      id-token: 'write'
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: create .env file
-        shell: bash
-        run: |
-          tee -a .env <<EOF
-          VUE_APP_VERSION=${{ needs.compute-build-info.outputs.package_version }}
-          VUE_APP_RECAPTCHA_SITE_KEY=${{ secrets.VUE_APP_RECAPTCHA_SITE_KEY }}
-          VUE_APP_ROLE=${{ secrets.VUE_APP_ROLE }}
-          VUE_APP_DEBIO_USE_TOKEN_NAME=${{ secrets.VUE_APP_DEBIO_USE_TOKEN_NAME }}
-          VUE_APP_DEBIO_DAI_TOKEN_ADDRESS=${{ secrets.VUE_APP_DEBIO_DAI_TOKEN_ADDRESS }}
-          VUE_APP_DEBIO_ESCROW_ETH_ADDRESS=${{ secrets.VUE_APP_DEBIO_ESCROW_ETH_ADDRESS }}
-          VUE_APP_DEBIO_SUBSTRATE_WS=${{ secrets.VUE_APP_DEBIO_SUBSTRATE_WS }}
-          VUE_APP_WEB3_RPC=${{ secrets.VUE_APP_WEB3_RPC }}
-          VUE_APP_BACKEND_API=${{ secrets.VUE_APP_BACKEND_API }}
-          VUE_APP_DEBIO_API_KEY=${{ secrets.VUE_APP_DEBIO_API_KEY }}
-          VUE_APP_USERNAME=${{ secrets.VUE_APP_USERNAME }}
-          VUE_APP_PASSWORD=${{ secrets.VUE_APP_PASSWORD }}
-          VUE_APP_MIXPANEL_TOKEN=${{ secrets.VUE_APP_MIXPANEL_TOKEN }}
-          VUE_APP_SENTRY_DSN=${{ secrets.VUE_APP_SENTRY_DSN }}
-          VUE_APP_PINATA_GATEWAY=${{ secrets.VUE_APP_PINATA_GATEWAY }}
-          VUE_APP_PINATA_KEY=${{ secrets.VUE_APP_PINATA_KEY }}
-          VUE_APP_PINATA_SECRET_KEY=${{ secrets.VUE_APP_PINATA_SECRET_KEY }}
-          VUE_APP_PINATA_JWT_KEY=${{ secrets.VUE_APP_PINATA_JWT_KEY }}
-          EOF
-      - name: create contract.json file
-        if: ${{ needs.compute-build-info.outputs.environment == 'mainnet' }}
-        shell: bash
-        run: |
-          tee -a .env <<EOF
-          rm -f ./src/store/metamask/contracts/contract.json
-
-          tee -a ./src/store/metamask/contracts/contract.json <<EOF
-          ${{ secrets.CONTRACT_JSON }}
-          EOF
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -123,29 +72,19 @@ jobs:
           key: ${{ runner.os }}-buildx-main
           restore-keys: |
             ${{ runner.os }}-buildx-
-      - id: 'auth'
-        name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v0'
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
         with:
-          token_format: 'access_token'
-          workload_identity_provider: ${{ secrets.GOOGLE_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-      - name: Login to GCR
-        uses: docker/login-action@v2
-        with:
-          registry: gcr.io
-          username: oauth2accesstoken
-          password: ${{ steps.auth.outputs.access_token }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: .
           push: true
           file: .maintain/docker/Dockerfile
           tags: |
-            gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ github.repository }}:${{ needs.compute-build-info.outputs.revision_tag }}
-            gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ github.repository }}:${{ needs.compute-build-info.outputs.latest_tag }}
+            ${{ github.repository }}:${{ needs.compute-build-info.outputs.revision_tag }}
+            ${{ github.repository }}:${{ needs.compute-build-info.outputs.latest_tag }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
       # Temp fix
@@ -155,16 +94,9 @@ jobs:
         run: |
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
-  draft-release:
-    if: "startsWith(github.ref, 'refs/tags/')"
-    runs-on: ubuntu-20.04
-    needs: [build, compute-build-info]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+      # publish-draft-release
       - name: Build changelog
+        if: "startsWith(github.ref, 'refs/tags/')"
         id: build_changelog
         uses: mikepenz/release-changelog-builder-action@v2
         env:
@@ -172,6 +104,7 @@ jobs:
         with:
           configuration: '.github/workflows/rcb_config.json'
       - name: Create draft release
+        if: "startsWith(github.ref, 'refs/tags/')"
         uses: softprops/action-gh-release@v1
         with:
           body: ${{ steps.build_changelog.outputs.changelog }}
