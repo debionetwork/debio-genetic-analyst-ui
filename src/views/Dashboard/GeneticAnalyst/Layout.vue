@@ -197,10 +197,13 @@ export default {
     },
 
     async getListNotification() {
-      await this.$store.dispatch("substrate/getListNotification", {
-        address: this.wallet.address,
-        role: "analyst"
-      })
+      if (this.lastBlockData) {
+        await this.$store.dispatch("substrate/getListNotification", {
+          address: this.wallet.address,
+          role: "analyst",
+          block: this.lastBlockData
+        })
+      }
     },
 
     goToRequestTestPage() {

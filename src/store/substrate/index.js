@@ -150,9 +150,10 @@ export default {
         ]
 
         const { block } = (await api.rpc.chain.getBlock()).toHuman()
+        const newBlock = parseInt(block?.header?.number?.replaceAll(",", ""))
+        commit("SET_LAST_BLOCK", newBlock)
 
         const getNotificationList = async () => {
-          const newBlock = parseInt(block?.header?.number?.replaceAll(",", ""))
           let lastBlock = 0
 
           const notifications = JSON.parse(localStorage.getLocalStorageByName(
@@ -161,10 +162,14 @@ export default {
 
           if (notifications?.length) lastBlock = parseInt((notifications[notifications.length-1].block).replaceAll(",", ""))
 
-          if (newBlock > lastBlock) await getUnlistedNotification(newBlock)
+          if (newBlock > lastBlock) {
+            await getUnlistedNotification(newBlock)
+          }
         }
 
-        await getNotificationList()
+        if (localStorage.getAddress()) {
+          await getNotificationList()
+        }
 
         // Example of how to subscribe to events via storage
         api.query.system.events(async (events) => {
@@ -286,7 +291,10 @@ export default {
         return { success: false }
       }
     },
-    async getListNotification({ commit }, { address, role }) {
+    async getListNotification({ commit }, { address, role, block }) {
+      
+      if (block) await getUnlistedNotification(block)
+
       try {
         //localStorage.removeLocalStorageByName("LOCAL_NOTIFICATION_BY_ADDRESS_" + address + "_" + role, null);
         commit("SET_CONFIG_EVENT", eventTypes)
