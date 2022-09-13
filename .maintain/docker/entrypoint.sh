@@ -21,6 +21,6 @@ JSON_STRING='window.configs = { \
   "VUE_APP_PINATA_REQUIRED_DOCUMENT":"'"${VUE_APP_PINATA_REQUIRED_DOCUMENT}"'" \
 }'
 
-sed -i "s@// CONFIGURATIONS_PLACEHOLDER@${JSON_STRING}@" /usr/share/nginx/html/index.html
+sed -i "s~// CONFIGURATIONS_PLACEHOLDER~${JSON_STRING}~" /usr/share/nginx/html/index.html
 
 exec "$@"
