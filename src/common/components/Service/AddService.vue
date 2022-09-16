@@ -161,7 +161,11 @@ export default {
   mixins: [validateForms],
 
   data: () => ({
-    currency: [{currency: "DBIO"}],
+    currency: [
+      {currency: "DBIO"},
+      {currency: "USN"},
+      {currency: "USDT"}
+    ],
     service: {
       name: "",
       currency: "DBIO",
