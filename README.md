@@ -3,12 +3,15 @@
 </div>
 
 <div align="Center">
-<h1> DeBio Network Genetic Analyst UI</h1>
+<h1> DeBio Network Genetic Analyst UI </h1>
 <h2> Decentralized Sovereign Biomed </h2>
 The Anonymous-First Platform for Medical and Bioinformatics Data.
 
 <br>
+<br>
 
+[![Node.js version](https://img.shields.io/badge/Node.js-%5E14.0.0-green?logo=Node.Js)](https://nodejs.org/)
+[![VueJs version](https://img.shields.io/badge/VueJs-%5E2.6.11-green?logo=Vue.Js)](https://github.com/vuejs/vue)
 [![Medium](https://img.shields.io/badge/Medium-DeBio%20Network-brightgreen?logo=medium)](https://blog.debio.network)
 
 </div>
@@ -17,53 +20,59 @@ The Anonymous-First Platform for Medical and Bioinformatics Data.
 
 DeBio Network is a decentralized anonymous-first platform for medical and bioinformatics data. It uses blockchain technology as the immutable transaction ledger to support its processes.
 
-## Project setup
+## Getting Started
+
+Follow these steps to get started with our Genetic Analyst UI
+
+### Node.js Setup
+
+All <a href="http://nodejs.org" target="_blank">Node.js</a> versions `14.0.0` above are compatible with our Genetic Analyst UI.
+
+### Project setup
 ```sh
-cp .env-example .env
+cp .env-template .env
 ```
 adjust the contents of the `.env` file
 
-## Install dependencies
+### Installation
 
-```sh
-npm install
+```bash
+$ npm install
 ```
 
-### Compiles and hot-reloads for development
-```sh
+### Running a Development Server
+
+Start the development server with detailed logging:
+
+```bash
 npm run serve
 ```
 
-### Compiles and minifies for production
-```sh
+Build for production environments:
+
+```bash
 npm run build
 ```
 
-### Run your unit tests
-```sh
-npm run test:unit
-```
+Execute tests:
 
-### Lints and fixes files
-```sh
-npm run lint
+```bash
+npm run test
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
 
 ### Run in Docker
 
 First, install [Docker](https://docs.docker.com/get-docker/) and
 [Docker Compose](https://docs.docker.com/compose/install/).
 
-Run the following command.
+Then run the following command to start a Genetic Analyst UI server using Docker Compose.
 
 ```sh
 ./.maintain/docker/create-network.sh
 ```
 
-```sh
+```bash
 ./.maintain/docker/start-docker-compose.sh
 ```
-Open http://127.0.0.1:8085 in your browser.
+
+Server running on http://127.0.0.1:8082.

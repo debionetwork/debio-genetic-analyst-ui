@@ -13,10 +13,10 @@ services:
       - HOST=0.0.0.0
       - PORT=80
     ports:
-      - 8086:80
+      - 8082:80
     networks:
       debio:
-        ipv4_address: 172.27.1.6
+        ipv4_address: 172.27.1.15
         aliases:
           - debio-genetic-analyst-ui
 
