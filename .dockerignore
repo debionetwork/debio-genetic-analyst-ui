@@ -97,6 +97,7 @@ README.md
 .maintain
 !.maintain/docker/nginx/
 !.maintain/docker/entrypoint.sh
+.storybook
 
 # Environment File
 .env

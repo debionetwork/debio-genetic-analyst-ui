@@ -1,5 +1,7 @@
 #!/bin/sh
 
+export VUE_APP_VERSION=`echo $(cat app_version.txt)`
+
 JSON_STRING='window.configs = { \
   "NODE_ENV":"'"${NODE_ENV}"'", \
   "VUE_APP_VERSION":"'"${VUE_APP_VERSION}"'", \
@@ -21,6 +23,6 @@ JSON_STRING='window.configs = { \
   "VUE_APP_PINATA_REQUIRED_DOCUMENT":"'"${VUE_APP_PINATA_REQUIRED_DOCUMENT}"'" \
 }'
 
-sed -i "s~// CONFIGURATIONS_PLACEHOLDER~${JSON_STRING}~" /usr/share/nginx/html/index.html
+sed -i "" "s~// CONFIGURATIONS_PLACEHOLDER~${JSON_STRING}~" index.html
 
 exec "$@"
