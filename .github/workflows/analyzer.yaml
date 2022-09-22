@@ -57,7 +57,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'javascript', 'typescript' ]
+        language: [ 'javascript']
     name: Security Static Code Analysis for ${{ matrix.language }}
     steps:
       - name: Checkout Repository
