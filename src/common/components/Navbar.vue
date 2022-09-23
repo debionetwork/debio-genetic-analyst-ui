@@ -49,15 +49,19 @@
                         )
                           | {{ compareDate(new Date(), new Date(parseInt(notif.timestamp))) }}
 
-                section.navbar__dropdown-content(v-if="getActiveMenu.type === 'settings'")
-                  .navbar__settings
-                    .settings-item(role="button")
-                      .settings-item__wrapper(@click="signOut")
-                        .settings-item__title(aria-label="Signout") Sign Out
-                        ui-debio-icon.settings-item__icon(:icon="logoutIcon" size="24" stroke color="#C400A5")
-
                 section.navbar__dropdown-content(v-if="getActiveMenu.type === 'polkadot'")
-                  ui-debio-input(label="Your Address" :data-wallet="walletAddress" ref="polkadot" disabled :value="walletAddress" block)
+                  .navbar__wallet-header
+                    ui-debio-icon.mb-5(
+                      :icon="getActiveMenu.icon"
+                      size="24"
+                      :class="{ 'notification-dot': getActiveMenu.type === 'notification' && notifications.some(v => v.read === false) }"
+                      :color="getActiveMenu.active ? '#C400A5' : '#5640A5'"
+                      stroke
+                    )
+                    h4.ml-5 Polkadot
+
+
+                  ui-debio-input(label="Address" variant="small" :data-wallet="walletAddress" ref="polkadot" disabled :value="walletAddress" block)
                     ui-debio-icon(
                       slot="icon-append"
                       :icon="copyIcon"
@@ -70,13 +74,26 @@
                     )
                   .navbar__balance
                     .navbar__balance-wrapper
-                      .navbar__balance-type {{ getActiveMenu.currency }} Balance
-                      .navbar__balance-amount
-                        ui-debio-icon(:icon="debioIcon" size="10")
-                        span {{ activeBalance }}
+                      .navbar__balance-type Balance
+                      .navbar__balance-instruction 
+                        v-icon(size="10" type="button") mdi-open-in-new
+                        span.ml-2 How to add balance
 
-              template(slot="footer" v-if="getActiveMenu.action")
-                v-btn.navbar__footer-button(block color="primary" outlined @click="handleDropdownAction(getActiveMenu.type)") {{ getActiveMenu.action }}
+                    v-divider.navbar__balance-divider
+                    .navbar__balance-amount(v-for="wallet in polkadotWallets")
+                      v-img(
+                        alt="no-list-data"
+                        :src="require(`../../assets/${wallet.icon}.svg`)"
+                        max-width="24px"
+                        max-height="24px"
+                      )
+                      span {{ wallet.balance }} {{ wallet.currency }} 
+
+                    v-divider.navbar__balance-divider-sec
+
+
+              template(slot="footer" v-if="getActiveMenu.type === 'polkadot'")
+                v-btn.navbar__footer-button(block color="primary" outlined @click="signOut()") Sign Out
 
     v-progress-linear.navbar__loading(
       v-if="loading"
@@ -106,6 +123,7 @@ import localStorage from "@/common/lib/local-storage"
 import { generalDebounce } from "@/common/lib/utils"
 import { queryAccountBalance } from "@debionetwork/polkadot-provider"
 import { setReadNotification } from "@/common/lib/api"
+import { queryGetAssetBalance } from "@/common/lib/polkadot-provider/query/octopus-assets"
 
 let timeout
 
@@ -149,17 +167,39 @@ export default {
       },
       {
         id: 2,
-        icon: settingIcon,
-        type: "settings",
-        active: false
-      },
-      {
-        id: 3,
         icon: polkadotIcon,
         type: "polkadot",
-        title: "Polkadot Wallet",
+        title: "Wallet",
         currency: "DBIO",
         active: false
+      }
+    ],
+    polkadotWallets: [
+      {
+        id: 0,
+        name: "debio",
+        icon: "debio-logo",
+        currency: "DBIO",
+        unit: "ether",
+        balance: 0
+      },
+
+      {
+        id: 1,
+        name: "usdn",
+        icon: "near-logo",
+        currency: "USDN",
+        unit: "ether",
+        balance: 0
+      },
+
+      {
+        id: 2,
+        name: "usdt",
+        icon: "tether-logo",
+        currency: "USDT",
+        unit: "mwei",
+        balance: 0
       }
     ]
   }),
@@ -173,6 +213,7 @@ export default {
       walletBalance: (state) => state.substrate.walletBalance,
       api: (state) => state.substrate.api,
       wallet: (state) => state.substrate.wallet,
+      web3: (state) => state.web3Store.web3,
       lastEventData: (state) => state.substrate.lastEventData
     }),
 
@@ -189,6 +230,7 @@ export default {
 
   async mounted () {
     this.fetchWalletBalance()
+    this.fetchPolkadotBallance()
   },
 
   watch: {
@@ -196,6 +238,7 @@ export default {
       if(!val) return
 
       this.fetchWalletBalance()
+      this.fetchPolkadotBallance()
       this.loading = false
     }
   },
@@ -270,9 +313,21 @@ export default {
           this.wallet.address
         )
         this.setWalletBalance(balanceNummber)
+        this.polkadotWallets[0].balance = this.walletBalance
       } catch (err) {
         console.error(err)
       }
+    },
+
+    async fetchPolkadotBallance() {
+      this.polkadotWallets.forEach(async (w) => {
+        if (w.name !== "debio") {
+          const { balance } = await queryGetAssetBalance(
+            this.api, w.id, this.wallet.address
+          )
+          w.balance = this.web3.utils.fromWei(balance.replaceAll(",", ""), w.unit)
+        }
+      })
     },
 
     signOut () {
@@ -362,10 +417,21 @@ export default {
       top: 3.125rem
       right: 0
 
+    &__wallet-header
+      display: flex
+
     &__balance
       margin-top: 0.75rem
       display: flex
       flex-direction: column
+
+    &__balance-type
+      @include body-text-medium-1
+
+    &__balance-instruction
+      color: #8F98AA
+      @include tiny-reg
+   
 
     &__balance-wrapper
       display: inherit
@@ -373,9 +439,14 @@ export default {
       justify-content: space-between
 
     &__balance-amount
+      padding: 6px
       display: flex
       align-items: center
       gap: 0.375rem
+
+    &__balance-divider
+      margin-top: 0.75rem
+      margin-bottom: 0.9rem
 
     &__balance-usd
       display: inherit
