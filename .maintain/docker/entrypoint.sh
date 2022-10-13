@@ -1,6 +1,7 @@
 #!/bin/sh
 
-VUE_APP_VERSION=`echo $(cat app_version.txt)`
+export VUE_APP_VERSION=`cat /usr/share/nginx/app_version.txt`
+
 JSON_STRING='window.configs = { \
   "VUE_APP_VERSION":"'"${VUE_APP_VERSION}"'", \
   "VUE_APP_RECAPTCHA_SITE_KEY":"'"${VUE_APP_RECAPTCHA_SITE_KEY}"'", \
