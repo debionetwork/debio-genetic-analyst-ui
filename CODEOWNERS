@@ -1,0 +1,5 @@
+*                    @debionetwork/frontend
+
+.github/             @debionetwork/devops
+.maintain/           @debionetwork/devops
+.dockerignore        @debionetwork/devops
