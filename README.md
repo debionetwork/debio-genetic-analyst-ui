@@ -10,8 +10,8 @@ The Anonymous-First Platform for Medical and Bioinformatics Data.
 <br>
 <br>
 
-[![Node.js version](https://img.shields.io/badge/Node.js-%5E14.0.0-green?logo=Node.Js)](https://nodejs.org/)
-[![VueJs version](https://img.shields.io/badge/VueJs-%5E2.6.11-green?logo=Vue.Js)](https://github.com/vuejs/vue)
+[![Node.js](https://img.shields.io/badge/Node.js-%5E14.0.0-green?logo=Node.Js)](https://nodejs.org)
+[![Vue.js](https://img.shields.io/badge/Vue.js-%5E2.6.11-green?logo=Vue.Js)](https://vuejs.org)
 [![Medium](https://img.shields.io/badge/Medium-DeBio%20Network-brightgreen?logo=medium)](https://blog.debio.network)
 
 </div>
