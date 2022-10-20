@@ -35,6 +35,8 @@ import {pencilIcon, trashIcon} from "@debionetwork/ui-icons"
 import AddServiceForm from "@/common/components/Service/AddService"
 import DeleteDialog from "@/common/components/Dialog/DeleteServiceDialog"
 import SuccessDialog from "@/common/components/Dialog/SuccessDialogGeneral"
+import { fromEther, toEther } from "@/common/lib/balance-format"
+
 
 const stepData = [
   {label: "Set Up Account", active: false},
@@ -53,7 +55,7 @@ export default {
     services: [],
     service: {
       name: "",
-      currency: "DBIO",
+      currency: "",
       totalPrice: "",
       duration: "",
       durationType: "Days",
@@ -101,7 +103,7 @@ export default {
     async getData(id) {
       const data = await queryGeneticAnalystServicesByHashId(this.api, id)
       const testResultLink = await getIpfsMetaData(data?.info?.testResultSample.split("/").pop())
-      const totalPrice = String(this.web3.utils.fromWei(String(data?.info?.pricesByCurrency[0].totalPrice.replaceAll(",", "") || 0), "ether"))
+      const totalPrice = await fromEther(data?.info?.pricesByCurrency[0].totalPrice, data?.info?.pricesByCurrency[0].currency)
       
       const service = {
         name: data?.info?.name,
@@ -134,7 +136,7 @@ export default {
         testResultSample,
         totalPrice
       } = value
-      const price = this.web3.utils.toWei(String(totalPrice), "ether")
+      const price = toEther(totalPrice, currency)
 
       const dataToSend = {
         name,

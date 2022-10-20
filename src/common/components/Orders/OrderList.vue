@@ -70,6 +70,7 @@ import { generalDebounce } from "@/common/lib/utils"
 import { geneticAnalystIllustration, eyeIcon, alertIcon, searchIcon } from "@debionetwork/ui-icons"
 import { mapState } from "vuex"
 import localStorage from "@/common/lib/local-storage";
+import { fromEther } from "@/common/lib/balance-format"
 
 export default {
   name: "OrderList",
@@ -179,11 +180,8 @@ export default {
 
         for (const order of orderData.data) {
           const sourceData = order._source
-
-          const formatedPrice = `
-            ${Number(this.web3.utils.fromWei(String(sourceData.service_info?.prices_by_currency[0]?.total_price.replaceAll(",", "") || 0), "ether")).toFixed(4)} 
-            ${sourceData?.currency}
-          `
+          const price = await fromEther(sourceData.service_info?.prices_by_currency[0]?.total_price, sourceData?.currency)
+          const formatedPrice = `${price} ${sourceData?.currency}`
 
           const data = {
             ...sourceData,

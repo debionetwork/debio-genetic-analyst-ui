@@ -40,7 +40,7 @@ describe("Genetic Analyst Account Dashboard", () => {
           auth: {
             loadingData: "LOADING"
           },
-          metamask: {
+          web3Store: {
             web3: "WEB3"
           }
         }

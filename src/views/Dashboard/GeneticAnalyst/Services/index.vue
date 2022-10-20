@@ -253,10 +253,10 @@ export default {
           info: {description, name: serviceName, testResultSample}
         } = serviceDetail
 
-        const price = this.formatPrice(
-          serviceDetail.info.pricesByCurrency[0].totalPrice
-        )
         const currency = serviceDetail.info.pricesByCurrency[0].currency
+        const price = this.formatPrice(
+          serviceDetail.info.pricesByCurrency[0].totalPrice, currency
+        )
         const duration = `${serviceDetail.info.expectedDuration.duration} ${serviceDetail.info.expectedDuration.durationType}`
 
         const service = {
@@ -278,8 +278,12 @@ export default {
       this.orders = orders
     },
 
-    formatPrice(price) {
-      return this.web3.utils.fromWei(String(price.replaceAll(",", "")), "ether")
+    formatPrice(price, currency) {
+      let unit
+      let formatedBalance = 0
+      currency === "USDT" ? unit = "mwei" : unit = "ether"
+      formatedBalance = this.web3.utils.fromWei(String(price.replaceAll(",", "")), unit)
+      return formatedBalance
     },
 
     async showDialog(id) {

@@ -37,7 +37,7 @@ describe("Genetic Analysis Add Service", () => {
           auth: {
             loadingData: "LOADING"
           },
-          metamask: {
+          web3Store: {
             web3: "WEB3"
           }
         }

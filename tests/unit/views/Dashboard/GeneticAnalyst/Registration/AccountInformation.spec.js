@@ -31,7 +31,7 @@ describe("Genetic Analysis Registration Information", () => {
           auth: {
             loadingData: "LOADING"
           },
-          metamask: {
+          web3Store: {
             web3: "WEB3"
           }
         }

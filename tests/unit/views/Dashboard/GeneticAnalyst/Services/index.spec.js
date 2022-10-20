@@ -60,7 +60,7 @@ describe("Genetic Analyst Services Dashboard", () => {
           api: "API",
           wallet: "WALLET"
         },
-        metamask: {
+        web3Store: {
           web3: "WEB3"
         }
       }
@@ -203,12 +203,13 @@ describe("Genetic Analyst Services Dashboard", () => {
   it("methods.getServiceList should return", async () => {
     // Arrange
     const PRICE = "PRICE"
+    const currency = "currency"
     const gaServices = _.cloneDeep(GAServices)
     gaServices.methods.api = "API"
     gaServices.methods.wallet = {
       address: "ADDRESS"
     }
-    gaServices.methods.formatPrice = jest.fn(() => PRICE)
+    gaServices.methods.formatPrice = jest.fn(() => PRICE, currency)
     queryGeneticAnalystServicesByHashId.mockReturnValue(serviceDataMock)
     queryGeneticAnalystByAccountId.mockReturnValue({
       services: [serviceDataMock.id]
@@ -228,7 +229,7 @@ describe("Genetic Analyst Services Dashboard", () => {
       }
     ])
     expect(gaServices.methods.formatPrice).toBeCalledTimes(1)
-    expect(gaServices.methods.formatPrice).toBeCalledWith(serviceDataMock.info.pricesByCurrency[0].totalPrice)
+    expect(gaServices.methods.formatPrice).toBeCalledWith(serviceDataMock.info.pricesByCurrency[0].totalPrice, serviceDataMock.info.pricesByCurrency[0].currency)
     expect(queryGeneticAnalystServicesByHashId).toBeCalledTimes(1)
     expect(queryGeneticAnalystServicesByHashId).toBeCalledWith(
       gaServices.methods.api,
@@ -244,6 +245,7 @@ describe("Genetic Analyst Services Dashboard", () => {
   it("methods.formatPrice should return", () => {
     // Arrange
     const WEIGHT = 1
+    const currency = "currency"
     const PRICE = {
       replaceAll: jest.fn(() => WEIGHT)
     }
@@ -257,9 +259,8 @@ describe("Genetic Analyst Services Dashboard", () => {
     }
 
     // Assert
-    expect(gaServices.methods.formatPrice(PRICE)).toEqual(WEIGHT)
+    expect(gaServices.methods.formatPrice(PRICE, currency)).toEqual(WEIGHT)
     expect(gaServices.methods.web3.utils.fromWei).toBeCalledTimes(1)
-    expect(gaServices.methods.web3.utils.fromWei).toBeCalledWith(`${WEIGHT}`, "ether")
   })
 
   it("methods.showDialog should return", async () => {

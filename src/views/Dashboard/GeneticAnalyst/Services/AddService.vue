@@ -68,6 +68,7 @@ import {
 import {pencilIcon, trashIcon} from "@debionetwork/ui-icons"
 import AddServiceForm from "@/common/components/Service/AddService"
 import DeleteDialog from "@/common/components/Dialog/DeleteServiceDialog"
+import { toEther } from "@/common/lib/balance-format.js"
 
 const stepData = [
   {label: "Set Up Account", active: false},
@@ -86,7 +87,7 @@ export default {
     services: [],
     service: {
       name: "",
-      currency: "DBIO",
+      currency: "",
       totalPrice: "",
       duration: "",
       durationType: "Days",
@@ -154,7 +155,7 @@ export default {
       
       const service = {
         name: data.name,
-        currency: "DBIO",
+        currency: data.currency,
         totalPrice: data.pricesByCurrency[0].totalPrice,
         duration: data.expectedDuration.duration,
         durationType: "Days",
@@ -188,7 +189,7 @@ export default {
       this.submitLoading = true
 
       data.forEach(service => {
-        const totalPrice = this.web3.utils.toWei(String(service.pricesByCurrency[0].totalPrice), "ether")
+        const totalPrice = toEther(service.pricesByCurrency[0].totalPrice, service.pricesByCurrency[0].currency)
         delete service.file
 
         services.push({
@@ -214,7 +215,7 @@ export default {
     clearForm() {
       this.service = {
         name: "",
-        currency: "DBIO",
+        currency: "",
         totalPrice: "",
         duration: "",
         durationType: "Days",

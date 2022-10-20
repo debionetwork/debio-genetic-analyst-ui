@@ -42,7 +42,7 @@ describe("Genetic Analyst Layout", () => {
           auth: {
             loadingData: "LOADING"
           },
-          metamask: {
+          web3Store: {
             web3: "WEB3"
           }
         }

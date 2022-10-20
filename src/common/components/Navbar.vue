@@ -287,11 +287,7 @@ export default {
 
       selectedMenu.active = true
 
-      const checkSmallDropdown = selectedMenu.type === "settings"
-
-      const calculateFinalPosition = checkSmallDropdown
-        ? 37
-        : this.$refs.menu.getBoundingClientRect().width - 7
+      const calculateFinalPosition = this.$refs.menu.getBoundingClientRect().width + 200
 
       this.arrowPosition = `${
         e.target.getBoundingClientRect().left -

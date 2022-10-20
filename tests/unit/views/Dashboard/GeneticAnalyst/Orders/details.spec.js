@@ -47,7 +47,7 @@ describe("Genetic Analysis Order Details", () => {
           auth: {
             loadingData: "LOADING"
           },
-          metamask: {
+          web3Store: {
             web3: "WEB3"
           }
         }
