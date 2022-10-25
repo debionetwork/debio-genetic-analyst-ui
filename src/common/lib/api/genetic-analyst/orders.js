@@ -12,3 +12,8 @@ export async function GAGetOrders(keyword) {
 
   return data;
 }
+
+export async function sendRegisteredEmail() {
+  const data = await apiClientRequest.post(`email/registered-genetic-analyst/${localStorage.getAddress()}`)
+  return data
+}

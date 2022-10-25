@@ -86,6 +86,8 @@ import AddServiceForm from "@/common/components/Service/AddService"
 import DeleteDialog from "@/common/components/Dialog/DeleteServiceDialog"
 import StakeDialog from "@/common/components/Dialog/StakeDialog"
 import { toEther } from "@/common/lib/balance-format"
+import { generalDebounce } from "@/common/lib/utils"
+import { sendRegisteredEmail } from "@/common/lib/api"
 
 const stepData = [
   {label: "Set Up Account", active: false},
@@ -123,12 +125,23 @@ export default {
     ...mapState({
       api: (state) => state.substrate.api,
       web3: (state) => state.web3Store.web3,
-      wallet: (state) => state.substrate.wallet
+      wallet: (state) => state.substrate.wallet,
+      lastEventData: (state) => state.substrate.lastEventData
     }),
 
     ...mapGetters({
       pair: "substrate/wallet"
     })
+  },
+
+  watch: {
+    lastEventData: {
+      deep: true,
+      immediate: true,
+      handler: generalDebounce(async function(val) {
+        if (val?.method === "GeneticAnalystStakeSuccessful") await sendRegisteredEmail()
+      }, 100)
+    }
   },
 
   async created() {
