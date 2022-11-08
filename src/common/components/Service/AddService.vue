@@ -162,12 +162,11 @@ export default {
 
   data: () => ({
     currency: [
-      {currency: "USN"},
       {currency: "USDT"}
     ],
     service: {
       name: "",
-      currency: "USN",
+      currency: "USDT",
       totalPrice: "",
       duration: "",
       description: ""

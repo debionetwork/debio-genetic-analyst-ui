@@ -106,7 +106,7 @@ export default {
     services: [],
     service: {
       name: "",
-      currency: "USN",
+      currency: "USDT",
       totalPrice: "",
       duration: "",
       durationType: "Days",
