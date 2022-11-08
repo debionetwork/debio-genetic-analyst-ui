@@ -197,6 +197,7 @@ export default {
         console.error(err)
       }
     },
+
     async registerMnemonic({ commit }, { mnemonic, password }) {
       try {
         commit("SET_LOADING_WALLET", true)
@@ -220,6 +221,7 @@ export default {
         return { success: false, error: err.message }
       }
     },
+
     async restoreAccountKeystore({ commit }, { file, password }) {
       try {
         if (Array.isArray(file)) {
@@ -260,6 +262,7 @@ export default {
         commit("SET_MNEMONIC_DATA", CryptoJS.AES.decrypt(encryptedMnemonic, password));
       }
     },
+
     async getAllAccounts({ commit }, { address }) {
       try {
         commit("SET_LOADING_WALLET", true)
@@ -276,6 +279,7 @@ export default {
         return { success: false, error: err.message }
       }
     },
+
     async checkMnemonicSomeAddress({ commit }, { mnemonic, accountAddress }) {
       try {
         const keyringX = new Keyring({ type: "ed25519", ss58Format: 42 })
@@ -291,6 +295,7 @@ export default {
         return { success: false }
       }
     },
+
     async getListNotification({ commit }, { address, role, block }) {
       
       if (block) await getUnlistedNotification(block)
@@ -309,6 +314,7 @@ export default {
         console.error(err)
       }
     },
+
     async addListNotification({ commit }, { address, event, block, role }) {
       try {
         const storageName = "LOCAL_NOTIFICATION_BY_ADDRESS_" + address + "_" + role

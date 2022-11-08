@@ -47,7 +47,7 @@ export async function getUnlistedNotification (end_block) {
       id,
       timestamp,
       route: routes[entity],
-      params: reference_id,
+      params: { id: reference_id },
       block: block_number,
       read,
       notifDate
