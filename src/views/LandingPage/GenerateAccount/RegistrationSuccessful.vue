@@ -24,7 +24,7 @@
         template(v-slot:main): div.pop-up-main
             img(src='@/assets/check-circle-primary.png')
             h2 {{ text }}
-            v-btn.white--text(elevation='0' color='primary' @click="onContinue") Continue
+            v-btn.white--text(elevation='0' color='primary' @click="onContinue") Select Role
 </template>
 
 <script>
@@ -37,7 +37,7 @@ export default {
   },
   methods: {
     onContinue() {
-      this.$router.push({ name: "ga-dashboard" })
+      this.$router.push({ name: "select-role" })
     }
   },
   computed: {

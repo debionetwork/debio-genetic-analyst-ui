@@ -31,7 +31,15 @@ const signInRoutes = [
     name: "change-password-successful",
     meta: { pageHeader: "Change Password", parent: "sign-in" },
     component: () => import(/* webpackChunkName */ "@/views/LandingPage/SignIn/ChangePasswordSuccessful")
+  },
+  {
+    path: "/select-role",
+    name: "select-role",
+    meta: { pageHeader: "Select Role" },
+    beforeEnter: checkIsLoggedIn,
+    component: () => import(/* webpackChunkName */ "../../views/LandingPage/SelectRole")
   }
+
 ]
 
 export default signInRoutes

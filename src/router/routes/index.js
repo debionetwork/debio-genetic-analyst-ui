@@ -1,7 +1,9 @@
-import GeneticAnalystRoutes from "./geneticAnalyst"
+import GeneticAnalystRoutes from "./genetic-analyst"
+import HealthProfessional from "./health-professional"
 
 const indexRoutes = [
-  ...GeneticAnalystRoutes
+  ...GeneticAnalystRoutes,
+  ...HealthProfessional
 ]
 
 export default indexRoutes

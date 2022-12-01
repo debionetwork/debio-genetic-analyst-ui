@@ -50,7 +50,7 @@ export async function checkAccountStatus(to, from, next) {
   const { GAAccount } = await store.dispatch("substrate/getGAAccount")
   
   if (!GAAccount) {
-    next("/registration")
+    next("analyst/registration")
   } else {
     if (GAAccount.verificationStatus === "Verified") {
       next()

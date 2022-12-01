@@ -242,7 +242,7 @@ export default {
 
       this._show = false
       this.clearInput()
-      this.$router.push({ name: "ga-dashboard" })
+      this.$router.push({ name: "select-role" })
     },
 
     clearInput() {

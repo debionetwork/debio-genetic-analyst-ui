@@ -24,7 +24,7 @@ export default {
 
   methods: {
     handleToDashboard() {
-      this.$router.push({ name: "ga-dashboard" })
+      this.$router.push({ name: "landing-page" })
     }
   }
 }

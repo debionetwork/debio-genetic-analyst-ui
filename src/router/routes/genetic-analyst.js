@@ -1,5 +1,4 @@
 import { checkIsLoggedIn, checkAccountStatus } from "@/common/lib/route-guard"
-import registrationRoutes from "./registration"
 import store from "@/store/index"
 
 export default [
@@ -11,14 +10,14 @@ export default [
     redirect: { name: "ga-dashboard" },
     children: [
       {
-        path: "",
+        path: "/analyst",
         name: "ga-dashboard",
         meta: { pageHeader: "Home" },
         component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Home"),
         beforeEnter: checkAccountStatus
       },
       {
-        path: "/",
+        path: "/analyst",
         name: "ga-dashboard-verification",
         meta: { pageHeader: "Home" },
         component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Home/Unverified"),
@@ -63,7 +62,32 @@ export default [
         meta: { pageHeader: "Details", parent: "ga-orders" },
         component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Orders/Details")
       },
-      ...registrationRoutes
+      {
+        path: "analyst/registration",
+        name: "ga-registration",
+        meta: { pageHeader: "Registration", parent: "genetic-analyst" },
+        component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Registration/AccountInformation"),
+        beforeEnter: async (to, from, next) => {
+          const accountInfo = await store.dispatch("substrate/getGAAccount")
+          
+          if (accountInfo.success) next({name: "ga-registration-service"})
+          else next()
+        }
+      },
+      {
+        path: "analyst/registration/service",
+        name: "ga-registration-service",
+        meta: { pageHeader: "Registration" },
+        component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Registration/AddService"),
+        beforeEnter: async (to, from, next) => {
+          const accountInfo = await store.dispatch("substrate/getGAAccount")
+          
+          if (accountInfo.success) {
+            if (accountInfo.GAAccount.services.length > 0) next({ name: "ga-dashboard" })
+            else next()
+          } else next()
+        }
+      }
     ]
   }
 ]

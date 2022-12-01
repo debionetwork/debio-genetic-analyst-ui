@@ -1,5 +1,5 @@
 import signInRoutes from "./signIn"
-import generateAccountRoutes from "./generateAccount"
+import generateAccountRoutes from "./generate-account"
 
 const landingPageRoutes = [{
   path: "/landing-page",
