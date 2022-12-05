@@ -123,7 +123,9 @@ import localStorage from "@/common/lib/local-storage"
 import { generalDebounce } from "@/common/lib/utils"
 import { queryAccountBalance } from "@debionetwork/polkadot-provider"
 import { setReadNotification } from "@/common/lib/api"
-import { queryGetAssetBalance } from "@/common/lib/polkadot-provider/query/octopus-assets"
+import { queryGetAssetBalance, queryGetAllOctopusAssets } from "@/common/lib/polkadot-provider/query/octopus-assets"
+import getEnv from "@/common/lib/utils/env"
+
 
 let timeout
 
@@ -176,23 +178,34 @@ export default {
     ],
     polkadotWallets: [
       {
-        id: 0,
+        id: null,
         name: "debio",
         icon: "debio-logo",
         currency: "DBIO",
         unit: "ether",
-        balance: 0
+        balance: 0,
+        tokenId: ""
       },
       {
-        id: 2,
+        id: null,
         name: "usdt",
         icon: "tether-logo",
         currency: "USDT",
         unit: "mwei",
-        balance: 0
+        balance: 0,
+        tokenId: ""
       }
-    ]
+    ],
+    octopusAsset: []
   }),
+
+  created() {
+    this.polkadotWallets.forEach(wallet => {
+      if(wallet.name ==="usdt") {
+        wallet.tokenId = getEnv("VUE_APP_DEBIO_USDT_TOKEN_ID")
+      }
+    })
+  },
 
   computed: {
     ...mapActions({
@@ -306,18 +319,29 @@ export default {
     async fetchPolkadotBallance() {
       this.polkadotWallets.forEach(async (w) => {
         if (w && w.name !== "debio") {
-          const { balance } = await queryGetAssetBalance(
-            this.api, w.id, this.wallet.address
-          )
-          w.balance = this.web3.utils.fromWei(balance.replaceAll(",", ""), w.unit)
+          const octopusData = this.octopusAsset.find(data => data.tokenId === w.tokenId)
+          w.balance = this.web3.utils.fromWei(octopusData.data.balance.replaceAll(",", ""), w.unit)
         }
       })
+    },
+
+    async getOctopusAsset() {
+      this.octopusAsset = []
+      const assets = await queryGetAllOctopusAssets(this.api)
+      for (let i = 0; i < assets.length; i++) {
+        const tokenId = assets[i][0].toHuman()[0]
+        const id = assets[i][1].toHuman()
+        const data = await queryGetAssetBalance(this.api, id, this.wallet.address)
+        const assetData = {id, data, name:  tokenId.split(".")[0], tokenId}
+        this.octopusAsset.push(assetData)
+      }
+      await this.fetchPolkadotBallance()
     },
 
     async refetchBalance() {
       try {
         await this.fetchWalletBalance()
-        await this.fetchPolkadotBallance()
+        await this.getOctopusAsset()
       } catch (err) {
         console.error(err)
       }
