@@ -12,14 +12,14 @@ export default [
       {
         path: "/analyst",
         name: "ga-dashboard",
-        meta: { pageHeader: "Home" },
+        meta: { pageHeader: "Dashboard" },
         component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Home"),
         beforeEnter: checkAccountStatus
       },
       {
         path: "/analyst",
         name: "ga-dashboard-verification",
-        meta: { pageHeader: "Home" },
+        meta: { pageHeader: "Dashboard" },
         component: () => import(/* webpackChunkName */ "@/views/Dashboard/GeneticAnalyst/Home/Unverified"),
         beforeEnter: (to, from, next) => {
           if (store.state.substrate.GAAccount.verificationStatus === "Verified") next({ name: "ga-dashboard" })

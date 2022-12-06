@@ -9,7 +9,7 @@
             span.stepper__box-text {{ idx + 1 }}
           .stepper__label {{ item.label }}
       .ga-account__title Set Up Account
-      GAForm(:onSubmit="onSubmitInformation" :submitLoading="loading")
+      GAForm(:onSubmit="onSubmitInformation" :submitLoading="loading" role="genetic-analyst")
 </template>
 
 <script>

@@ -19,7 +19,7 @@
             color="secondary"
             block
             @click="onSubmit"
-          ) Ok
+          ) {{ buttonTitle }}
 
 </template>
 
@@ -39,7 +39,8 @@ export default {
   props: {
     show: Boolean,
     title: { type: String, default: "Title" },
-    message: { type: String, default: "" }
+    message: { type: String, default: "" },
+    buttonTitle: { type: String, default: "OK" }
   },
 
   methods: {
@@ -87,6 +88,7 @@ export default {
       margin: 20px 27px
 
     &__buttons
-      margin-top: 20px 
+      margin: 40px 0 20px 0
+      width: 228px
 
 </style>

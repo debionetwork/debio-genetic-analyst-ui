@@ -100,6 +100,32 @@
       validate-on-blur
     )
 
+    ui-debio-dropdown(
+      v-if="role === 'professional-health'"
+      :items="roles"
+      v-model="info.registerAs"
+      variant="small"
+      label="Register as"
+      placeholder="Select Category"
+      outlined
+      close-on-select
+      validate-on-blur
+      block
+    )
+
+    ui-debio-dropdown(
+      v-if="role === 'professional-health'"
+      :items="profHealthCategories"
+      v-model="info.profHealthCategory"
+      variant="small"
+      label="Category"
+      placeholder="Select Category"
+      outlined
+      close-on-select
+      validate-on-blur
+      block
+    )
+
     ui-debio-input(
       :error="isDirty.info && isDirty.info.phoneNumber"
       :rules="$options.rules.info.phoneNumber"
@@ -169,6 +195,17 @@
           :disabled="stakingStatus != 'Staked'"
           style="margin-left: 10px;"
         ) Unavailable
+
+    template(v-if="role === 'professional-health'")
+      label.text-title Privacy Settings
+      label.text-label Identity on Marketplace
+      v-radio-group.ga-account__radio-input(
+        v-model="info.privacy"
+        row
+      )
+        v-radio(label="Hide My Identity" value="hide")
+        v-radio(label="Show My Identity" value="show")
+    
 
     label.text-title Qualification
 
@@ -373,7 +410,9 @@ export default {
       profileLink: "",
       phoneNumber: "",
       dateOfBirth: null,
-      specialization: ""
+      specialization: "",
+      registerAs: null,
+      profHealthCategory: null
     },
     profileImage: "",
     experiences: [{title: "", error: ""}],
@@ -388,7 +427,9 @@ export default {
     errorProfile: "",
     categories: [],
     editId: null,
-    txWeight: null
+    txWeight: null,
+    roles: ["Counselour", "Psikolog", "Psikiater"],
+    profHealthCategories: ["Mental Health", "Physical Health"]
   }),
 
   components: { CertificationDialog, InsufficientDialog},
@@ -396,7 +437,8 @@ export default {
   props: {
     onSubmit: {type: Function, default: () => {}},
     isEdit: {type: Boolean, default: false},
-    submitLoading: {type: Boolean, default: false}
+    submitLoading: {type: Boolean, default: false},
+    role: { type: String }
   },
 
   computed: {
