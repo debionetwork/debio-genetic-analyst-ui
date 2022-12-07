@@ -165,11 +165,11 @@ export default {
 
   data: () => ({
     currency: [
-      {currency: "USDT"}
+      {currency: "USDT.e"}
     ],
     service: {
       name: "",
-      currency: "USDT",
+      currency: "USDT.e",
       totalPrice: "",
       duration: "",
       description: ""
@@ -228,7 +228,7 @@ export default {
   },
 
   async created() {
-    this.usdRate = await getConversionCache(this.service.currency, "USD")
+    this.usdRate = await getConversionCache(this.service.currency === "USDT.e" ? "USDT" : this.service.currency, "USD")
   },
 
   computed: {

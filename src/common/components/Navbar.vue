@@ -190,7 +190,7 @@ export default {
         id: null,
         name: "usdt",
         icon: "tether-logo",
-        currency: "USDT",
+        currency: "USDT.e",
         unit: "mwei",
         balance: 0,
         tokenId: ""
