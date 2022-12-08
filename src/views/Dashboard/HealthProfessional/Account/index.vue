@@ -4,7 +4,7 @@
       .hp-account__title Set Up Account
       .hp-account__wrapper
       GAForm(
-        role="professional-health" 
+        role="health-professional" 
         :onSubmit="onSubmitInformation"
       )
       StakeDialog(

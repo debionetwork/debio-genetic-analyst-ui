@@ -101,7 +101,7 @@
     )
 
     ui-debio-dropdown(
-      v-if="role === 'professional-health'"
+      v-if="role === 'health-professional'"
       :items="roles"
       v-model="info.registerAs"
       variant="small"
@@ -114,7 +114,7 @@
     )
 
     ui-debio-dropdown(
-      v-if="role === 'professional-health'"
+      v-if="role === 'health-professional'"
       :items="profHealthCategories"
       v-model="info.profHealthCategory"
       variant="small"
@@ -196,7 +196,7 @@
           style="margin-left: 10px;"
         ) Unavailable
 
-    template(v-if="role === 'professional-health'")
+    template(v-if="role === 'health-professional'")
       label.text-title Privacy Settings
       label.text-label Identity on Marketplace
       v-radio-group.ga-account__radio-input(
