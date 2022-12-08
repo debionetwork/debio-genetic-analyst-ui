@@ -3,7 +3,7 @@
     .health-professional-banner
       .health-professional-banner__content
         .health-professional-banner__title DeBio Second Opinion
-        .health-professional-banner__sub-title Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam, purus sit amet luctus venenatis, lectus magna fringilla urna, porttitor rhoncus dolor purus non enim praesent elementum facilisis
+        .health-professional-banner__sub-title Provide a second opinion point of view regarding to mental and physical health for customer who need more enhance opinion of their health record
 
       v-img(
         alt="no-list-data"
