@@ -34,7 +34,7 @@
           )
           .ga-account__space-between
             span.text-title {{ item.name }}
-            span.text-secondary {{ item.pricesByCurrency[0].totalPrice }} {{ item.pricesByCurrency[0].currency }}
+            span.text-secondary {{ item.pricesByCurrency[0].totalPrice }} {{ formatUSDTE(item.pricesByCurrency[0].currency) }}
           span.text-secondary {{ item.description }}
           span.text-title Service Duration: {{ item.expectedDuration.duration }} {{ item.expectedDuration.durationType }}
           .ga-account__space-between
@@ -85,7 +85,7 @@ import localStorage from "@/common/lib/local-storage"
 import AddServiceForm from "@/common/components/Service/AddService"
 import DeleteDialog from "@/common/components/Dialog/DeleteServiceDialog"
 import StakeDialog from "@/common/components/Dialog/StakeDialog"
-import { toEther } from "@/common/lib/balance-format"
+import { toEther, formatUSDTE } from "@/common/lib/balance-format"
 import { generalDebounce } from "@/common/lib/utils"
 import { sendRegisteredEmail } from "@/common/lib/api"
 
@@ -238,7 +238,7 @@ export default {
         services.push({
           ...service, 
           pricesByCurrency: [{
-            currency: service.pricesByCurrency[0].currency,
+            currency: formatUSDTE(service.pricesByCurrency[0].currency),
             totalPrice: totalPrice,
             priceComponents: [{component: "Main Price", value: totalPrice}]
           }]

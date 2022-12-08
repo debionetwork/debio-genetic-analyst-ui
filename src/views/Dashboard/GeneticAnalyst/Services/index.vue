@@ -96,7 +96,7 @@
 
           template(v-slot:[`item.price`]="{ item }")
             .d-flex.flex-column.ga-services__price
-              span {{ item.price }} {{ item.currency }}
+              span {{ item.price }} {{ formatUSDTE(item.currency) }}
 
           template(v-slot:[`item.duration`]="{ item }")
             .d-flex.flex-column.ga-services__duration
@@ -131,6 +131,7 @@ import {
   deleteGeneticAnalystServiceFee
 } from "@debionetwork/polkadot-provider"
 import {GAGetOrders} from "@/common/lib/api"
+import { formatUSDTE } from "@/common/lib/balance-format.js"
 
 import WarningDialog from "@/common/components/Dialog/WarningDialog"
 
@@ -145,6 +146,7 @@ export default {
     pencilIcon,
     trashIcon,
     alertTriangleIcon,
+    formatUSDTE,
     error: "",
     txWeight: "",
     serviceId: "",
@@ -281,7 +283,7 @@ export default {
     formatPrice(price, currency) {
       let unit
       let formatedBalance = 0
-      currency === "USDT" || currency === "USDT.e"  ? unit = "mwei" : unit = "ether"
+      currency === "USDT" || currency === "USDT.e" || currency === "USDTE" ? unit = "mwei" : unit = "ether"
       formatedBalance = this.web3.utils.fromWei(String(price.replaceAll(",", "")), unit)
       return formatedBalance
     },

@@ -151,6 +151,7 @@ import {uploadFile, getFileUrl} from "@/common/lib/pinata-proxy"
 import rulesHandler from "@/common/constants/rules"
 import { validateForms } from "@/common/lib/validate"
 import { getConversionCache } from "@/common/lib/api/customer/debio-balance"
+import { formatUSDTE } from "@/common/lib/balance-format.js"
 
 const documentFormat = [
   "image/jpg",
@@ -200,7 +201,7 @@ export default {
         totalPrice: newVal.totalPrice,
         duration: newVal.duration,
         description: newVal.description,
-        currency: newVal.currency
+        currency: formatUSDTE(newVal.currency)
       },
       this.durationType = newVal.durationType
       this.testResultSample = newVal.testResultSample

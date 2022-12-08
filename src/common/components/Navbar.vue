@@ -87,7 +87,7 @@
                         max-width="24px"
                         max-height="24px"
                       )
-                      span {{ wallet.balance }} {{ wallet.currency }} 
+                      span {{ wallet.balance }} {{ wallet.currency === "USDTE" ? "USDT.e" : wallet.currency }} 
 
                     v-divider.navbar__balance-divider-sec
 
@@ -190,7 +190,7 @@ export default {
         id: null,
         name: "usdt",
         icon: "tether-logo",
-        currency: "USDT.e",
+        currency: "USDTE",
         unit: "mwei",
         balance: 0,
         tokenId: ""

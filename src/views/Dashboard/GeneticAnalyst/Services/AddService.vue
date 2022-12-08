@@ -68,7 +68,7 @@ import {
 import {pencilIcon, trashIcon} from "@debionetwork/ui-icons"
 import AddServiceForm from "@/common/components/Service/AddService"
 import DeleteDialog from "@/common/components/Dialog/DeleteServiceDialog"
-import { toEther } from "@/common/lib/balance-format.js"
+import { toEther, formatUSDTE } from "@/common/lib/balance-format.js"
 
 const stepData = [
   {label: "Set Up Account", active: false},
@@ -195,7 +195,7 @@ export default {
         services.push({
           ...service, 
           pricesByCurrency: [{
-            currency: service.pricesByCurrency[0].currency,
+            currency: formatUSDTE(service.pricesByCurrency[0].currency),
             totalPrice: totalPrice,
             priceComponents: [{component: "Main Price", value: totalPrice}]
           }]

@@ -35,7 +35,7 @@ import {pencilIcon, trashIcon} from "@debionetwork/ui-icons"
 import AddServiceForm from "@/common/components/Service/AddService"
 import DeleteDialog from "@/common/components/Dialog/DeleteServiceDialog"
 import SuccessDialog from "@/common/components/Dialog/SuccessDialogGeneral"
-import { fromEther, toEther } from "@/common/lib/balance-format"
+import { fromEther, toEther, formatUSDTE } from "@/common/lib/balance-format"
 
 
 const stepData = [
@@ -107,7 +107,7 @@ export default {
       
       const service = {
         name: data?.info?.name,
-        currency: data?.info?.pricesByCurrency[0].currency,
+        currency: formatUSDTE(data?.info?.pricesByCurrency[0].currency),
         totalPrice: totalPrice,
         duration: data?.info?.expectedDuration.duration,
         durationType: data?.info?.expectedDuration.durationType,
@@ -141,7 +141,7 @@ export default {
       const dataToSend = {
         name,
         pricesByCurrency: [{
-          currency, 
+          currency: formatUSDTE(currency), 
           totalPrice: price,
           priceComponents: [{component: "Main Price", value: price}]
         }],
