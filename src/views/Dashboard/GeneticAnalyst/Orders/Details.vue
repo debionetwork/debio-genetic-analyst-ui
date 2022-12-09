@@ -254,7 +254,7 @@ import rulesHandler from "@/common/constants/rules"
 
 import Card from "./Card.vue"
 import UploadingDialog from "@/common/components/Dialog/UploadingDialog"
-import { fromEther } from "@/common/lib/balance-format"
+import { fromEther, formatUSDTE } from "@/common/lib/balance-format"
 
 export default {
   name: "GAOrderDetails",
@@ -504,7 +504,7 @@ export default {
             ...serviceData.info,
             price: `
               ${fromEther(serviceData.info.pricesByCurrency[0].totalPrice, serviceData.info.pricesByCurrency[0].currency)}
-              ${serviceData.info.pricesByCurrency[0].currency}
+              ${formatUSDTE(serviceData.info.pricesByCurrency[0].currency)}
             `,
             expectedDuration: `${serviceData.info.expectedDuration.duration} ${serviceData.info.expectedDuration.durationType}`
           }
