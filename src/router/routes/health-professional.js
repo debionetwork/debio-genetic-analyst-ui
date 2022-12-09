@@ -18,7 +18,7 @@ export default [
       {
         path: "/health-professional/account",
         name: "hp-account",
-        meta: { pageHeader: "Registration", parent: "health-professional" },
+        meta: { pageHeader: "Account", parent: "health-professional" },
         component: () => import(/* webpackChunkName */ "@/views/Dashboard/HealthProfessional/Account")
         // beforeEnter: checkAccountStatus
       }

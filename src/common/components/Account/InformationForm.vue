@@ -37,11 +37,13 @@
           outlined
           block
           validate-on-blur
+          :disabled="disableFields"
         )
       v-col
         ui-debio-input(
           :error="isDirty.info && isDirty.info.lastName"
           :rules="$options.rules.info.lastName"
+          :disabled="disableFields"
           variant="small"
           label="Last Name"
           placeholder="Add Last Name"
@@ -55,6 +57,7 @@
     v-radio-group.ga-account__radio-input(
       :error="isDirty.info && isDirty.info.gender"
       :rules="$options.rules.info.gender"
+      :disabled="disableFields"
       v-model="info.gender"
       row
     )
@@ -65,6 +68,7 @@
     ui-debio-input(
       :error="isDirty.info && isDirty.info.dateOfBirth"
       :rules="$options.rules.info.dateOfBirth"
+      :disabled="disableFields"
       variant="small"
       label="Date of Birth"
       placeholder="Add Date of Birth"
@@ -79,6 +83,7 @@
     ui-debio-input(
       :error="isDirty.info && isDirty.info.email"
       :rules="$options.rules.info.email"
+      :disabled="disableFields"
       variant="small"
       label="Email"
       placeholder="Add Email"
@@ -91,6 +96,7 @@
     ui-debio-input(
       :error="isDirty.info && isDirty.info.profileLink"
       :rules="$options.rules.info.profileLink"
+      :disabled="disableFields"
       variant="small"
       label="Linkedin URL"
       placeholder="Add Linkedin"
@@ -103,6 +109,7 @@
     ui-debio-dropdown(
       v-if="role === 'health-professional'"
       :items="roles"
+      :disabled="disableFields"
       v-model="info.registerAs"
       variant="small"
       label="Register as"
@@ -116,6 +123,7 @@
     ui-debio-dropdown(
       v-if="role === 'health-professional'"
       :items="profHealthCategories"
+      :disabled="disableFields"
       v-model="info.profHealthCategory"
       variant="small"
       label="Category"
@@ -129,6 +137,7 @@
     ui-debio-input(
       :error="isDirty.info && isDirty.info.phoneNumber"
       :rules="$options.rules.info.phoneNumber"
+      :disabled="disableFields"
       variant="small"
       label="Phone"
       placeholder="Add Phone Number"
@@ -200,6 +209,7 @@
       label.text-title Privacy Settings
       label.text-label Identity on Marketplace
       v-radio-group.ga-account__radio-input(
+        :disabled="disableFields"
         v-model="info.privacy"
         row
       )
@@ -207,12 +217,30 @@
         v-radio(label="Show My Identity" value="show")
     
 
+
+    ui-debio-input(
+      v-if="role === 'health-professional' && info.privacy === 'show'"
+      :error="isDirty.info && isDirty.info.username"
+      :disabled="disableFields"
+      variant="small"
+      label="Username"
+      placeholder="PinkPanter"
+      v-model="info.username"
+      outlined
+      block
+      validate-on-blur
+      style="margin-top: 15px;"
+      max="12"
+    )
+
+
     label.text-title Qualification
 
     ui-debio-dropdown(
       :items="categories"
       :error="isDirty.info && isDirty.info.specialization"
       :rules="$options.rules.info.specialization"
+      :disabled="disableFields"
       variant="small"
       label="Specialization"
       placeholder="Select Specialization"
@@ -244,6 +272,7 @@
     )
       ui-debio-input(
         :error-messages="experiences[idx].error"
+        :disabled="disableFields"
         :error="!experiences[idx].title"
         variant="small"
         label="Experience"
@@ -271,7 +300,7 @@
         width="35px"
         height="35px"
         @click="showCertDialog = true"
-        :disabled="submitLoading"
+        :disabled="submitLoading || disableFields"
       ) 
         v-icon mdi-plus
     
@@ -347,7 +376,7 @@
       @click="handleSubmit"
       :disabled="disable"
       block
-    ) Next
+    ) {{ !account || isEditing ? "Next" : "Edit" }}
 
     CertificationDialog(
       :show="showCertDialog" 
@@ -363,7 +392,7 @@
 </template>
 
 <script>
-import {mapState} from "vuex"
+import { mapState } from "vuex"
 import errorMessages from "@/common/constants/error-messages"
 import {uploadFile, getFileUrl} from "@/common/lib/pinata-proxy"
 import {getSpecializationCategory} from "@/common/lib/api"
@@ -428,14 +457,16 @@ export default {
     categories: [],
     editId: null,
     txWeight: null,
-    roles: ["Counselour", "Psikolog", "Psikiater"],
-    profHealthCategories: ["Mental Health", "Physical Health"]
+    roles: ["Medical specialist", "General practitioner", "Psychiatric practitioner"],
+    profHealthCategories: ["Mental Health", "Physical Health"],
+    isEditing: false
   }),
 
   components: { CertificationDialog, InsufficientDialog},
 
   props: {
     onSubmit: {type: Function, default: () => {}},
+    onUpdate: {type: Function, default: () => {}},
     isEdit: {type: Boolean, default: false},
     submitLoading: {type: Boolean, default: false},
     role: { type: String }
@@ -446,7 +477,8 @@ export default {
       api: (state) => state.substrate.api,
       web3: (state) => state.web3Store.web3,
       wallet: (state) => state.substrate.wallet,
-      walletBalance: (state) => state.substrate.walletBalance
+      walletBalance: (state) => state.substrate.walletBalance,
+      account: (state) => state.auth.account
     }),
 
     computeAvatar() {
@@ -455,7 +487,16 @@ export default {
         : require("@/assets/image-placeholder.png")
     },
 
+    disableFields() {
+      if (this.isEditing) return false
+      return this.role==="health-professional" && this.account
+    },
+
     disable() {
+      if(this.role==="health-professional" && this.account) {
+        return false
+      }
+
       const {
         firstName,
         lastName,
@@ -535,6 +576,8 @@ export default {
     await this.getTxWeight()
     await this.getSpecialization()
 
+    if (this.role === "health-professional" && this.account) await this.fetchAccountDetail()
+
     this.isLoading = false
   },
 
@@ -543,6 +586,11 @@ export default {
       const categories = await getSpecializationCategory()
 
       this.categories = categories
+    },
+
+    async fetchAccountDetail() {
+      this.info = this.account
+      this.experiences = this.account.experiences
     },
 
     async getTxWeight() {
@@ -600,6 +648,11 @@ export default {
     },
 
     handleSubmit() {
+      if (this.account && !this.isEditing) {
+        this.isEditing = true
+        return        
+      }
+
       this._touchForms("info")
       const isInfoValid = Object.values(this.isDirty?.info).every(v => v !== null && v === false)
       const experiences = experienceValidation(this.experiences)
@@ -621,6 +674,11 @@ export default {
       }
       
       if (this.walletBalance < this.txWeight) return this.showInsufficientDialog = true
+
+      if (this.isEditing) {
+        this.onUpdate(data)
+        return
+      }
 
       this.onSubmit(data)
     },

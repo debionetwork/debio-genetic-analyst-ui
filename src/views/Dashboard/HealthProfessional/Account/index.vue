@@ -6,6 +6,7 @@
       GAForm(
         role="health-professional" 
         :onSubmit="onSubmitInformation"
+        :onUpdate="onUpdateInformation"
       )
       StakeDialog(
         :show="showStakeDialog" 
@@ -15,9 +16,9 @@
 
       SuccessDialogGeneral(
         :show="showSuccessDialog"
-        title="Registration Sent!"
+        :title="title"
         buttonTitle="Back to Home"
-        message="Your verification submission is being reviewed by Daogenic"
+        :message="message"
         @close="toHomePage"
         @submit="toHomePage"
       )
@@ -28,6 +29,7 @@
 
 <script>
 
+import { mapMutations } from "vuex"
 import GAForm from "@/common/components/Account/InformationForm"
 import StakeDialog from "@/common/components/Dialog/StakeDialog"
 import SuccessDialogGeneral from "@/common/components/Dialog/SuccessDialogGeneral.vue"
@@ -38,7 +40,8 @@ export default {
 
   data: () => ({
     showStakeDialog: false,
-    showSuccessDialog: false
+    showSuccessDialog: false,
+    account: null
   }),
 
   components: {
@@ -48,12 +51,29 @@ export default {
   },
 
   methods: {
-    async onSubmitInformation() {
+
+    ...mapMutations({
+      setAccount: "auth/SET_ACCOUNT"      
+    }),
+
+
+    async onSubmitInformation(val) {
+      this.account = val
       this.showStakeDialog = true
     },
 
     onSubmit() {
       this.showStakeDialog = false
+      this.setAccount(this.account)
+      this.title="Registration Sent!"
+      this.message="Your verification submission is being reviewed by Daogenic"
+      this.showSuccessDialog = true
+    },
+
+    onUpdateInformation(val) {
+      this.setAccount(val)
+      this.title="Success"
+      this.message="Your service has been edited!"      
       this.showSuccessDialog = true
     },
 

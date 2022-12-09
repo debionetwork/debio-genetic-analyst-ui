@@ -4,7 +4,8 @@ import getEnv from "../common/lib/utils/env"
 const defaultState = {
   role: null,
   configApp: null,
-  loadingData: null
+  loadingData: null,
+  account: null
 }
 
 export default {
@@ -29,6 +30,10 @@ export default {
 
     CLEAR(state) {
       state.role = defaultState.role
+    },
+
+    SET_ACCOUNT(state, data) {
+      state.account = data
     }
   },
 
