@@ -73,7 +73,7 @@ export default {
     onUpdateInformation(val) {
       this.setAccount(val)
       this.title="Success"
-      this.message="Your service has been edited!"      
+      this.message="Your account has been edited!"      
       this.showSuccessDialog = true
     },
 
