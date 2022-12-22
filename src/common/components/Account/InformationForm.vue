@@ -292,7 +292,7 @@
       )
       
       v-row.ga-account__experience-ph(v-if="role !== 'genetic-analyst'")
-        v-col
+        v-col(cols=7)
           ui-debio-input(
             :error-messages="experiences[idx].error"
             :disabled="disableFields"
