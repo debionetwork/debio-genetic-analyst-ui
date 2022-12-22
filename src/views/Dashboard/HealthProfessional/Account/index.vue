@@ -66,7 +66,7 @@ export default {
       this.showStakeDialog = false
       this.setAccount(this.account)
       this.title="Registration Sent!"
-      this.message="Your verification submission is being reviewed by Daogenic"
+      this.message="Your verification submission is being reviewed by Daogenics"
       this.showSuccessDialog = true
     },
 

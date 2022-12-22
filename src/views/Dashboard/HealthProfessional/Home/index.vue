@@ -16,7 +16,7 @@
             stroke
           )
           template
-            span.hp-dashboard__alert-text Your verification submission is being reviewed by Daogenic
+            span.hp-dashboard__alert-text Your verification submission is being reviewed by Daogenics
 
 </template>
 

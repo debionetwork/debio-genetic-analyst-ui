@@ -23,7 +23,7 @@
               stroke
             )
             .verification-status__text
-              | Your verification submission is {{ verificationStatus === 'Unverified' ? " being reviewed" : verificationStatus }} by Daogenic
+              | Your verification submission is {{ verificationStatus === 'Unverified' ? " being reviewed" : verificationStatus }} by Daogenics
 
         .ga-dashboard__table(v-else)
           ui-debio-data-table(:headers="headers" :items="orderLists" :loading="isLoading")

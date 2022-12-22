@@ -81,6 +81,21 @@
     )
 
     ui-debio-input(
+      :error="isDirty.info && isDirty.info.phoneNumber"
+      :rules="$options.rules.info.phoneNumber"
+      :disabled="disableFields"
+      variant="small"
+      label="Phone"
+      placeholder="Add Phone Number"
+      v-model="info.phoneNumber"
+      outlined
+      block
+      validate-on-blur
+      style="margin-top: 15px;"
+      max="12"
+    )
+
+    ui-debio-input(
       :error="isDirty.info && isDirty.info.email"
       :rules="$options.rules.info.email"
       :disabled="disableFields"
@@ -92,32 +107,24 @@
       block
       validate-on-blur
     )
+    
+    label.ga-account__form-label LinkedIn URL
+      ui-debio-button.ga-account__form-label-desc(
+        disabled
+        style="font-size: 8px;"
+        width="40"
+        height="20"
+        ) Optional
 
     ui-debio-input(
-      :error="isDirty.info && isDirty.info.profileLink"
-      :rules="$options.rules.info.profileLink"
+      :rules="profileLink ? $options.rules.profileLink : []"
       :disabled="disableFields"
       variant="small"
-      label="Linkedin URL"
       placeholder="Add Linkedin"
-      v-model="info.profileLink"
+      v-model="profileLink"
       outlined
       block
       validate-on-blur
-    )
-
-    ui-debio-dropdown(
-      v-if="role === 'health-professional'"
-      :items="roles"
-      :disabled="disableFields"
-      v-model="info.registerAs"
-      variant="small"
-      label="Register as"
-      placeholder="Select Category"
-      outlined
-      close-on-select
-      validate-on-blur
-      block
     )
 
     ui-debio-dropdown(
@@ -134,19 +141,18 @@
       block
     )
 
-    ui-debio-input(
-      :error="isDirty.info && isDirty.info.phoneNumber"
-      :rules="$options.rules.info.phoneNumber"
+    ui-debio-dropdown(
+      v-if="role === 'health-professional'"
+      :items="roles"
       :disabled="disableFields"
+      v-model="info.registerAs"
       variant="small"
-      label="Phone"
-      placeholder="Add Phone Number"
-      v-model="info.phoneNumber"
+      label="Register as"
+      placeholder="Select Category"
       outlined
-      block
+      close-on-select
       validate-on-blur
-      style="margin-top: 15px;"
-      max="12"
+      block
     )
 
     div(v-if="isEdit")
@@ -237,6 +243,7 @@
     label.text-title Qualification
 
     ui-debio-dropdown(
+      v-if="role === 'genetic-analyst' || info.registerAs === 'Medical Doctor - Specialist Practitioner'"
       :items="categories"
       :error="isDirty.info && isDirty.info.specialization"
       :rules="$options.rules.info.specialization"
@@ -271,6 +278,7 @@
       :key="idx"
     )
       ui-debio-input(
+        v-if="role === 'genetic-analyst'"
         :error-messages="experiences[idx].error"
         :disabled="disableFields"
         :error="!experiences[idx].title"
@@ -282,6 +290,50 @@
         block
         validate-on-blur
       )
+      
+      v-row.ga-account__experience-ph(v-if="role !== 'genetic-analyst'")
+        v-col
+          ui-debio-input(
+            :error-messages="experiences[idx].error"
+            :disabled="disableFields"
+            :error="!experiences[idx].title"
+            variant="small"
+            label="Work Experience"
+            placeholder="Add Experience"
+            v-model="experiences[idx].title"
+            outlined
+            block
+            validate-on-blur
+          )
+        v-col
+          ui-debio-dropdown(
+            :items="selectYears"
+            variant="small"
+            label="Year Start"
+            placeholder="Select"
+            v-model="experienceYear.start"
+            outlined
+            close-on-select
+            validate-on-blur
+            block
+          )
+
+        v-col
+          ui-debio-dropdown(
+            :items="selectYears"
+            variant="small"
+            label="Year End"
+            placeholder="Select"
+            v-model="experienceYear.end"
+            outlined
+            close-on-select
+            validate-on-blur
+            block
+          )
+
+
+          
+
       v-icon.ga-account__icon-experience(
         color="#C400A5"
         v-if="experiences.length > 1"
@@ -295,6 +347,12 @@
 
     div.ga-account__space-between
       span.text-title Certification
+        ui-debio-button.ga-account__form-label-desc(
+          disabled
+          style="font-size: 8px;"
+          width="40"
+          height="20"
+          ) Optional
       ui-debio-button(
         color="secondary"
         width="35px"
@@ -402,6 +460,7 @@ import { validateForms } from "@/common/lib/validate"
 import rulesHandler from "@/common/constants/rules"
 import CertificationDialog from "@/common/components/Dialog/CertificateDialog"
 import InsufficientDialog from "@/common/components/Dialog/InsufficientBalanceDialog"
+import dummySpecialization from "./dummySpecialization"
 
 const imageType = ["image/jpg", "image/png", "image/jpeg"]
 
@@ -436,13 +495,13 @@ export default {
       lastName: "",
       gender: "",
       email: "",
-      profileLink: "",
       phoneNumber: "",
       dateOfBirth: null,
       specialization: "",
       registerAs: null,
       profHealthCategory: null
     },
+    profileLink: "",
     profileImage: "",
     experiences: [{title: "", error: ""}],
     profile: {
@@ -457,9 +516,13 @@ export default {
     categories: [],
     editId: null,
     txWeight: null,
-    roles: ["Medical specialist", "General practitioner", "Psychiatric practitioner"],
+    roles: ["Medical Doctor - Generalist Practitioner", "Medical Doctor - Specialist Practitioner", "Clinical Psychologist", "Clinical Psychiatrist"],
     profHealthCategories: ["Mental Health", "Physical Health"],
-    isEditing: false
+    isEditing: false,
+    experienceYear: {
+      start: "",
+      end: ""
+    }
   }),
 
   components: { CertificationDialog, InsufficientDialog},
@@ -512,6 +575,15 @@ export default {
         return true
       }
       return false
+    },
+
+    selectYears() {
+      const years = []
+      const thisYear = new Date().getFullYear()
+      for (let i = thisYear; i >= 1900; i--) {
+        years.push(String(i))
+      }
+      return years
     }
   },
 
@@ -561,14 +633,13 @@ export default {
       ],
       specialization: [
         rulesHandler.FIELD_REQUIRED
-      ],
-      profileLink: [
-        rulesHandler.FIELD_REQUIRED,
-        rulesHandler.ENGLISH_ALPHABET,
-        rulesHandler.MAX_CHARACTER(255),
-        rulesHandler.WEBSITE
       ]
-    }
+    },
+    profileLink: [
+      rulesHandler.ENGLISH_ALPHABET,
+      rulesHandler.MAX_CHARACTER(255),
+      rulesHandler.WEBSITE
+    ]
   },
 
   async created() {
@@ -583,9 +654,13 @@ export default {
 
   methods: {
     async getSpecialization() {
-      const categories = await getSpecializationCategory()
-
-      this.categories = categories
+      if (this.role === "genetic-analyst") {
+        const categories = await getSpecializationCategory()
+        this.categories = categories
+        return
+      }
+      // TODO: get Specialist Practitioner Specialization from API
+      this.categories = dummySpecialization.data
     },
 
     async fetchAccountDetail() {
@@ -669,6 +744,7 @@ export default {
       const data = {
         profileImage: this.profileImage,
         experiences: this.experiences,
+        profileLink: this.profileLink,
         ...this.info,
         ...this.profile
       }
@@ -774,6 +850,13 @@ function experienceValidation(data) {
     flex-direction: column
     align-self: center
     gap: 20px
+
+  &__form-label
+    @include body-text-3-opensans
+
+  &__form-label-desc
+    margin-left: 8px
+    margin-bottom: 6px
 
   &__radio-input
     padding: 0
