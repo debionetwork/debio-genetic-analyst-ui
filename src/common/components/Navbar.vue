@@ -93,7 +93,8 @@
 
 
               template(slot="footer" v-if="getActiveMenu.type === 'polkadot'")
-                v-btn.navbar__footer-button(block color="primary" outlined @click="signOut()") Sign Out
+                v-btn.navbar__footer-button(outlined block color="#FE379E" dark @click="exportKeystoreAction") Export Keystore
+                v-btn.navbar__footer-button(block dark color="#FE379E" @click="signOut()") Sign Out
 
     v-progress-linear.navbar__loading(
       v-if="loading"
@@ -342,6 +343,25 @@ export default {
       try {
         await this.fetchWalletBalance()
         await this.getOctopusAsset()
+      } catch (err) {
+        console.error(err)
+      }
+    },
+
+    exportKeystoreAction(){
+      try {
+        const keystore = localStorage.getKeystore()
+        const address = localStorage.getAddress()
+        const file = new Blob([keystore], {type: "text/json;charset=utf-8"})
+        const downloadUrl = window.URL.createObjectURL(file)
+        const downloadLink = document.createElement("a")
+        downloadLink.href = downloadUrl
+        downloadLink.target = "_blank"
+        downloadLink.download = `${address}.json`
+
+        downloadLink.click()
+
+        window.URL.revokeObjectURL(downloadUrl)
       } catch (err) {
         console.error(err)
       }
