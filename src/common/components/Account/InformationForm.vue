@@ -212,8 +212,27 @@
         ) Unavailable
 
     template(v-if="role === 'health-professional'")
-      label.text-title Privacy Settings
+      label.text-title Privacy Settings            
       label.text-label Identity on Marketplace
+        v-tooltip.visible(right color="grey lighten-5")
+          template(v-slot:activator="{ on, attrs }")
+            v-icon.trans-weight-icon(
+              style="font-size: 12px;"
+              color="primary"
+              dark
+              v-bind="attrs"
+              v-on="on"
+            ) mdi-help-circle-outline
+          p.tooltip__box(style="color: #000000") This will only affect your username on Myriad.Social. Both options will show your role, category, specialization, experiences and certifications. Private data such as date of birth, phone number and email will only be visible to you.
+          v-row
+            v-col(cols=3)
+              p.tooltip__option(style="color: #000000") Hide My Identity
+            p.tooltip__text(style="color: #000000") To protect your privacy, you will be given a username consisting of two random words e.g. curioushippo, happycat, etc.
+          v-row
+            v-col(cols=3)
+              p.tooltip__option(style="color: #000000") Show My Identity
+            p.tooltip__text(style="color: #000000") You will use your real name as your username (we will combine your first and last name, and possibly following with random numbers). e.g. johndoe, johndoe1, johndoe2
+
       v-radio-group.ga-account__radio-input(
         :disabled="disableFields"
         v-model="info.privacy"
@@ -941,4 +960,18 @@ function experienceValidation(data) {
   &__cta
     width: 250px
     margin: 0 auto
+
+.tooltip
+  &__box
+    padding: 5px
+    width: 540px
+    font-size: 12px
+
+  &__option
+    font-size: 12px
+    font-weight: 600
+
+  &__text
+    width: 400px
+    font-size: 12px
 </style>
