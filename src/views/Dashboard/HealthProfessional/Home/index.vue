@@ -34,14 +34,59 @@
                 color="secondary"
                 @click="toInstall"
               ) Install
+
+            ui-debio-modal.hp-dashboard__modal-connect(
+              :show="showConnect"
+              :show-title="false"
+              :show-cta="false"
+              @onClose="showConnect = false"
+            )
+              v-img(
+                alt="debio-to-myriad"
+                src="@/assets/debio-to-myriad.svg"
+                max-width="129px"
+                max-height="48px"
+              )
+
+              h2.mt-5 Redirecting You to Myriad
+              .hp-dashboard__subtitle
+                p The Second Opinion Marketplace requires a Polkadot account to conduct transactions.
+                p By clicking this button below, you will download your account's keystore and you will be asked to upload that keystore in the Polkadot extension to export your account.
+                p Do you wish to continue?
+
+
+              ui-debio-button(
+                width="304px"
+                block
+                color="secondary"
+                @click="toContinue"
+              ) CONTINUE & EXPORT KEYSTORE
+
+
+            ui-debio-modal.hp-dashboard__modal-connect(
+              :show="isConnectToMyriad"
+              :show-title="false"
+              :show-cta="false"
+              @onClose="isConnectToMyriad = false"
+            )
+              p.hp-dashboard__subtitle Connecting your request into Myriad
+
+              v-img(
+                alt="debio-logo-loading"
+                :src="require(`../../../../assets/${logo}.svg`)"
+                max-width="360px"
+                max-height="72px"
+              )
+
 </template>
 
 <script>
 
+import { mapState } from "vuex"
 import HealthProfessionalBanner from "@/common/components/HealthProfessionalBanner.vue"
 import { alertIcon, alertTriangleIcon } from "@debionetwork/ui-icons"
-import { isWeb3Injected } from "@polkadot/extension-dapp"
-
+import { isWeb3Injected, web3Enable, web3Accounts, web3FromAddress } from "@polkadot/extension-dapp"
+import localStorage from "@/common/lib/local-storage"
 
 export default {
   name: "PHDashboard",
@@ -49,20 +94,96 @@ export default {
   data: () => ({
     alertIcon,
     alertTriangleIcon,
-    isNotInstalled: false
+    isNotInstalled: false,
+    showConnect: false,
+    isConnectToMyriad: false,
+    isConnecting: false,
+    isConnected: false,
+    logo: "debio-logo-loading"
   }),
 
   components: {
     HealthProfessionalBanner
   },
 
+  computed: {
+    ...mapState({
+      api: (state) => state.substrate.api,
+      wallet: (state) => state.substrate.wallet
+    })
+  },
+
   methods: {
     async toGiveOpinion() {
       this.isNotInstalled = !isWeb3Injected
+      if (!this.isNotInstalled) {
+        this.showConnect = true
+      }
+
     },
 
     async toInstall() {
       window.open("https://polkadot.js.org/extension/", "_blank")
+    },
+
+    exportKeystoreAction(){
+      try {
+        const keystore = localStorage.getKeystore()
+        const address = localStorage.getAddress()
+        const file = new Blob([keystore], {type: "text/json;charset=utf-8"})
+        const downloadUrl = window.URL.createObjectURL(file)
+        const downloadLink = document.createElement("a")
+        downloadLink.href = downloadUrl
+        downloadLink.target = "_blank"
+        downloadLink.download = `${address}.json`
+
+        downloadLink.click()
+
+        window.URL.revokeObjectURL(downloadUrl)
+      } catch (err) {
+        console.error(err)
+      }
+    },
+
+    async toContinue() {
+      const sender = this.wallet.address 
+      const allInjected = await web3Enable("my cool dapp");
+      if (!allInjected) return this.isNotInstalled = false
+
+      const allAccounts = await web3Accounts()
+      if (!allAccounts.length) await this.exportKeystoreAction()
+
+      const account = allAccounts.find(account => account.address === sender)
+      if(!account) await this.exportKeystoreAction()
+
+      const injector = await web3FromAddress(sender)
+      if (injector) {
+        this.showConnect = false
+        this.isConnectToMyriad = true
+
+        setTimeout(() => {
+          this.logo = "connection-loading"
+        }, 1000);
+
+        let promise = new Promise(function(res, rej) {
+          setTimeout(() => res("myriad-logo-loading"), 2000);
+          console.error(rej)
+        })
+
+        promise
+          .then(
+            (result) => this.logo = result,
+            (err) => console.error(err)
+          )
+          .then(
+            (result) =>  {
+              this.logo = result
+              window.open("https://app.myriad.social/", "_self")
+              this.isConnectToMyriad = false  
+            },
+            (err) => console.error(err)
+          )
+      }
     }
   }
 }
@@ -101,6 +222,6 @@ export default {
       max-width: 304px
       text-align: left
       color: #595959
-      @include body-text-3-opensans
+      @include new-body-text-2-medium
 
 </style>
