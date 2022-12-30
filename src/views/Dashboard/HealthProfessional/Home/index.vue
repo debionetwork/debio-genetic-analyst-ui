@@ -147,7 +147,7 @@ export default {
 
     async toContinue() {
       const sender = this.wallet.address 
-      const allInjected = await web3Enable("my cool dapp");
+      const allInjected = await web3Enable("DeBio Network");
       if (!allInjected) return this.isNotInstalled = false
 
       const allAccounts = await web3Accounts()
@@ -159,30 +159,7 @@ export default {
       const injector = await web3FromAddress(sender)
       if (injector) {
         this.showConnect = false
-        this.isConnectToMyriad = true
-
-        setTimeout(() => {
-          this.logo = "connection-loading"
-        }, 1000);
-
-        let promise = new Promise(function(res, rej) {
-          setTimeout(() => res("myriad-logo-loading"), 2000);
-          console.error(rej)
-        })
-
-        promise
-          .then(
-            (result) => this.logo = result,
-            (err) => console.error(err)
-          )
-          .then(
-            (result) =>  {
-              this.logo = result
-              window.open("https://app.myriad.social/", "_self")
-              this.isConnectToMyriad = false  
-            },
-            (err) => console.error(err)
-          )
+        this.$router.push({ name: "connecting-page"})
       }
     }
   }
