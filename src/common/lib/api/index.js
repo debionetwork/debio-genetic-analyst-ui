@@ -4,8 +4,9 @@ import * as Sentry from "@sentry/vue"
 import getEnv from "../utils/env"
 
 // EXPORT API COLLECTIONS HERE
-export * from "./customer"
+export * from "./health-professional"
 export * from "./genetic-analyst"
+export * from "./notification"
 
 // AXIOS INSTANCE EXPORT BY DEFAULT
 // PLEASE DISCUSS BEFORE YOU WANT TO EDIT THIS SCRIPT

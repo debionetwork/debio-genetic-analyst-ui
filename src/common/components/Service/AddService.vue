@@ -150,7 +150,7 @@ import errorMessages from "@/common/constants/error-messages"
 import {uploadFile, getFileUrl} from "@/common/lib/pinata-proxy"
 import rulesHandler from "@/common/constants/rules"
 import { validateForms } from "@/common/lib/validate"
-import { getConversionCache } from "@/common/lib/api/customer/debio-balance"
+import { getConversionCache } from "@/common/lib/api"
 import { formatUSDTE } from "@/common/lib/balance-format.js"
 
 const documentFormat = [

@@ -4,7 +4,6 @@ import auth from "./auth"
 import web3Store from "./web3Store"
 import testRequest from "./test-request"
 import substrate from "./substrate"
-import lab from "./lab"
 import wallet from "./wallet"
 import rating from "./rating"
 import geneticData from "./genetic-data"
@@ -20,7 +19,6 @@ export default new Vuex.Store({
     web3Store,
     testRequest,
     substrate,
-    lab,
     wallet,
     rating,
     geneticData

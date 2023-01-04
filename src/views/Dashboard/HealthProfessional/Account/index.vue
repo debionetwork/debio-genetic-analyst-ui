@@ -9,7 +9,9 @@
         :onUpdate="onUpdateInformation"
       )
       StakeDialog(
+        role="health-professional"
         :show="showStakeDialog" 
+        :loading="isLoading"
         @close="showStakeDialog = false"
         @submit="onSubmit"
       )
@@ -23,17 +25,31 @@
         @submit="toHomePage"
       )
 
+      ui-debio-modal(
+        :show="isUsernameExist"
+        :message="message"
+        title="Username Exist"
+        :cta-outlined="false"
+        buttonTitle="Back"
+        @onClose="isUsernameExist = false"
+      )
 
 
 </template>
 
 <script>
 
-import { mapMutations } from "vuex"
+import { mapState } from "vuex"
+import Kilt from "@kiltprotocol/sdk-js"
+import CryptoJS from "crypto-js"
+import { u8aToHex } from "@polkadot/util"
 import GAForm from "@/common/components/Account/InformationForm"
 import StakeDialog from "@/common/components/Dialog/StakeDialog"
 import SuccessDialogGeneral from "@/common/components/Dialog/SuccessDialogGeneral.vue"
-
+import { registerProfessionalHealth, stakeProfessionalHealth } from "@/common/lib/polkadot-provider/command/register-professional-health"
+import { checkMyriadUsername } from "@/common/lib/api" 
+import { queryGetHealthProfessionalAccount } from "@/common/lib/polkadot-provider/query/health-professional"
+import { generateUsername } from "@/common/lib/username-generator"
 
 export default {
   name: "PHAccount",
@@ -41,7 +57,13 @@ export default {
   data: () => ({
     showStakeDialog: false,
     showSuccessDialog: false,
-    account: null
+    isUsernameExist: false,
+    account: {},
+    boxPublicKey: "",
+    isStaked: true,
+    title: "",
+    message: "",
+    isLoading: false
   }),
 
   components: {
@@ -50,24 +72,107 @@ export default {
     SuccessDialogGeneral
   },
 
+  computed: {
+    ...mapState({
+      mnemonicData: (state) => state.substrate.mnemonicData,
+      api: (state) => state.substrate.api,
+      wallet: (state) => state.substrate.wallet
+    })
+  },
+
+  watch: {
+    async mnemonicData(val) {
+      if(val) {
+        await this.getInitialData()
+        await this.getAccountDetail()
+      }
+    }
+  },
+
+
   methods: {
-
-    ...mapMutations({
-      setAccount: "auth/SET_ACCOUNT"      
-    }),
-
-
-    async onSubmitInformation(val) {
-      this.account = val
-      this.showStakeDialog = true
+    async getInitialData() {
+      const cred = Kilt.Identity.buildFromMnemonic(this.mnemonicData.toString(CryptoJS.enc.Utf8))
+      this.boxPublicKey =  u8aToHex(cred.boxKeyPair.publicKey)
     },
 
-    onSubmit() {
-      this.showStakeDialog = false
-      this.setAccount(this.account)
-      this.title="Registration Sent!"
-      this.message="Your verification submission is being reviewed by Daogenics"
-      this.showSuccessDialog = true
+    async getAccountDetail() {
+      const data = await queryGetHealthProfessionalAccount(this.api, this.wallet.address)
+      if(data?.stakeStatus === "Unstaked"){
+        this.isStaked = false
+        this.showStakeDialog = true
+      }
+    },
+
+    async onSubmitInformation(val) {
+      const {
+        profileImage,
+        firstName,
+        lastName,
+        gender,
+        dateOfBirth,
+        email,
+        phoneNumber,
+        registerAs,
+        profHealthCategory,
+        profileLink,
+        anonymous
+      } = val
+
+      let isUsernameExist
+      let username
+
+      if (!anonymous) {
+        username = firstName.toLowerCase()+lastName.toLowerCase()
+        do {
+          isUsernameExist = await checkMyriadUsername(username)
+          let i = 1
+          username = username + i
+          i++
+        } while(!isUsernameExist.status)
+      } else {
+        username = await generateUsername()
+      }
+
+      const info = {
+        boxPublicKey: this.boxPublicKey,
+        profileImage,
+        firstName,
+        lastName,
+        myriadUsername: username,
+        gender,
+        dateOfBirth,
+        email,
+        phoneNumber,
+        role: registerAs,
+        category: profHealthCategory,
+        profileLink,
+        anonymous
+      }
+
+      await registerProfessionalHealth(
+        this.api,
+        this.wallet,
+        info,
+        () => {
+          this.showStakeDialog = true
+        }
+      )
+    },
+
+    async onSubmit() {
+      this.isLoading = true
+      await stakeProfessionalHealth(
+        this.api, 
+        this.wallet,
+        () => {
+          this.showStakeDialog = false
+          this.isLoading = false
+          this.title="Registration Sent!"
+          this.message="Your verification submission is being reviewed by Daogenics"
+          this.showSuccessDialog = true
+        }
+      )
     },
 
     onUpdateInformation(val) {
