@@ -5,7 +5,7 @@ export async function queryGetHealthProfessionalAccount(api, accountId) {
   return res.toHuman()
 }
 
-export async function queryProgessionalHealthMinimumStakeAmount(api) {
+export async function queryProfessionalHealthMinimumStakeAmount(api) {
   const res = await api.query.healthProfessional.minimumStakeAmount()
   return res.toHuman()
 }

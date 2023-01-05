@@ -46,7 +46,7 @@ import { u8aToHex } from "@polkadot/util"
 import GAForm from "@/common/components/Account/InformationForm"
 import StakeDialog from "@/common/components/Dialog/StakeDialog"
 import SuccessDialogGeneral from "@/common/components/Dialog/SuccessDialogGeneral.vue"
-import { registerProfessionalHealth, stakeProfessionalHealth } from "@/common/lib/polkadot-provider/command/register-professional-health"
+import { registerProfessionalHealth, stakeProfessionalHealth, createHealtProfessionalQualification } from "@/common/lib/polkadot-provider/command/professional-health"
 import { checkMyriadUsername } from "@/common/lib/api" 
 import { queryGetHealthProfessionalAccount } from "@/common/lib/polkadot-provider/query/health-professional"
 import { generateUsername } from "@/common/lib/username-generator"
@@ -105,6 +105,9 @@ export default {
     },
 
     async onSubmitInformation(val) {
+
+      console.log(val)
+      
       const {
         profileImage,
         firstName,
@@ -116,8 +119,12 @@ export default {
         registerAs,
         profHealthCategory,
         profileLink,
-        anonymous
+        anonymous,
+        experiences,
+        certification
       } = val
+
+
 
       let isUsernameExist
       let username
@@ -150,12 +157,19 @@ export default {
         anonymous
       }
 
+      const _experiences = experiences.filter(value => value != "")
       await registerProfessionalHealth(
         this.api,
         this.wallet,
         info,
-        () => {
-          this.showStakeDialog = true
+        async () => {
+          await createHealtProfessionalQualification(
+            this.api,
+            this.wallet,
+            _experiences,
+            certification,
+            this.showStakeDialog = true
+          )
         }
       )
     },

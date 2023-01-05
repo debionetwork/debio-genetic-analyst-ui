@@ -35,3 +35,14 @@ export async function stakeProfessionalHealth(api, pair, callback) {
       }
     )
 }
+
+
+export async function createHealtProfessionalQualification(api, pair, experiences, certifications, callback) {
+  let unsub =  await api.tx.healthProfessionalQualification
+    .create(experiences, certifications)
+    .signAndSend(pair, { nonce: -1},
+      ({ events, status}) => {
+        successCallback(api, { events, status, callback, unsub });
+      }
+    )
+}

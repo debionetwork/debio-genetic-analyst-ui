@@ -50,7 +50,7 @@
 import {mapState} from "vuex"
 import {alertTriangleIcon} from "@debionetwork/ui-icons"
 import {stakeGeneticAnalystFee, queryGeneticAnalystMinimumStakeAmount} from "@debionetwork/polkadot-provider"
-import { queryProgessionalHealthMinimumStakeAmount } from "@/common/lib/polkadot-provider/query/health-professional"
+import { queryProfessionalHealthMinimumStakeAmount } from "@/common/lib/polkadot-provider/query/health-professional"
 
 export default {
   name: "StakeDialog",
@@ -90,7 +90,7 @@ export default {
 
     async getHPMinStakingAmount() {
       try {
-        const minimumStaking = await queryProgessionalHealthMinimumStakeAmount(this.api)
+        const minimumStaking = await queryProfessionalHealthMinimumStakeAmount(this.api)
         const getTxWeight = await this.getTxWeight()
         this.txWeight = `${this.web3.utils.fromWei(String(getTxWeight.partialFee), "ether")}`
         this.minimumStaking = this.web3.utils.fromWei(String(minimumStaking.toString().split(",").join("")), "ether")

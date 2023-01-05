@@ -312,7 +312,7 @@
             variant="small"
             label="Year Start"
             placeholder="Select"
-            v-model="experienceYear.start"
+            v-model="experiences[idx].start"
             outlined
             close-on-select
             validate-on-blur
@@ -325,7 +325,7 @@
             variant="small"
             label="Year End"
             placeholder="Select"
-            v-model="experienceYear.end"
+            v-model="experiences[idx].end"
             outlined
             close-on-select
             validate-on-blur
@@ -521,11 +521,7 @@ export default {
     txWeight: null,
     roles: ["Medical Doctor - Generalist Practitioner", "Medical Doctor - Specialist Practitioner", "Clinical Psychologist", "Clinical Psychiatrist"],
     profHealthCategories: ["Mental Health", "Physical Health"],
-    isEditing: false,
-    experienceYear: {
-      start: "",
-      end: ""
-    }
+    isEditing: false
   }),
 
   components: { CertificationDialog, InsufficientDialog},
@@ -649,20 +645,14 @@ export default {
   },
 
   async created() {
-    console.log("creating...");
     await this.getSpecialization()
     await this.getTxWeight()
-
-    console.log("???")
     if (this.role === "health-professional") await this.fetchAccountDetail()
   },
 
   methods: {
     async getSpecialization() {
-      console.log("get specialization")
-
       if (this.role === "genetic-analyst") {
-        console.log("hello ?")
         const categories = await getSpecializationCategory()
         this.categories = categories
         return
@@ -672,13 +662,12 @@ export default {
     },
 
     async fetchAccountDetail() {
-      console.log("fetch account detail")
       const data = await queryGetHealthProfessionalAccount(this.api, this.wallet.address)
-      console.log(data)
-
       if(data) {
         this.isEditing = true
         this.info = data.info
+        this.info.profHealthCategory = data.info.category
+        this.info.registerAs = data.info.role
         this.profileLink = data.info.profileLink
         this.profileImage = data.info.profileImage
         const dateOfBirth = String(data.info.dateOfBirth.replaceAll(",", ""))        
@@ -688,7 +677,6 @@ export default {
           month: "numeric"
         })
       }
-      console.log(this.info)
     },
 
     async getTxWeight() {
@@ -709,8 +697,7 @@ export default {
 
     addExperience() {
       const experiences = this.experiences
-      experiences.push({title: ""})
-
+      experiences.push({title: "", start: 0, end: 0})
       this.experiences = experiences
     },
 
@@ -824,6 +811,7 @@ export default {
 }
 
 function experienceValidation(data) {
+
   const experiences = []
   for (const experience of data) {
     if (rulesHandler.FIELD_REQUIRED(experience.title) !== true) {
@@ -844,7 +832,7 @@ function experienceValidation(data) {
 
     } else {
       experiences.push({
-        title: experience.title
+        title: `${experience.title} (${ experience.start } - ${experience.end})`
       })
     }
   }
