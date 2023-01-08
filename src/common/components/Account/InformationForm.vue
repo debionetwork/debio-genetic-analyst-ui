@@ -454,7 +454,7 @@
 import { mapState } from "vuex"
 import errorMessages from "@/common/constants/error-messages"
 import {uploadFile, getFileUrl} from "@/common/lib/pinata-proxy"
-import {getSpecializationCategory} from "@/common/lib/api"
+import {getSpecializationCategory, getHealthProfessionalSpecialization} from "@/common/lib/api"
 import {createQualificationFee, registerGeneticAnalystFee} from "@debionetwork/polkadot-provider"
 import { queryGetHealthProfessionalAccount, queryGetHealthProfessionalQualification } from "@/common/lib/polkadot-provider/query/health-professional"
 import { fileTextIcon, pencilIcon, trashIcon } from "@debionetwork/ui-icons"
@@ -462,7 +462,6 @@ import { validateForms } from "@/common/lib/validate"
 import rulesHandler from "@/common/constants/rules"
 import CertificationDialog from "@/common/components/Dialog/CertificateDialog"
 import InsufficientDialog from "@/common/components/Dialog/InsufficientBalanceDialog"
-import dummySpecialization from "./dummySpecialization"
 
 const imageType = ["image/jpg", "image/png", "image/jpeg"]
 
@@ -659,8 +658,9 @@ export default {
         this.categories = categories
         return
       }
-      // TODO: get Specialist Practitioner Specialization from API
-      this.categories = dummySpecialization.data
+
+      const categories = await getHealthProfessionalSpecialization()
+      this.categories = categories.data
     },
 
     async fetchAccountDetail() {

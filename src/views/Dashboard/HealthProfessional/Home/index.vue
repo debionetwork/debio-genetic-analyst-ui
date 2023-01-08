@@ -17,7 +17,7 @@
               size="25"
               stroke
             )
-            span.hp-dashboard__alert-text Your verification submission is being reviewed by Daogenics
+            span.hp-dashboard__alert-text Thank you. Your application is being reviewed by DAOGenics. This might take a while
         template(v-if="isVerified")
           ui-debio-modal.hp-dashboard__modal(
             :show="isNotInstalled"
