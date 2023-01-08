@@ -10,73 +10,73 @@
       ) + Give Opinion
 
       .hp-dashboard__content
-        .hp-dashboard__alert 
-          ui-debio-icon(
-            :icon="alertIcon"
-            size="25"
-            stroke
-          )
-          template
+        template(v-if="!isVerified")
+          .hp-dashboard__alert 
+            ui-debio-icon(
+              :icon="alertIcon"
+              size="25"
+              stroke
+            )
             span.hp-dashboard__alert-text Your verification submission is being reviewed by Daogenics
+        template(v-if="isVerified")
+          ui-debio-modal.hp-dashboard__modal(
+            :show="isNotInstalled"
+            :show-title="false"
+            :show-cta="false"
+            @onClose="isNotInstalled = false"
+          )
+            h2.mt-5 Install Polkadot Extension
+            ui-debio-icon.mb-8(:icon="alertTriangleIcon" stroke size="80")
+            p.hp-dashboard__subtitle Press install Polkadot Extensions button below to continue, your second opinion will be redirected to myriad.social platform.
 
-            ui-debio-modal.hp-dashboard__modal(
-              :show="isNotInstalled"
-              :show-title="false"
-              :show-cta="false"
-              @onClose="isNotInstalled = false"
+            ui-debio-button(
+              block
+              color="secondary"
+              @click="toInstall"
+            ) Install
+
+          ui-debio-modal.hp-dashboard__modal-connect(
+            :show="showConnect"
+            :show-title="false"
+            :show-cta="false"
+            @onClose="showConnect = false"
+          )
+            v-img(
+              alt="debio-to-myriad"
+              src="@/assets/debio-to-myriad.svg"
+              max-width="129px"
+              max-height="48px"
             )
-              h2.mt-5 Install Polkadot Extension
-              ui-debio-icon.mb-8(:icon="alertTriangleIcon" stroke size="80")
-              p.hp-dashboard__subtitle Press install Polkadot Extensions button below to continue, your second opinion will be redirected to myriad.social platform.
 
-              ui-debio-button(
-                block
-                color="secondary"
-                @click="toInstall"
-              ) Install
+            h2.mt-5 Redirecting You to Myriad
+            .hp-dashboard__subtitle
+              p The Second Opinion Marketplace requires a Polkadot account to conduct transactions.
+              p By clicking this button below, you will download your account's keystore and you will be asked to upload that keystore in the Polkadot extension to export your account.
+              p Do you wish to continue?
 
-            ui-debio-modal.hp-dashboard__modal-connect(
-              :show="showConnect"
-              :show-title="false"
-              :show-cta="false"
-              @onClose="showConnect = false"
+
+            ui-debio-button(
+              width="304px"
+              block
+              color="secondary"
+              @click="toContinue"
+            ) CONTINUE & EXPORT KEYSTORE
+
+
+          ui-debio-modal.hp-dashboard__modal-connect(
+            :show="isConnectToMyriad"
+            :show-title="false"
+            :show-cta="false"
+            @onClose="isConnectToMyriad = false"
+          )
+            p.hp-dashboard__subtitle Connecting your request into Myriad
+
+            v-img(
+              alt="debio-logo-loading"
+              :src="require(`../../../../assets/${logo}.svg`)"
+              max-width="360px"
+              max-height="72px"
             )
-              v-img(
-                alt="debio-to-myriad"
-                src="@/assets/debio-to-myriad.svg"
-                max-width="129px"
-                max-height="48px"
-              )
-
-              h2.mt-5 Redirecting You to Myriad
-              .hp-dashboard__subtitle
-                p The Second Opinion Marketplace requires a Polkadot account to conduct transactions.
-                p By clicking this button below, you will download your account's keystore and you will be asked to upload that keystore in the Polkadot extension to export your account.
-                p Do you wish to continue?
-
-
-              ui-debio-button(
-                width="304px"
-                block
-                color="secondary"
-                @click="toContinue"
-              ) CONTINUE & EXPORT KEYSTORE
-
-
-            ui-debio-modal.hp-dashboard__modal-connect(
-              :show="isConnectToMyriad"
-              :show-title="false"
-              :show-cta="false"
-              @onClose="isConnectToMyriad = false"
-            )
-              p.hp-dashboard__subtitle Connecting your request into Myriad
-
-              v-img(
-                alt="debio-logo-loading"
-                :src="require(`../../../../assets/${logo}.svg`)"
-                max-width="360px"
-                max-height="72px"
-              )
 
 </template>
 
@@ -86,7 +86,9 @@ import { mapState } from "vuex"
 import HealthProfessionalBanner from "@/common/components/HealthProfessionalBanner.vue"
 import { alertIcon, alertTriangleIcon } from "@debionetwork/ui-icons"
 import { isWeb3Injected, web3Enable, web3Accounts, web3FromAddress } from "@polkadot/extension-dapp"
+import { queryGetHealthProfessionalAccount } from "@/common/lib/polkadot-provider/query/health-professional"
 import localStorage from "@/common/lib/local-storage"
+
 
 export default {
   name: "PHDashboard",
@@ -99,6 +101,7 @@ export default {
     isConnectToMyriad: false,
     isConnecting: false,
     isConnected: false,
+    isVerified: true,
     logo: "debio-logo-loading"
   }),
 
@@ -113,7 +116,20 @@ export default {
     })
   },
 
+  async created () {
+    await this.checkAccount()
+  },
+
   methods: {
+    async checkAccount() {
+      const account = await queryGetHealthProfessionalAccount(this.api, this.wallet.address)
+      if (!account) {
+        this.$router.push({ name: "hp-account" })   
+        return
+      }
+      if (account.verificationStatus === "Unverified") this.isVerified = false
+    },
+    
     async toGiveOpinion() {
       this.isNotInstalled = !isWeb3Injected
       if (!this.isNotInstalled) {

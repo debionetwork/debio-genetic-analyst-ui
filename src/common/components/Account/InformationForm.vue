@@ -645,6 +645,7 @@ export default {
   },
 
   async created() {
+    this.isLoading = false    
     await this.getSpecialization()
     await this.getTxWeight()
     if (this.role === "health-professional") await this.fetchAccountDetail()
@@ -733,6 +734,7 @@ export default {
     },
 
     handleSubmit() {
+      this.isLoading = true
       this._touchForms("info")
       const isInfoValid = Object.values(this.isDirty?.info).every(v => v !== null && v === false)
       const experiences = experienceValidation(this.experiences)

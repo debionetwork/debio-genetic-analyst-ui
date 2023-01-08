@@ -82,6 +82,7 @@
 
 <script>
 import { mapActions, mapState } from "vuex"
+import VueRouter from "@/router"
 import store from "@/store"
 import { validateForms } from "@/common/lib/validate"
 import {
@@ -99,7 +100,7 @@ import maintenancePageLayout from "@/views/Dashboard/maintenancePageLayout"
 import errorMessage from "@/common/constants/error-messages"
 import localStorage from "@/common/lib/local-storage"
 import { getUnlistedNotification } from "@/common/lib/notification"
-import VueRouter from "@/router"
+import { queryGetHealthProfessionalAccount } from "@/common/lib/polkadot-provider/query/health-professional"
 
 export default {
   name: "MainPage",
@@ -130,6 +131,7 @@ export default {
 
   computed: {
     ...mapState({
+      api: (state) => state.substrate.api,
       lastEventData: (state) => state.substrate.lastEventData,
       lastBlockData: (state) => state.substrate.lastBlockData,
       wallet: (state) => state.substrate.wallet,
@@ -176,6 +178,7 @@ export default {
     if (!this.mnemonicData) this.showModalPassword = true
     if (this.$route.meta.maintenance) this.pageError = true
     await this.getListNotification()
+    await this.checkAccount()
   },
 
   rules: {
@@ -186,6 +189,15 @@ export default {
     ...mapActions({
       clearAuth: "auth/clearAuth"
     }),
+
+    async checkAccount() {
+      const account = await queryGetHealthProfessionalAccount(this.api, this.wallet.address)
+      if (!account) {
+        const nav = this.navs.find(nav => nav.text === "Dashboard")
+        nav.disabled = true
+        this.$router.push({ name: "hp-account" })     
+      }
+    },
 
     handlePageError(error) {
       this.pageError = error
