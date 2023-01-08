@@ -25,6 +25,15 @@ export async function registerGeneticAnalystFee(api, pair, info) {
     .paymentInfo(pair)
 }
 
+export async function updateProfessionalHealth(api, pair, info, callback) {
+  let unsub = await api.tx.healthProfessional
+    .updateInfo(info)
+    .signAndSend(pair, { nonce: -1},
+      ({ events, status}) => {
+        successCallback(api, { events, status, callback, unsub });
+      }
+    )
+}
 
 export async function stakeProfessionalHealth(api, pair, callback) {
   let unsub =  await api.tx.healthProfessional
@@ -40,6 +49,16 @@ export async function stakeProfessionalHealth(api, pair, callback) {
 export async function createHealtProfessionalQualification(api, pair, experiences, certifications, callback) {
   let unsub =  await api.tx.healthProfessionalQualification
     .create(experiences, certifications)
+    .signAndSend(pair, { nonce: -1},
+      ({ events, status}) => {
+        successCallback(api, { events, status, callback, unsub });
+      }
+    )
+}
+
+export async function updateHealtProfessionalQualification(api, pair, qualificationId, experiences, certifications, callback) {
+  let unsub =  await api.tx.healthProfessionalQualification
+    .update(qualificationId, experiences, certifications)
     .signAndSend(pair, { nonce: -1},
       ({ events, status}) => {
         successCallback(api, { events, status, callback, unsub });

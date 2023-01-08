@@ -46,7 +46,7 @@ import { u8aToHex } from "@polkadot/util"
 import GAForm from "@/common/components/Account/InformationForm"
 import StakeDialog from "@/common/components/Dialog/StakeDialog"
 import SuccessDialogGeneral from "@/common/components/Dialog/SuccessDialogGeneral.vue"
-import { registerProfessionalHealth, stakeProfessionalHealth, createHealtProfessionalQualification } from "@/common/lib/polkadot-provider/command/professional-health"
+import { registerProfessionalHealth, stakeProfessionalHealth, createHealtProfessionalQualification, updateProfessionalHealth, updateHealtProfessionalQualification } from "@/common/lib/polkadot-provider/command/health-professional"
 import { checkMyriadUsername } from "@/common/lib/api" 
 import { queryGetHealthProfessionalAccount } from "@/common/lib/polkadot-provider/query/health-professional"
 import { generateUsername } from "@/common/lib/username-generator"
@@ -104,10 +104,7 @@ export default {
       }
     },
 
-    async onSubmitInformation(val) {
-
-      console.log(val)
-      
+    async onSubmitInformation(val) {      
       const {
         profileImage,
         firstName,
@@ -123,8 +120,6 @@ export default {
         experiences,
         certification
       } = val
-
-
 
       let isUsernameExist
       let username
@@ -189,11 +184,60 @@ export default {
       )
     },
 
-    onUpdateInformation(val) {
-      this.setAccount(val)
-      this.title="Success"
-      this.message="Your account has been edited!"      
-      this.showSuccessDialog = true
+    async onUpdateInformation(val, id) {      
+      const {
+        profileImage,
+        firstName,
+        lastName,
+        gender,
+        dateOfBirth,
+        email,
+        phoneNumber,
+        registerAs,
+        profHealthCategory,
+        profileLink,
+        anonymous,
+        experiences,
+        certification,
+        myriadUsername
+      } = val
+
+      const info = {
+        boxPublicKey: this.boxPublicKey,
+        profileImage,
+        firstName,
+        lastName,
+        myriadUsername,
+        gender,
+        dateOfBirth,
+        email,
+        phoneNumber,
+        role: registerAs,
+        category: profHealthCategory,
+        profileLink,
+        anonymous
+      }
+
+      const _experiences = experiences.filter(value => value != "")
+      await updateProfessionalHealth(
+        this.api,
+        this.wallet,
+        info,
+        async () => {
+          await updateHealtProfessionalQualification(
+            this.api,
+            this.wallet,
+            id,
+            _experiences,
+            certification,
+            () => {
+              this.title="Success"
+              this.message="Your account has been edited!"      
+              this.showSuccessDialog = true
+            }
+          )
+        }
+      )
     },
 
     toHomePage() {

@@ -456,7 +456,7 @@ import errorMessages from "@/common/constants/error-messages"
 import {uploadFile, getFileUrl} from "@/common/lib/pinata-proxy"
 import {getSpecializationCategory} from "@/common/lib/api"
 import {createQualificationFee, registerGeneticAnalystFee} from "@debionetwork/polkadot-provider"
-import { queryGetHealthProfessionalAccount } from "@/common/lib/polkadot-provider/query/health-professional"
+import { queryGetHealthProfessionalAccount, queryGetHealthProfessionalQualification } from "@/common/lib/polkadot-provider/query/health-professional"
 import { fileTextIcon, pencilIcon, trashIcon } from "@debionetwork/ui-icons"
 import { validateForms } from "@/common/lib/validate"
 import rulesHandler from "@/common/constants/rules"
@@ -521,7 +521,8 @@ export default {
     txWeight: null,
     roles: ["Medical Doctor - Generalist Practitioner", "Medical Doctor - Specialist Practitioner", "Clinical Psychologist", "Clinical Psychiatrist"],
     profHealthCategories: ["Mental Health", "Physical Health"],
-    isEditing: false
+    isEditing: false,
+    hpQualificationId: null
   }),
 
   components: { CertificationDialog, InsufficientDialog},
@@ -666,7 +667,19 @@ export default {
       const data = await queryGetHealthProfessionalAccount(this.api, this.wallet.address)
       if(data) {
         this.isEditing = true
-        this.info = data.info
+  
+        this.info = {
+          firstName: data.info.firstName,
+          lastName: data.info.lastName,
+          gender: data.info.gender,
+          email: data.info.email,
+          phoneNumber: data.info.phoneNumber,
+          dateOfBirth: data.info.dateOfBirth,
+          registerAs: data.info.role,
+          profHealthCategory: data.info.profHealthCategory,
+          anonymous: data.info.anonymous,
+          myriadUsername: data.info.myriadUsername
+        }
         this.info.profHealthCategory = data.info.category
         this.info.registerAs = data.info.role
         this.profileLink = data.info.profileLink
@@ -678,6 +691,22 @@ export default {
           month: "numeric"
         })
       }
+      this.hpQualificationId = data.qualifications[0]
+      const qualifications = await queryGetHealthProfessionalQualification(this.api, this.hpQualificationId)
+      const experiences = qualifications.info.experiences
+      this.certifications = qualifications.info.certifications
+      const _experiences = []
+      experiences.map((exp) => {
+        const title = exp.title.split(" (")[0]
+        const years = (exp.title.split(" (")[1]).split(" - ")
+        _experiences.push({
+          title,
+          start: years[0],
+          end: years[1].split(")")[0]
+        })
+      })
+      this.experiences = _experiences
+    
     },
 
     async getTxWeight() {
@@ -755,11 +784,11 @@ export default {
         ...this.info,
         ...this.profile
       }
-      
+
       if (this.walletBalance < this.txWeight) return this.showInsufficientDialog = true
 
       if (this.isEditing) {
-        this.onUpdate(data)
+        this.onUpdate(data, this.hpQualificationId)
         return
       }
 
