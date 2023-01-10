@@ -186,8 +186,8 @@
           label="Specialization"
           placeholder="Select Specialization"
           v-model="profile.specialization"
-          item-text="category"
-          item-value="category"
+          item-text="specialization"
+          item-value="specialization"
           outlined
           close-on-select
           validate-on-blur
