@@ -118,7 +118,8 @@ export default {
     servicesLoading: false,
     showStakeDialog: false,
     modalDelete: null,
-    editId: null
+    editId: null,
+    formatUSDTE
   }),
 
   computed: {

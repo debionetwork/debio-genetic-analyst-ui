@@ -253,8 +253,8 @@
       label="Specialization"
       placeholder="Select Specialization"
       v-model="specialization"
-      item-text="specialization"
-      item-value="specialization"
+      item-text="category"
+      item-value="category"
       outlined
       close-on-select
       validate-on-blur
@@ -570,9 +570,11 @@ export default {
       } = this.info
       const experienceValidation = this.experiences.length === 1 && this.experiences.find(value => value.title === "")
 
-      if (!this.profileImage || !firstName || !lastName || !gender || !dateOfBirth || !email || !phoneNumber || !registerAs || experienceValidation) {
+      if (!this.profileImage || !firstName || !lastName || !gender || !dateOfBirth || !email || !phoneNumber || experienceValidation) {
         if (this.role === "genetic-analyst" || this.info.registerAs === "Medical Doctor - Specialist Practitioner") {
           if (!this.specialization) return true
+        } else {
+          if (!registerAs) return true
         }
         return true
       }
@@ -727,7 +729,11 @@ export default {
 
     addExperience() {
       const experiences = this.experiences
-      experiences.push({title: "", start: 0, end: 0})
+      if (this.role === "health-professional") {
+        experiences.push({title: "", start: 0, end: 0})
+      } else {
+        experiences.push({title: ""})
+      }
       this.experiences = experiences
     },
 
@@ -766,7 +772,7 @@ export default {
       this.isLoading = true
       this._touchForms("info")
       const isInfoValid = Object.values(this.isDirty?.info).every(v => v !== null && v === false)
-      const experiences = experienceValidation(this.experiences)
+      const experiences = experienceValidation(this.role, this.experiences)
       const isExpError = experiences.filter(v => v.error)
       
       this.experiences = experiences
@@ -841,7 +847,7 @@ export default {
   }
 }
 
-function experienceValidation(data) {
+function experienceValidation(role, data) {
 
   const experiences = []
   for (const experience of data) {
@@ -862,9 +868,13 @@ function experienceValidation(data) {
       })
 
     } else {
-      experiences.push({
-        title: `${experience.title} (${ experience.start } - ${experience.end})`
-      })
+      if(role === "health-professional") {
+        experiences.push({
+          title: `${experience.title} (${ experience.start } - ${experience.end})`
+        })
+      } else {
+        experiences.push({ title: experience.title})
+      }
     }
   }
   
