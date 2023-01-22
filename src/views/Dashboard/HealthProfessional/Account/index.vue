@@ -131,9 +131,11 @@ export default {
           let i = 1
           username = username + i
           i++
-        } while(!isUsernameExist.status)
+        } while(isUsernameExist.status)
       } else {
-        username = await generateUsername()
+        do {
+          username = await generateUsername()
+        } while(username.length > 16 )
       }
 
       const info = {

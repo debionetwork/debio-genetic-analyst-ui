@@ -244,7 +244,7 @@
     label.text-title Qualification
 
     ui-debio-dropdown(
-      v-if="role === 'genetic-analyst' || info.registerAs === 'Medical Doctor - Specialist Practitioner'"
+      v-if="role === 'genetic-analyst'"
       :items="categories"
       :error="isDirty.specialization"
       :rules="$options.rules.specialization"
@@ -255,6 +255,24 @@
       v-model="specialization"
       item-text="category"
       item-value="category"
+      outlined
+      close-on-select
+      validate-on-blur
+      block
+    )
+
+    ui-debio-dropdown(
+      v-if="info.registerAs === 'Medical Doctor - Specialist Practitioner'"
+      :items="categories"
+      :error="isDirty.specialization"
+      :rules="$options.rules.specialization"
+      :disabled="disableFields"
+      variant="small"
+      label="Specialization"
+      placeholder="Select Specialization"
+      v-model="specialization"
+      item-text="specialization"
+      item-value="specialization"
       outlined
       close-on-select
       validate-on-blur
@@ -791,7 +809,11 @@ export default {
         ...this.profile
       }
 
-      if (this.walletBalance < this.txWeight) return this.showInsufficientDialog = true
+      if (this.walletBalance < this.txWeight) {
+        this.showInsufficientDialog = true
+        this.isLoading = false
+        return
+      }
 
       if (this.isEditing) {
         this.onUpdate(data, this.hpQualificationId)
