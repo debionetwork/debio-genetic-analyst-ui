@@ -9,6 +9,37 @@
         @click="toGiveOpinion"
       ) + Give Opinion
 
+      v-row.hp-dashboard__cards(v-if="isVerified")
+        ui-debio-card.mr-5(
+          width="280px"
+          height="108px"
+        )
+          v-row
+            v-img.mr-2(
+              alt="opinion-icon"
+              src="@/assets/opinion-icon.svg"
+              max-width="64px"
+              max-height="64px"
+            )
+            .hp-dashboard__card-text
+              span Opinion Given
+              h1 {{ opinionGiven }}
+          
+        ui-debio-card(
+          width="280px"
+          height="108px"
+        )
+          v-row
+            v-img.mr-2(
+              alt="income-icon"
+              src="@/assets/income-icon.svg"
+              max-width="64px"
+              max-height="64px"
+            )
+            .hp-dashboard__card-text
+              span Income(USDT)
+              h1 {{ totalIncome }}
+
       .hp-dashboard__content
         template(v-if="!isVerified")
           .hp-dashboard__alert 
@@ -18,7 +49,14 @@
               stroke
             )
             span.hp-dashboard__alert-text Thank you. Your application is being reviewed by DAOGenics. This might take a while
+
         template(v-if="isVerified")
+          ui-debio-data-table(
+            :headers="headers"
+            :items="items"
+            :loading="isLoadingData"
+          )
+
           ui-debio-modal.hp-dashboard__modal(
             :show="isNotInstalled"
             :show-title="false"
@@ -88,12 +126,18 @@ import { alertIcon, alertTriangleIcon } from "@debionetwork/ui-icons"
 import { isWeb3Injected, web3Enable, web3Accounts, web3FromAddress } from "@polkadot/extension-dapp"
 import { queryGetHealthProfessionalAccount } from "@/common/lib/polkadot-provider/query/health-professional"
 import localStorage from "@/common/lib/local-storage"
+import { myriadCheckUser, myriadRegistration, getNonce, myriadAuth, myriadContentTotal, myriadTipTotal } from "@/common/lib/api" 
+import Kilt from "@kiltprotocol/sdk-js"
+import CryptoJS from "crypto-js"
+import { u8aToHex } from "@polkadot/util"
+
 
 
 export default {
   name: "PHDashboard",
 
   data: () => ({
+    account: {},
     alertIcon,
     alertTriangleIcon,
     isNotInstalled: false,
@@ -102,7 +146,21 @@ export default {
     isConnecting: false,
     isConnected: false,
     isVerified: true,
-    logo: "debio-logo-loading"
+    logo: "debio-logo-loading",
+    addressHex: "",
+    isLoadingData: false,
+    opinionGiven:  0,
+    totalIncome: 0,
+    myriadAccountDetails: {},
+    items: [],
+    headers: [
+      { text: "User", value: "user", sortable: true },
+      { text: "Category", value: "category", sortable: true },
+      { text: "Opinion Date", value: "opinionDate", sortable: true },
+      { text: "Unlocked Content", value: "unlockedContent", sortable: true },
+      { text: "Opinion Fee", value: "unlockedFee", width: "115", sortable: true },
+      { text: "Actions", value: "actions", sortable: false, align: "center" }
+    ]
   }),
 
   components: {
@@ -112,8 +170,17 @@ export default {
   computed: {
     ...mapState({
       api: (state) => state.substrate.api,
-      wallet: (state) => state.substrate.wallet
+      wallet: (state) => state.substrate.wallet,
+      mnemonicData: (state) => state.substrate.mnemonicData
     })
+  },
+
+  watch: {
+    async mnemonicData(val) {
+      if(val) {
+        await this.getInitialData()
+      }
+    }
   },
 
   async created () {
@@ -128,6 +195,7 @@ export default {
         return
       }
       if (account.verificationStatus === "Unverified") this.isVerified = false
+      this.account = account
     },
     
     async toGiveOpinion() {
@@ -135,11 +203,63 @@ export default {
       if (!this.isNotInstalled) {
         this.showConnect = true
       }
+    },
 
+    async getInitialData() {
+      const cred = Kilt.Identity.buildFromMnemonic(this.mnemonicData.toString(CryptoJS.enc.Utf8))
+      this.addressHex =  cred.signPublicKeyAsHex
+      await this.checkMyriadUser()
     },
 
     async toInstall() {
       window.open("https://polkadot.js.org/extension/", "_blank")
+    },
+
+    async checkMyriadUser() {
+      try {
+        const data = await myriadCheckUser(this.addressHex)
+        await this.getMyriadTotal(data)
+        return data
+      } catch (error) {
+        if(error.response.status === 404) await this.registerMyriad()
+        if(error.response.status === 401) await this.myriadAuthentication()
+      }
+    },
+
+    async getMyriadTotal(data) {
+      const myriadContent = await myriadContentTotal(data.user_id, data.jwt)
+      this.opinionGiven = myriadContent.data.count
+
+      const myriadTip = await myriadTipTotal(data.jwt)
+      this.totalIncome = myriadTip.data.data.length
+    },
+
+    async registerMyriad() {
+      const info = {
+        username: this.account.info.myriadUsername,
+        name: `${this.account.info.firstName} ${this.account.info.lastName}`,
+        address: this.addressHex,
+        role: this.account.info.category === "Mental Health" ? "health-professional/mental-health" : "health-professional/physical-health"
+      }
+      const data = await myriadRegistration(info)
+      this.myriadAccountDetails = data
+      await this.myriadAuthentication()
+    },
+
+    async myriadAuthentication() {
+      const nonce = await getNonce(this.addressHex)
+      const formatedNonce = "0x" + nonce.toString(16)
+      const signature = u8aToHex(this.wallet.sign(formatedNonce))
+      const role = this.account.info.category === "Mental Health" ? "health-professional/mental-health" : "health-professional/physical-health"
+      const jwt = await myriadAuth({
+        nonce,
+        publicAddress: this.addressHex,
+        signature: signature,
+        walletType: "polkadot{.js}",
+        networkType: "debio",
+        role
+      })
+      return jwt
     },
 
     exportKeystoreAction(){
@@ -175,6 +295,7 @@ export default {
       const injector = await web3FromAddress(sender)
       if (injector) {
         this.showConnect = false
+        await this.checkMyriadUser()
         this.$router.push({ name: "connecting-page"})
       }
     }
@@ -193,6 +314,10 @@ export default {
 
     &__button
       margin-top: 30px
+
+    &__cards
+      margin-top: 30px
+      margin-left: 4px
 
     &__content
       background: #FFFFFF
