@@ -18,10 +18,10 @@ export async function myriadCheckUser (address) {
 
 
 export async function myriadRegistration(info) {
-  const { data } =  await apiClientRequest.post(`myriad/register`, {
-    params: { info }
-  })
-  
+  console.log("register")
+  console.log(info)
+
+  const { data } =  await apiClientRequest.post(`myriad/register`, info)
   return data
 }
 
@@ -31,9 +31,9 @@ export async function getNonce(address) {
 }
 
 export async function myriadAuth(info) {
-  const { data } = await apiClientRequest.post(`myriad/auth`, {
-    params: { info }
-  })
+  console.log("auth...")
+  const { data } = await apiClientRequest.post(`myriad/auth`, {...info})
+  console.log(data)
   return data
 }
 

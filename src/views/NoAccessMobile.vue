@@ -2,8 +2,8 @@
   .no-access
     .no-access__wrapper
       ui-debio-icon.no-access__icon(:icon="debioFullIcon" view-box="0 0 146 52" width="245" height="100" fill)
-      h5.no-access__title We are truly sorry
-      p.no-access__subtitle Signing in mobile is currently unavailable
+      h5.mb-5.no-access__title We are truly sorry
+      p.no-access__subtitle Please note that our interface isn't optimized for mobile yet, by signing-in, you understand that you will encounter errors or inaccuracies
       p.no-access__text To access DeBio, you need to use desktop browser
       a.no-access__cta(color="primary" href="https://www.debio.network/") Visit DeBio Network
 </template>

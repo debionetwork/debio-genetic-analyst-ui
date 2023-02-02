@@ -235,13 +235,12 @@ export default {
     },
 
     async registerMyriad() {
-      const info = {
+      const data = await myriadRegistration({
         username: this.account.info.myriadUsername,
         name: `${this.account.info.firstName} ${this.account.info.lastName}`,
         address: this.addressHex,
         role: this.account.info.category === "Mental Health" ? "health-professional/mental-health" : "health-professional/physical-health"
-      }
-      const data = await myriadRegistration(info)
+      })
       this.myriadAccountDetails = data
       await this.myriadAuthentication()
     },
