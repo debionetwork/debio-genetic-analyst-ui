@@ -14,7 +14,7 @@
 
     template(v-else)
       LoadingScreen(v-show="isLoadingSubstrateApi")
-      NoAccessMobile(v-show="isMobileDevice")
+      NoAccessMobile(v-show="isMobileDevice" @close="isMobileDevice = false")
       router-view(v-show="!isLoadingSubstrateApi && !isMobileDevice")
 </template>
   
