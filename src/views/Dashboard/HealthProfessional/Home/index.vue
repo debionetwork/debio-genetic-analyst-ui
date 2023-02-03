@@ -126,11 +126,9 @@ import { alertIcon, alertTriangleIcon } from "@debionetwork/ui-icons"
 import { isWeb3Injected, web3Enable, web3Accounts, web3FromAddress } from "@polkadot/extension-dapp"
 import { queryGetHealthProfessionalAccount } from "@/common/lib/polkadot-provider/query/health-professional"
 import localStorage from "@/common/lib/local-storage"
-import { myriadCheckUser, myriadRegistration, getNonce, myriadAuth, myriadContentTotal, myriadTipTotal } from "@/common/lib/api" 
+import { myriadContentTotal, myriadTipTotal } from "@/common/lib/api" 
 import Kilt from "@kiltprotocol/sdk-js"
 import CryptoJS from "crypto-js"
-import { u8aToHex } from "@polkadot/util"
-
 
 
 export default {
@@ -190,9 +188,8 @@ export default {
   methods: {
     async checkAccount() {
       const account = await queryGetHealthProfessionalAccount(this.api, this.wallet.address)
-      if (!account) {
-        this.$router.push({ name: "hp-account" })   
-        return
+      if (!account || account?.stakeStatus !== "Staked") {
+        this.$router.push({ name: "hp-account" })    
       }
       if (account.verificationStatus === "Unverified") this.isVerified = false
       this.account = account
@@ -208,22 +205,10 @@ export default {
     async getInitialData() {
       const cred = Kilt.Identity.buildFromMnemonic(this.mnemonicData.toString(CryptoJS.enc.Utf8))
       this.addressHex =  cred.signPublicKeyAsHex
-      await this.checkMyriadUser()
     },
 
     async toInstall() {
       window.open("https://polkadot.js.org/extension/", "_blank")
-    },
-
-    async checkMyriadUser() {
-      try {
-        const data = await myriadCheckUser(this.addressHex)
-        await this.getMyriadTotal(data)
-        return data
-      } catch (error) {
-        if(error.response.status === 404) await this.registerMyriad()
-        if(error.response.status === 401) await this.myriadAuthentication()
-      }
     },
 
     async getMyriadTotal(data) {
@@ -232,33 +217,6 @@ export default {
 
       const myriadTip = await myriadTipTotal(data.jwt)
       this.totalIncome = myriadTip.data.data.length
-    },
-
-    async registerMyriad() {
-      const data = await myriadRegistration({
-        username: this.account.info.myriadUsername,
-        name: `${this.account.info.firstName} ${this.account.info.lastName}`,
-        address: this.addressHex,
-        role: this.account.info.category === "Mental Health" ? "health-professional/mental-health" : "health-professional/physical-health"
-      })
-      this.myriadAccountDetails = data
-      await this.myriadAuthentication()
-    },
-
-    async myriadAuthentication() {
-      const nonce = await getNonce(this.addressHex)
-      const formatedNonce = "0x" + nonce.toString(16)
-      const signature = u8aToHex(this.wallet.sign(formatedNonce))
-      const role = this.account.info.category === "Mental Health" ? "health-professional/mental-health" : "health-professional/physical-health"
-      const jwt = await myriadAuth({
-        nonce,
-        publicAddress: this.addressHex,
-        signature: signature,
-        walletType: "polkadot{.js}",
-        networkType: "debio",
-        role
-      })
-      return jwt
     },
 
     exportKeystoreAction(){
@@ -294,7 +252,6 @@ export default {
       const injector = await web3FromAddress(sender)
       if (injector) {
         this.showConnect = false
-        await this.checkMyriadUser()
         this.$router.push({ name: "connecting-page"})
       }
     }

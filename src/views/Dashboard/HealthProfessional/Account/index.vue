@@ -47,7 +47,7 @@ import GAForm from "@/common/components/Account/InformationForm"
 import StakeDialog from "@/common/components/Dialog/StakeDialog"
 import SuccessDialogGeneral from "@/common/components/Dialog/SuccessDialogGeneral.vue"
 import { registerProfessionalHealth, stakeProfessionalHealth, createHealtProfessionalQualification, updateProfessionalHealth, updateHealtProfessionalQualification } from "@/common/lib/polkadot-provider/command/health-professional"
-import { checkMyriadUsername } from "@/common/lib/api" 
+import { checkMyriadUsername, myriadRegistration, getNonce, myriadAuth, sendPHRegisteredEmail } from "@/common/lib/api" 
 import { queryGetHealthProfessionalAccount } from "@/common/lib/polkadot-provider/query/health-professional"
 import { generateUsername } from "@/common/lib/username-generator"
 
@@ -59,6 +59,7 @@ export default {
     showSuccessDialog: false,
     isUsernameExist: false,
     account: {},
+    myriadAccountDetails: {},
     boxPublicKey: "",
     isStaked: true,
     title: "",
@@ -94,6 +95,7 @@ export default {
     async getInitialData() {
       const cred = Kilt.Identity.buildFromMnemonic(this.mnemonicData.toString(CryptoJS.enc.Utf8))
       this.boxPublicKey =  u8aToHex(cred.boxKeyPair.publicKey)
+      this.addressHex =  cred.signPublicKeyAsHex
     },
 
     async getAccountDetail() {
@@ -125,7 +127,8 @@ export default {
       let username
 
       if (!anonymous) {
-        username = firstName.toLowerCase()+lastName.toLowerCase()
+        const lengthOfName = (firstName.toLowerCase()+lastName.toLowerCase()).length
+        username = lengthOfName < 16 ? firstName.toLowerCase()+lastName.toLowerCase() : firstName.toLowerCase()
         do {
           isUsernameExist = await checkMyriadUsername(username)
           let i = 1
@@ -154,6 +157,8 @@ export default {
         anonymous
       }
 
+      this.account = info
+
       const _experiences = experiences.filter(value => value != "")
       await registerProfessionalHealth(
         this.api,
@@ -165,10 +170,41 @@ export default {
             this.wallet,
             _experiences,
             certification,
-            this.showStakeDialog = true
+            async () => {
+              await this.registerMyriad()
+            }
           )
         }
       )
+    },
+
+    async registerMyriad() {
+      const info = {
+        username: this.account.myriadUsername,
+        name: `${this.account.firstName} ${this.account.lastName}`,
+        address: this.addressHex,
+        role: this.account.category === "Mental Health" ? "unverified/health-professional/mental-health" : "unverified/health-professional/physical-health"
+      }
+      const data = await myriadRegistration(info)
+      this.myriadAccountDetails = data
+      await this.myriadAuthentication()
+    },
+
+    async myriadAuthentication() {
+      const nonce = await getNonce(this.addressHex)
+      const formatedNonce = "0x" + nonce.toString(16)
+      const signature = u8aToHex(this.wallet.sign(formatedNonce))
+      const role = this.account.category === "Mental Health" ? "unverified/health-professional/mental-health" : "unverified/health-professional/physical-health"
+      const jwt = await myriadAuth({
+        nonce,
+        publicAddress: this.addressHex,
+        signature: signature,
+        walletType: "polkadot{.js}",
+        networkType: "debio",
+        role
+      })
+      this.showStakeDialog = true
+      return jwt
     },
 
     async onSubmit() {
@@ -176,7 +212,8 @@ export default {
       await stakeProfessionalHealth(
         this.api, 
         this.wallet,
-        () => {
+        async () => {
+          await sendPHRegisteredEmail()
           this.showStakeDialog = false
           this.isLoading = false
           this.title="Registration Sent!"

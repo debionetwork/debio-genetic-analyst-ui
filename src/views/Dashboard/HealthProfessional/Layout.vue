@@ -192,10 +192,12 @@ export default {
 
     async checkAccount() {
       const account = await queryGetHealthProfessionalAccount(this.api, this.wallet.address)
-      if (!account) {
-        const nav = this.navs.find(nav => nav.text === "Dashboard")
-        nav.disabled = true
-        this.$router.push({ name: "hp-account" })     
+      if (this.$route.name !== "hp-account") {
+        if (!account || account?.stakeStatus !== "Staked") {
+          const nav = this.navs.find(nav => nav.text === "Dashboard")
+          nav.disabled = true
+          this.$router.push({ name: "hp-account" })     
+        }        
       }
     },
 

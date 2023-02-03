@@ -231,7 +231,7 @@
           v-row
             v-col(cols=3)
               p.tooltip__option(style="color: #000000") Show My Identity
-            p.tooltip__text(style="color: #000000") You will use your real name as your username (we will combine your first and last name, and possibly following with random numbers). e.g. johndoe, johndoe1, johndoe2
+            p.tooltip__text(style="color: #000000") Your username will be a combination of your full name, followed by random number(s). If your full name exceeds 16 characters, it will consist of either your first name or your last name, followed by random number(s). (e.g. johndoe, johndoe1, johndoe2)
 
       v-radio-group.ga-account__radio-input(
         :disabled="disableFields"
@@ -810,8 +810,8 @@ export default {
       }
 
       if (this.walletBalance < this.txWeight) {
-        this.showInsufficientDialog = true
         this.isLoading = false
+        this.showInsufficientDialog = true
         return
       }
 

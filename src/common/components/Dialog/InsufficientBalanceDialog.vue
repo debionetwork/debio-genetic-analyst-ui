@@ -32,7 +32,7 @@ import {alertTriangleIcon} from "@debionetwork/ui-icons"
 
 
 export default {
-  name: "SuccessDialog",
+  name: "InsufficientDialog",
 
   data: () => ({
     alertTriangleIcon
