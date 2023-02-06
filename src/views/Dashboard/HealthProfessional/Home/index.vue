@@ -126,7 +126,7 @@ import { alertIcon, alertTriangleIcon } from "@debionetwork/ui-icons"
 import { isWeb3Injected, web3Enable, web3Accounts, web3FromAddress } from "@polkadot/extension-dapp"
 import { queryGetHealthProfessionalAccount } from "@/common/lib/polkadot-provider/query/health-professional"
 import localStorage from "@/common/lib/local-storage"
-import { myriadContentTotal, myriadTipTotal } from "@/common/lib/api" 
+import { myriadContentTotal, myriadTipTotal, myriadCheckUser } from "@/common/lib/api" 
 import Kilt from "@kiltprotocol/sdk-js"
 import CryptoJS from "crypto-js"
 
@@ -182,6 +182,7 @@ export default {
   },
 
   async created () {
+    await this.getInitialData()
     await this.checkAccount()
   },
 
@@ -202,9 +203,15 @@ export default {
       }
     },
 
+    async checkMyriadAccount() {
+      const jwt = await myriadCheckUser(this.addressHex)
+      await this.getMyriadTotal(jwt)
+    },
+
     async getInitialData() {
       const cred = Kilt.Identity.buildFromMnemonic(this.mnemonicData.toString(CryptoJS.enc.Utf8))
       this.addressHex =  cred.signPublicKeyAsHex
+      await this.checkMyriadAccount()
     },
 
     async toInstall() {
