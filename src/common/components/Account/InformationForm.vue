@@ -687,7 +687,6 @@ export default {
       const data = await queryGetHealthProfessionalAccount(this.api, this.wallet.address)
       if(data) {
         this.isEditing = true
-  
         this.info = {
           firstName: data.info.firstName,
           lastName: data.info.lastName,
@@ -695,13 +694,13 @@ export default {
           email: data.info.email,
           phoneNumber: data.info.phoneNumber,
           dateOfBirth: data.info.dateOfBirth,
-          registerAs: data.info.role,
           profHealthCategory: data.info.profHealthCategory,
           anonymous: data.info.anonymous,
           myriadUsername: data.info.myriadUsername
         }
+        this.specialization = data.info.role.split("|")[1]
         this.info.profHealthCategory = data.info.category
-        this.info.registerAs = data.info.role
+        this.info.registerAs = data.info.role.split("|")[0]
         this.profileLink = data.info.profileLink
         this.profileImage = data.info.profileImage
         const dateOfBirth = String(data.info.dateOfBirth.replaceAll(",", ""))        
@@ -801,6 +800,7 @@ export default {
         return
       }
 
+      this.info.registerAs = this.info.registerAs === "Medical Doctor - Specialist Practitioner" ? `${this.info.registerAs}|${this.specialization}` : this.info.registerAs
       const data = {
         profileImage: this.profileImage,
         experiences: this.experiences,
