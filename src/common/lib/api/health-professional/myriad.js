@@ -49,6 +49,24 @@ export async function myriadContentTotal(userId, jwt) {
   return data
 }
 
+export async function myriadContents(jwt) {
+  const request = axios.create({
+    baseURL: getEnv("VUE_APP_BACKEND_API"),
+    headers: {
+      "Content-Type": "application/json",
+      "debio-api-key": getEnv("VUE_APP_DEBIO_API_KEY"),
+      "JWT": jwt
+    },
+    auth: {
+      username: getEnv("VUE_APP_USERNAME"),
+      password: getEnv("VUE_APP_PASSWORD")
+    }
+  })
+
+  const data = request.get(`/myriad/content/unlockable`)
+  return data  
+}
+
 
 export async function myriadTipTotal(jwt) {
   const request = axios.create({

@@ -57,6 +57,17 @@
             :loading="isLoadingData"
           )
 
+            template(v-slot:[`item.action`]="{ item }")
+              ui-debio-button.hp-dashboard__table-button(
+                color="#FF8EF4" 
+                dark
+                text
+                width="120px"
+                height="35"
+                style="font-size: 6px;"
+                @click="toOpinion(item)"
+              ) View My Opinion
+
           ui-debio-modal.hp-dashboard__modal(
             :show="isNotInstalled"
             :show-title="false"
@@ -126,9 +137,10 @@ import { alertIcon, alertTriangleIcon } from "@debionetwork/ui-icons"
 import { isWeb3Injected, web3Enable, web3Accounts, web3FromAddress } from "@polkadot/extension-dapp"
 import { queryGetHealthProfessionalAccount } from "@/common/lib/polkadot-provider/query/health-professional"
 import localStorage from "@/common/lib/local-storage"
-import { myriadContentTotal, myriadTipTotal, myriadCheckUser } from "@/common/lib/api" 
+import { myriadContents, myriadContentTotal, myriadTipTotal, myriadCheckUser } from "@/common/lib/api" 
 import Kilt from "@kiltprotocol/sdk-js"
 import CryptoJS from "crypto-js"
+import getEnv from "@/common/lib/utils/env"
 
 
 export default {
@@ -152,12 +164,12 @@ export default {
     myriadAccountDetails: {},
     items: [],
     headers: [
-      { text: "User", value: "user", sortable: true },
+      { text: "User", value: "username", sortable: true },
       { text: "Category", value: "category", sortable: true },
       { text: "Opinion Date", value: "opinionDate", sortable: true },
       { text: "Unlocked Content", value: "unlockedContent", sortable: true },
-      { text: "Opinion Fee", value: "unlockedFee", width: "115", sortable: true },
-      { text: "Actions", value: "actions", sortable: false, align: "center" }
+      { text: "Opinion Fee", value: "opinionFee", width: "115", sortable: true },
+      { text: "Actions", value: "action", sortable: false, align: "center" }
     ]
   }),
 
@@ -201,11 +213,19 @@ export default {
       if (!this.isNotInstalled) {
         this.showConnect = true
       }
+      const timelineId = this.account.info.category === "Physical Health" ? getEnv("VUE_APP_PHYSICAL_HEALTH_TIMELINE_ID") : getEnv("VUE_APP_MENTAL_HEALTH_TIMELINE_ID")
+      window.open(`${getEnv("VUE_APP_MYRIAD_URL")}/?type=experience&id=${timelineId}`)
+      this.$router.push({ name: "hp-dashboard"})
     },
 
     async checkMyriadAccount() {
       const jwt = await myriadCheckUser(this.addressHex)
       await this.getMyriadTotal(jwt)
+      await this.getContent(jwt)
+    },
+
+    async toOpinion(post) {
+      window.open(`${getEnv("VUE_APP_MYRIAD_URL")}/login?redirect=${getEnv("VUE_APP_MYRIAD_URL")}%2Fpost%2F${post.postId}`)
     },
 
     async getInitialData() {
@@ -224,6 +244,26 @@ export default {
 
       const myriadTip = await myriadTipTotal(data.jwt)
       this.totalIncome = myriadTip.data.data.length
+    },
+
+    async getContent(data) {
+      const content = await myriadContents(data.jwt)
+      content.data.data.data.map(data => {
+        const detail = {
+          userId: data.userId,
+          postId: data.postId,
+          username: data.post.user.username,
+          category: data.post.experiences[0].name,
+          opinionDate: new Date (data.updatedAt).toLocaleString("en-GB", {
+            day: "numeric",
+            year: "numeric",
+            month: "short"
+          }),
+          unlockedContent: data.post.metric.tips,
+          opinionFee: `${data.asset.exclusiveContents[0].price} ${data.asset.exclusiveContents[0].symbol}`
+        }
+        this.items.push(detail)
+      })
     },
 
     exportKeystoreAction(){
