@@ -11,7 +11,7 @@
 
       v-row.hp-dashboard__cards(v-if="isVerified")
         ui-debio-card.mr-5(
-          width="280px"
+          width="380px"
           height="108px"
         )
           v-row
@@ -22,11 +22,11 @@
               max-height="64px"
             )
             .hp-dashboard__card-text
-              span Opinion Given
+              span Opinion(s) Given
               h1 {{ opinionGiven }}
           
         ui-debio-card(
-          width="280px"
+          width="380px"
           height="108px"
         )
           v-row
@@ -37,7 +37,7 @@
               max-height="64px"
             )
             .hp-dashboard__card-text
-              span Income(USDT)
+              span Bounties Received (USD)
               h1 {{ totalIncome }}
 
       .hp-dashboard__content
@@ -259,7 +259,7 @@ export default {
             year: "numeric",
             month: "short"
           }),
-          unlockedContent: data.post.metric.tips,
+          unlockedContent: data.asset.exclusiveContents[0].totalAmount,
           opinionFee: `${data.asset.exclusiveContents[0].price} ${data.asset.exclusiveContents[0].symbol}`
         }
         this.items.push(detail)
@@ -310,7 +310,7 @@ export default {
   @import "@/common/styles/functions.sass"
   @import "@/common/styles/mixins.sass"
 
-   
+
   .hp-dashboard
     &__wrapper
       height: 100%
@@ -321,6 +321,10 @@ export default {
     &__cards
       margin-top: 30px
       margin-left: 4px
+    
+      .ui-debio-card 
+        width: 300px
+        height: 108px
 
     &__content
       background: #FFFFFF
