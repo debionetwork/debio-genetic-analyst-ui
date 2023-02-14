@@ -259,7 +259,7 @@ export default {
             year: "numeric",
             month: "short"
           }),
-          unlockedContent: data.asset.exclusiveContents[0].totalAmount,
+          unlockedContent: data.asset.exclusiveContents[0].totalAmount ? "Yes" : "No",
           opinionFee: `${data.asset.exclusiveContents[0].price} ${data.asset.exclusiveContents[0].symbol}`
         }
         this.items.push(detail)
