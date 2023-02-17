@@ -1,5 +1,35 @@
 # Changelog
 
+## [1.2.0](https://github.com/debionetwork/debio-genetic-analyst-ui/compare/1.1.0...1.2.0) (2023-02-17)
+
+
+### Features
+
+* add edit account and adjust some wordings ([#212](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/212)) ([c76ae54](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/c76ae54ddd5bbc6146bd6a410bedcbd00e8fd567))
+* add health-professional dashboard ([#223](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/223)) ([303c55b](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/303c55b7d74a4eb9ccac8517b230cfbb810b61ea))
+* add install polkadot pop up ([#200](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/200)) ([2722a84](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/2722a84da6d1ebda5f4346211c2d9a35b50fe592))
+* add register and stake professional health ([#207](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/207)) ([1e2622b](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/1e2622b5e0a9e83894015b5116c264b8431d8b2d))
+* add tooltip on privacy setting ([#204](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/204)) ([809a91a](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/809a91a20291dd9fdfc6a422463b563257ed1492))
+* connect to myriad page ([#205](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/205)) ([4581c20](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/4581c209ec646d3af189ce474835a1f250d1bd48))
+* direct to myriad and fix fetch post data ([#235](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/235)) ([86aaea8](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/86aaea8ea908a72ff676b74594162514e74df5d7))
+* enhance mobile view ([#230](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/230)) ([5714001](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/57140018acdf87086c653dfdfb90a6bba6eb5286))
+* medical provider registration form enhancement ([#199](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/199)) ([01420b9](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/01420b915d15de6f514fe04328e8c951ec8ba1fa))
+
+
+### Bug Fixes
+
+* adjust api myriad contents ([#246](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/246)) ([3b6c031](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/3b6c03180d445b92304ac217d757fcb36b907855))
+* adjust api myriadContents ([#245](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/245)) ([f23e6a0](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/f23e6a04818b2e0fb23b60d24a08702e48d46d9e))
+* change amount to boolean on unlocked content column ([#244](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/244)) ([b0e115c](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/b0e115c1beac8ca8ae668ff95fb7b480b9c09ec2))
+* change category to specialization ([#215](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/215)) ([5ae8a81](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/5ae8a81356ae565294787e410939686b4efb6165))
+* change connection loading from pop up to page ([#206](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/206)) ([67bffa8](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/67bffa87b5e128d52143b4fbb1f45912559327c4))
+* checkUsername and add new fields for specialozation ([#222](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/222)) ([ce4e93f](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/ce4e93fc1e99271be77767d2d2648b9f0fcf2d1f))
+* docker entrypoint ([#236](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/236)) ([250e479](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/250e4794bb9e5f7630b50b74d2666b030c746185))
+* ga-registration ([#217](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/217)) ([96590fb](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/96590fb8d96a28b763a0497fb2dc824e244b119c))
+* hp dashboard ([#234](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/234)) ([50de6b9](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/50de6b9866eafd4afb9cc2cbaa3fba14ab754e33))
+* registrahtion hp enhancement ([#233](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/233)) ([c62d592](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/c62d59207487db9e5cb9057f9f84e332fef23e38))
+* some wordings and fetch unlocked content ([#242](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/242)) ([368af66](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/368af668f2af38a427a0ed156ba787ddbe797f52))
+
 ## [1.1.0](https://github.com/debionetwork/debio-genetic-analyst-ui/compare/1.0.7...1.1.0) (2022-12-16)
 
 
