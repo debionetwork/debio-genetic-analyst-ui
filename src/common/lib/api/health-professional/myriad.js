@@ -32,6 +32,7 @@ export async function myriadAuth(info) {
 }
 
 export async function myriadContentTotal(userId, jwt) {
+  console.log(userId)
   const request = axios.create({
     baseURL: getEnv("VUE_APP_BACKEND_API"),
     headers: {
@@ -63,7 +64,12 @@ export async function myriadContents(jwt) {
     }
   })
 
-  const data = request.get(`/myriad/content/unlockable`)
+  const data = request.get(`/myriad/content/unlockable`, {
+    params: {
+      limit: 1000,
+      page: 1   
+    }
+  })
   return data  
 }
 
