@@ -143,9 +143,11 @@
 
     ui-debio-dropdown(
       v-if="role === 'health-professional'"
-      :items="roles"
+      :items="roles.data"
       :disabled="disableFields"
       v-model="info.registerAs"
+      item-text="category"
+      item-value="category"
       variant="small"
       label="Register as"
       placeholder="Select Category"
@@ -472,7 +474,7 @@
 import { mapState } from "vuex"
 import errorMessages from "@/common/constants/error-messages"
 import {uploadFile, getFileUrl} from "@/common/lib/pinata-proxy"
-import {getSpecializationCategory, getHealthProfessionalSpecialization} from "@/common/lib/api"
+import {getSpecializationCategory, getHealthProfessionalSpecialization, getHealthProfessionalRole} from "@/common/lib/api"
 import {createQualificationFee, registerGeneticAnalystFee} from "@debionetwork/polkadot-provider"
 import { queryGetHealthProfessionalAccount, queryGetHealthProfessionalQualification } from "@/common/lib/polkadot-provider/query/health-professional"
 import { fileTextIcon, pencilIcon, trashIcon } from "@debionetwork/ui-icons"
@@ -536,7 +538,7 @@ export default {
     categories: [],
     editId: null,
     txWeight: null,
-    roles: ["Medical Doctor - Generalist Practitioner", "Medical Doctor - Specialist Practitioner", "Clinical Psychologist", "Clinical Psychiatrist"],
+    roles: [],
     profHealthCategories: ["Mental Health", "Physical Health"],
     isEditing: false,
     hpQualificationId: null
@@ -665,7 +667,8 @@ export default {
   },
 
   async created() {
-    this.isLoading = false    
+    this.isLoading = false
+    this.roles = await getHealthProfessionalRole()
     await this.getSpecialization()
     await this.getTxWeight()
     if (this.role === "health-professional") await this.fetchAccountDetail()
