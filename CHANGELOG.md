@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/debionetwork/debio-genetic-analyst-ui/compare/1.2.0...1.3.0) (2023-02-22)
+
+
+### Features
+
+* add API for get health professional roles ([#247](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/247)) ([8bd5c6f](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/8bd5c6fa7acd2bdbfef8e51393ffd0c9826f1da0))
+
 ## [1.2.0](https://github.com/debionetwork/debio-genetic-analyst-ui/compare/1.1.0...1.2.0) (2023-02-17)
 
 
