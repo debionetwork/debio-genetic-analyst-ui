@@ -192,7 +192,8 @@ export default {
 
     async myriadAuthentication() {
       const nonce = await getNonce(this.addressHex)
-      const formatedNonce = "0x" + nonce.toString(16)
+      const hexNonce = nonce.toString(16)
+      const formatedNonce =  hexNonce.length > 7 ? "0x" + nonce.toString(16) : "0x0" + nonce.toString(16)
       const signature = u8aToHex(this.wallet.sign(formatedNonce))
       const role = this.account.category === "Mental Health" ? "unverified/health-professional/mental-health" : "unverified/health-professional/physical-health"
       const jwt = await myriadAuth({
