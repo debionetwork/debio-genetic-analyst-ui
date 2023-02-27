@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/debionetwork/debio-genetic-analyst-ui/compare/1.3.0...1.3.1) (2023-02-27)
+
+
+### Bug Fixes
+
+* handle short nonce ([#250](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/250)) ([50bec08](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/50bec08e8f02f5a3a55002b646c5f97fb87c527a))
+
 ## [1.3.0](https://github.com/debionetwork/debio-genetic-analyst-ui/compare/1.2.0...1.3.0) (2023-02-22)
 
 
