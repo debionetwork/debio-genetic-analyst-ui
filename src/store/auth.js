@@ -30,10 +30,6 @@ export default {
 
     CLEAR(state) {
       state.role = defaultState.role
-    },
-
-    SET_ACCOUNT(state, data) {
-      state.account = data
     }
   },
 

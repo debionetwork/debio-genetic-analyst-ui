@@ -141,6 +141,7 @@ export default {
         } while(username.length > 16 )
       }
 
+      await this.getInitialData()
       const info = {
         boxPublicKey: this.boxPublicKey,
         profileImage,
@@ -148,7 +149,7 @@ export default {
         lastName,
         myriadUsername: username,
         gender,
-        dateOfBirth,
+        dateOfBirth: (new Date(dateOfBirth)).getTime(),
         email,
         phoneNumber,
         role: registerAs,
@@ -156,7 +157,6 @@ export default {
         profileLink,
         anonymous
       }
-
       this.account = info
 
       const _experiences = experiences.filter(value => value != "")
@@ -249,7 +249,7 @@ export default {
         lastName,
         myriadUsername,
         gender,
-        dateOfBirth,
+        dateOfBirth: (new Date(dateOfBirth)).getTime(),
         email,
         phoneNumber,
         role: registerAs,

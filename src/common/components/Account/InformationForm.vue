@@ -559,8 +559,7 @@ export default {
       api: (state) => state.substrate.api,
       web3: (state) => state.web3Store.web3,
       wallet: (state) => state.substrate.wallet,
-      walletBalance: (state) => state.substrate.walletBalance,
-      account: (state) => state.auth.account
+      walletBalance: (state) => state.substrate.walletBalance
     }),
 
     computeAvatar() {
@@ -706,7 +705,7 @@ export default {
         this.info.registerAs = data.info.role.split("|")[0]
         this.profileLink = data.info.profileLink
         this.profileImage = data.info.profileImage
-        const dateOfBirth = String(data.info.dateOfBirth.replaceAll(",", ""))        
+        const dateOfBirth = String(data.info.dateOfBirth.replaceAll(",", ""))
         this.info.dateOfBirth = new Date(+dateOfBirth).toLocaleString("fr-CA", {
           day: "numeric",
           year: "numeric",

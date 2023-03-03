@@ -22,8 +22,8 @@
             stroke
           )
           template(v-if="GAAccount")
-            span(v-if="GAAccount.verificationStatus === 'Unverified'") Your verification submission is being reviewed by Daogenics
-            span(v-else) Your account has been {{ GAAccount.verificationStatus.toLowerCase() }}
+            span(v-if="GAAccount?.verificationStatus === 'Unverified'") Your verification submission is being reviewed by Daogenics
+            span(v-else) Your account has been {{ GAAccount?.verificationStatus.toLowerCase() }}
 </template>
 
 <script>

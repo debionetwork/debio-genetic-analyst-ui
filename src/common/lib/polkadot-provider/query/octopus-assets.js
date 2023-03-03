@@ -9,6 +9,6 @@ export async function queryOctopusAssetMetadata(api, assetId) {
 }
 
 export async function queryGetAllOctopusAssets(api) {
-  const res = await api.query.octopusAppchain.assetIdByTokenId.entries()
+  const res = await api.query.octopusBridge.assetIdByTokenId.entries()
   return res
 }
