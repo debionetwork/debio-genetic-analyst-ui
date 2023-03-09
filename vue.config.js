@@ -1,4 +1,5 @@
 const WorkerPlugin = require("worker-plugin")
+const path = require('path');
 
 module.exports = {
   "transpileDependencies": [
@@ -14,7 +15,10 @@ module.exports = {
       new WorkerPlugin()
     ],
     resolve: {
-      extensions: ["*", ".mjs", ".js", ".vue", ".json", ".mjs", ".js", ".vue", ".json", ".gql", ".graphql"]
+      extensions: ["*", ".mjs", ".js", ".vue", ".json", ".mjs", ".js", ".vue", ".json", ".gql", ".graphql"],
+      alias: {
+        '@ledgerhq/devices/hid-framing': path.join(__dirname, 'node_modules/@ledgerhq/devices/lib/hid-framing'),
+      }
     },
     module: {
       rules: [
