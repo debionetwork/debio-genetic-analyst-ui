@@ -559,8 +559,7 @@ export default {
       api: (state) => state.substrate.api,
       web3: (state) => state.web3Store.web3,
       wallet: (state) => state.substrate.wallet,
-      walletBalance: (state) => state.substrate.walletBalance,
-      account: (state) => state.auth.account
+      walletBalance: (state) => state.substrate.walletBalance
     }),
 
     computeAvatar() {

@@ -321,7 +321,7 @@ export default {
       this.polkadotWallets.forEach(async (w) => {
         if (w && w.name !== "debio") {
           const octopusData = this.octopusAsset.find(data => data.tokenId === w.tokenId)
-          w.balance = this.web3.utils.fromWei(octopusData.data.balance.replaceAll(",", ""), w.unit)
+          w.balance = octopusData.data ? this.web3.utils.fromWei(octopusData.data.balance.replaceAll(",", ""), w.unit) : 0
         }
       })
     },
