@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/debionetwork/debio-genetic-analyst-ui/compare/1.3.1...1.4.0) (2023-03-30)
+
+
+### Features
+
+* update polkadot and adjust some changes ([#256](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/256)) ([be6605b](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/be6605b7873c76a9b13e5c7dc904ddfd7a782461))
+
 ## [1.3.1](https://github.com/debionetwork/debio-genetic-analyst-ui/compare/1.3.0...1.3.1) (2023-02-27)
 
 
