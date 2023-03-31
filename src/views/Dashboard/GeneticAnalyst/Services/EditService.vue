@@ -141,7 +141,7 @@ export default {
       const dataToSend = {
         name,
         pricesByCurrency: [{
-          currency: formatUSDTE(currency), 
+          currency: currency === "USDTE" ? currency : formatUSDTE(currency), 
           totalPrice: price,
           priceComponents: [{component: "Main Price", value: price}]
         }],
