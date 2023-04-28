@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/debionetwork/debio-genetic-analyst-ui/compare/1.4.0...1.4.1) (2023-04-28)
+
+
+### Bug Fixes
+
+* currency format in updateGeneticAnalystService ([#269](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/269)) ([acd74e2](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/acd74e22d98d0b2e95426c4e0592199addc89593))
+
 ## [1.4.0](https://github.com/debionetwork/debio-genetic-analyst-ui/compare/1.3.1...1.4.0) (2023-03-30)
 
 
