@@ -28,6 +28,7 @@
           .ga-account__space-between
             span.text-title {{ item.name }}
             span.text-secondary {{ item.pricesByCurrency[0].totalPrice }} {{ item.pricesByCurrency[0].currency }}
+            span.text-secondary {{ item.additionalPrice }} {{ item.pricesByCurrency[0].currency }}
           span.text-secondary {{ item.description }}
           span.text-title Service Duration: {{ item.expectedDuration.duration }} {{ item.expectedDuration.durationType }}
           .ga-account__space-between
@@ -123,7 +124,8 @@ export default {
         file,
         name,
         testResultSample,
-        totalPrice
+        totalPrice,
+        additionalPrice
       } = value
 
       const dataToSend = {
@@ -142,7 +144,8 @@ export default {
       } else {
         services.push({
           ...dataToSend,
-          file: {name: file.name}
+          file: {name: file.name},
+          additionalPrice
         })
       }
       
@@ -161,7 +164,8 @@ export default {
         durationType: "Days",
         description: data.description,
         testResultSample: data.testResultSample,
-        file: data.file
+        file: data.file,
+        additionalPrice: data.additionalPrice
       }
       
       this.service = service
@@ -189,15 +193,19 @@ export default {
       this.submitLoading = true
 
       data.forEach(service => {
-        const totalPrice = toEther(service.pricesByCurrency[0].totalPrice, service.pricesByCurrency[0].currency)
+        const totalPrice = toEther(Number(service.pricesByCurrency[0].totalPrice) + Number(service.additionalPrice), service.pricesByCurrency[0].currency)
+        const servicePrice = toEther(service.pricesByCurrency[0].totalPrice, service.pricesByCurrency[0].currency)
+        const qcPrice = toEther(service.additionalPrice, service.pricesByCurrency[0].currency)
         delete service.file
+        delete service.additionalPrice
 
         services.push({
           ...service, 
           pricesByCurrency: [{
             currency: formatUSDTE(service.pricesByCurrency[0].currency),
             totalPrice: totalPrice,
-            priceComponents: [{component: "Main Price", value: totalPrice}]
+            priceComponents: [{component: "Main Price", value: servicePrice}],
+            additionalPrices: [{component: "QC Price", value: qcPrice}]
           }]
         })
       });

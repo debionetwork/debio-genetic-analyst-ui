@@ -134,16 +134,20 @@ export default {
         durationType,
         name,
         testResultSample,
-        totalPrice
+        totalPrice,
+        additionalPrice
       } = value
       const price = toEther(totalPrice, currency)
+      const qcPrice = toEther(additionalPrice, currency)
+      const servicePrice = toEther(Number(totalPrice) - Number(additionalPrice), currency)
 
       const dataToSend = {
         name,
         pricesByCurrency: [{
           currency: currency === "USDTE" ? currency : formatUSDTE(currency), 
           totalPrice: price,
-          priceComponents: [{component: "Main Price", value: price}]
+          priceComponents: [{component: "Main Price", value: servicePrice}],
+          additionalPrices: [{component: "QC Price", value: qcPrice}]
         }],
         expectedDuration: {duration, durationType},
         description,

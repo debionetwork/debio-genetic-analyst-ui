@@ -33,7 +33,37 @@
             outlined
             block
             validate-on-blur
-            v-model="service.totalPrice"
+            v-model="service.totalPrice" 
+            :error="isDirty.service && isDirty.service.totalPrice"
+            :rules="$options.rules.service.totalPrice"
+          )
+          span.text-required {{ priceHint }}
+        v-col(md="3")
+          ui-debio-dropdown(
+            :items="currency"
+            variant="small"
+            label="Currency"
+            placeholder=""
+            outlined
+            close-on-select
+            validate-on-blur
+            item-text="currency"
+            item-value="currency"
+            block
+            v-model="service.currency"
+            :error="isDirty.service && isDirty.service.currency"
+            :rules="$options.rules.service.currency"
+          )
+
+      v-row(no-gutters)
+        v-col(style="padding-right: 10px;")
+          ui-debio-input(
+            variant="small"
+            label="QC Price"
+            outlined
+            block
+            validate-on-blur
+            v-model="service.additionalPrice"
             :error="isDirty.service && isDirty.service.totalPrice"
             :rules="$options.rules.service.totalPrice"
           )
@@ -172,6 +202,7 @@ export default {
       name: "",
       currency: "USDT.e",
       totalPrice: "",
+      additionalPrice: "",
       duration: "",
       description: ""
     },
