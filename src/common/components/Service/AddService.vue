@@ -37,7 +37,6 @@
             :error="isDirty.service && isDirty.service.totalPrice"
             :rules="$options.rules.service.totalPrice"
           )
-          span.text-required {{ priceHint }}
         v-col(md="3")
           ui-debio-dropdown(
             :items="currency"
