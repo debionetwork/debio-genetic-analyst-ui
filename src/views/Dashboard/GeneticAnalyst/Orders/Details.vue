@@ -182,7 +182,7 @@
               :rules="$options.rules.document.file"
               variant="medium"
               label="Upload Genetic Result"
-              label-rules="(.pdf, .doc - Maximum fle size is 2MB)"
+              label-rules="(.pdf, .doc - Maximum fle size is 200MB)"
             )
             ui-debio-textarea(
               v-model="document.description"
@@ -444,7 +444,7 @@ export default {
       file: [
         rulesHandler.FIELD_REQUIRED,
         rulesHandler.DEFAULT_ACCEPT_DOCUMENTS,
-        rulesHandler.FILE_SIZE(2000000)
+        rulesHandler.FILE_SIZE(211000000)
       ],
       description: [
         rulesHandler.ENGLISH_ALPHABET,
