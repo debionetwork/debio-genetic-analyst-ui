@@ -796,15 +796,7 @@ export default {
         this.isFailed = false; // Reset isFailed before starting the upload
 
         for (let i = 0; i < this.totalChunks; i++) {
-          let data = [`{"seed":${encryptedFileChunks[i].seed},"data":{"nonce":[${encryptedFileChunks[i].data.nonce}],"box":[`]
-          for(let k = 0 ; k < encryptedFileChunks[i].data.box.length; k++) {
-            if(k === 0) {
-              data.push(encryptedFileChunks[i].data.box[k])
-            }
-            else {
-              data.push("," + encryptedFileChunks[i].data.box[k])
-            }
-          }
+          let data = [`{"seed":${encryptedFileChunks[i].seed},"data":{"nonce":[${encryptedFileChunks[i].data.nonce}],"box":[${encryptedFileChunks[i].data.box}`]
           data.push("]}}")
           const blob = new Blob(data, { type: fileType });
           console.log(`data to be uploaded is`)
