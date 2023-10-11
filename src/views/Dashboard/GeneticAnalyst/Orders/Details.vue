@@ -444,7 +444,7 @@ export default {
       file: [
         rulesHandler.FIELD_REQUIRED,
         rulesHandler.DEFAULT_ACCEPT_DOCUMENTS,
-        rulesHandler.FILE_SIZE(211000000)
+        rulesHandler.FILE_SIZE(220200960)
       ],
       description: [
         rulesHandler.ENGLISH_ALPHABET,
@@ -483,7 +483,7 @@ export default {
           ...data,
           analysis_info: {
             ...analysisData,
-            fileName: analystReportDocument.rows[0]?.metadata?.name || analysisData.geneticLink.split("/").pop(),
+            fileName: analystReportDocument.rows[0]?.metadata?.name || analysisData.reportLink.split("/").pop(),
             fileSize: this.formatBytes(analystReportDocument.rows[0]?.metadata?.keyvalues?.fileSize || analystReportDocument?.rows[0]?.size || 0)
           },
           document: {
