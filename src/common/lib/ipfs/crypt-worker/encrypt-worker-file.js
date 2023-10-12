@@ -6,7 +6,7 @@ onmessage = function (e) {
   (async () => {
     const fileBlob = new Blob([e.data.text], { type: e.data.typeFr })
     console.log(fileBlob)
-    const chunkSize = 30 * 1000 * 1024 // 5mb chunk size
+    const chunkSize = 5 * 1000 * 1024 // 5mb chunk size
     const chunksAmount = Math.ceil(fileBlob.size / chunkSize)
     postMessage({ chunksAmount })
 

@@ -182,7 +182,7 @@
               :rules="$options.rules.document.file"
               variant="medium"
               label="Upload Genetic Result"
-              label-rules="(.pdf, .doc - Maximum fle size is 2MB)"
+              label-rules="(.pdf, .doc - Maximum fle size is 200MB)"
             )
             ui-debio-textarea(
               v-model="document.description"
@@ -282,11 +282,14 @@ export default {
     rejectionTitle: null,
     rejectionDesc: null,
     txWeight: null,
-    documentLink: null,
+    documentLinks: [],
     orderDataDetails: {
       analysis_info: {},
       document: {},
       analyst_info: {},
+      totalChunks: 0,          // Initialize totalChunks
+      currentChunkIndex: 0,    // Initialize currentChunkIndex
+      isFailed: false,
       service_info: {}
     },
     hilightDescription: "",
@@ -441,7 +444,7 @@ export default {
       file: [
         rulesHandler.FIELD_REQUIRED,
         rulesHandler.DEFAULT_ACCEPT_DOCUMENTS,
-        rulesHandler.FILE_SIZE(2000000)
+        rulesHandler.FILE_SIZE(220200960)
       ],
       description: [
         rulesHandler.ENGLISH_ALPHABET,
@@ -480,7 +483,7 @@ export default {
           ...data,
           analysis_info: {
             ...analysisData,
-            fileName: analystReportDocument.rows[0]?.metadata?.name || analysisData.geneticLink.split("/").pop(),
+            fileName: analystReportDocument.rows[0]?.metadata?.name || analysisData.reportLink.split("/").pop(),
             fileSize: this.formatBytes(analystReportDocument.rows[0]?.metadata?.keyvalues?.fileSize || analystReportDocument?.rows[0]?.size || 0)
           },
           document: {
@@ -787,19 +790,38 @@ export default {
     },
 
     async upload({ encryptedFileChunks, fileType, fileName, fileSize }) {
-      const data = JSON.stringify(encryptedFileChunks)
-      const blob = new Blob([data], { type: fileType })
+      try {
+        this.totalChunks = encryptedFileChunks.length;
+        this.currentChunkIndex = 0;
+        this.isFailed = false; // Reset isFailed before starting the upload
 
-      const result = await uploadFile({
-        title: fileName,
-        type: fileType,
-        size: fileSize,
-        file: blob
-      })
+        for (let i = 0; i < this.totalChunks; i++) {
+          let data = [`{"seed":${encryptedFileChunks[i].seed},"data":{"nonce":[${encryptedFileChunks[i].data.nonce}],"box":[${encryptedFileChunks[i].data.box}]}}`]
+          const blob = new Blob(data, { type: fileType });
+          console.log(`data to be uploaded is`)
+          console.log(blob)
 
-      const link = getFileUrl(result.IpfsHash)
+          try {
+            const result = await uploadFile({
+              title: fileName,
+              type: fileType,
+              size: fileSize,
+              file: blob
+            });
 
-      this.document.recordLink = link
+            const link = await getFileUrl(result.IpfsHash);
+            this.documentLinks.push(link);
+          } catch (error) {
+            console.error("Error on chunk upload", error);
+            this.isFailed = true; // Set isFailed to true if the upload fails for any chunk
+          }
+
+          this.currentChunkIndex++; // Increment the currentChunkIndex regardless of success or failure
+        }
+        this.document.recordLink = JSON.stringify(this.documentLinks);
+      } catch (e) {
+        console.error("Error on upload", e);
+      }
     },
 
     handleShowTooltip(e) {
