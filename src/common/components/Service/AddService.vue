@@ -288,12 +288,12 @@ export default {
       name: [
         rulesHandler.FIELD_REQUIRED,
         rulesHandler.ENGLISH_ALPHABET,
-        rulesHandler.MAX_CHARACTER(150)
+        rulesHandler.MAX_CHARACTER(50)
       ],
       description: [
         rulesHandler.FIELD_REQUIRED,
-        rulesHandler.MAX_CHARACTER(5000),
-        rulesHandler.ENGLISH_ALPHABET_WITH_LINK
+        rulesHandler.MAX_CHARACTER(100),
+        rulesHandler.ENGLISH_ALPHABET
       ],
       currency: [
         rulesHandler.FIELD_REQUIRED

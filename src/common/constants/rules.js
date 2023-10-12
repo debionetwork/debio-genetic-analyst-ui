@@ -3,7 +3,6 @@ import errorMessages from "./error-messages"
 export default Object.freeze({
   FIELD_REQUIRED: val => !!val || errorMessages.REQUIRED,
   ENGLISH_ALPHABET: val => (!!val && /^[A-Za-z0-9!@#$%^&*\\(\\)\-_=+:;"',.\\/? \n]+$/.test(val)) || errorMessages.INPUT_CHARACTER("English alphabet"),
-  ENGLISH_ALPHABET_WITH_LINK: val => (!!val && /^[\u005bA-Za-z0-9!@#$%^&*\\(\\)\-_=+:;"',.\\/? \n]+$/.test(val)) || errorMessages.INPUT_CHARACTER("English alphabet"),
   MAX_CHARACTER: (max) => {
     return val => (!!val && val.length <= max) || errorMessages.MAX_CHARACTER(max)
   },
