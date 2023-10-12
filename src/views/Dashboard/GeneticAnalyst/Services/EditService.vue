@@ -57,6 +57,7 @@ export default {
       name: "",
       currency: "",
       totalPrice: "",
+      additionalPrice: "",
       duration: "",
       durationType: "Days",
       description: "",
@@ -103,12 +104,14 @@ export default {
     async getData(id) {
       const data = await queryGeneticAnalystServicesByHashId(this.api, id)
       const testResultLink = await getIpfsMetaData(data?.info?.testResultSample.split("/").pop())
-      const totalPrice = await fromEther(data?.info?.pricesByCurrency[0].totalPrice, data?.info?.pricesByCurrency[0].currency)
+      const totalPrice = await fromEther(data?.info?.pricesByCurrency[0].priceComponents[0], data?.info?.pricesByCurrency[0].currency)
+      const additionalPrice = await fromEther(data?.info?.pricesByCurrency[0].additionalPrices[0], data?.info?.pricesByCurrency[0].currency)
       
       const service = {
         name: data?.info?.name,
         currency: formatUSDTE(data?.info?.pricesByCurrency[0].currency),
         totalPrice: totalPrice,
+        additionalPrice : additionalPrice,
         duration: data?.info?.expectedDuration.duration,
         durationType: data?.info?.expectedDuration.durationType,
         description: data?.info?.description,
@@ -123,6 +126,18 @@ export default {
       const getTxWeight = await updateGeneticAnalystServiceFee(this.api, this.wallet, this.service)
 
       this.txWeight = `${this.web3.utils.fromWei(String(getTxWeight.partialFee), "ether")}`
+    },
+
+    ParseLinks(description) {
+      const urlRegex = /(https?:\/\/[^\s]+)/g;
+      const parts = description.split(urlRegex);
+      return parts.map((part) => {
+        if (urlRegex.test(part)) {
+          return `<a href="${part}" target="_blank">${part}</a>`;
+        } else {
+          return part;
+        }
+      }).join("");
     },
 
     async onSubmitService(value) {
@@ -140,6 +155,7 @@ export default {
       const price = toEther(totalPrice, currency)
       const qcPrice = toEther(additionalPrice, currency)
       const servicePrice = toEther(Number(totalPrice) - Number(additionalPrice), currency)
+      const parsedDescription = this.ParseLinks(description)
 
       const dataToSend = {
         name,
@@ -150,7 +166,7 @@ export default {
           additionalPrices: [{component: "QC Price", value: qcPrice}]
         }],
         expectedDuration: {duration, durationType},
-        description,
+        description: parsedDescription,
         testResultSample
       }
 

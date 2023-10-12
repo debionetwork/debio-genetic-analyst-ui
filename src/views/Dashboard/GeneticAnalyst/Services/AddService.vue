@@ -128,11 +128,14 @@ export default {
         additionalPrice
       } = value
 
+      const parsedDescription = this.ParseLinks(description)
+      console.log(parsedDescription)
+
       const dataToSend = {
         name,
         pricesByCurrency: [{currency, totalPrice}],
         expectedDuration: {duration, durationType},
-        description,
+        description: parsedDescription,
         testResultSample
       }
 
@@ -185,6 +188,18 @@ export default {
 
       this.services = services
       this.modalDelete = null
+    },
+
+    ParseLinks(description) {
+      const urlRegex = /(https?:\/\/[^\s]+)/g;
+      const parts = description.split(urlRegex);
+      return parts.map((part) => {
+        if (urlRegex.test(part)) {
+          return `<a href="${part}" target="_blank">${part}</a>`;
+        } else {
+          return part;
+        }
+      }).join("");
     },
 
     async onSubmit() {
