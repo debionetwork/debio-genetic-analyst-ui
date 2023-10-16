@@ -95,7 +95,7 @@
                 :aria-label="orderDataDetails.analysis_info.fileName"
                 role="button"
                 @click="handleDownloadFile(orderDataDetails.analysis_info.reportLink, orderDataDetails.analysis_info.fileName)"
-              ) {{ orderDataDetails.analysis_info.fileName }} {{ orderDataDetails.analysis_info.fileSize }}
+              ) {{ orderDataDetails.analysis_info.fileName }}
 
             p(v-if="hilightDescription")
               | {{ readMore ? hilightDescription : hilightDescription.substr(0, 130) }}
@@ -155,7 +155,7 @@
                 :aria-label="orderDataDetails.document.fileName"
                 role="button"
                 @click="handleDownloadFile(orderDataDetails.document.reportLink, orderDataDetails.document.fileName)"
-              ) {{ orderDataDetails.document.fileName }} {{ orderDataDetails.document.fileSize }}
+              ) {{ orderDataDetails.document.fileName }}
 
               .order-details__actions.d-flex.justify-space-between(v-if="orderDataDetails.analysis_info.status !== 'Rejected' && step === 1")
                 ui-debio-button(
