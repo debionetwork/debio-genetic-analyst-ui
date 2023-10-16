@@ -104,8 +104,8 @@ export default {
     async getData(id) {
       const data = await queryGeneticAnalystServicesByHashId(this.api, id)
       const testResultLink = await getIpfsMetaData(data?.info?.testResultSample.split("/").pop())
-      const totalPrice = await fromEther(data?.info?.pricesByCurrency[0].priceComponents[0], data?.info?.pricesByCurrency[0].currency)
-      const additionalPrice = await fromEther(data?.info?.pricesByCurrency[0].additionalPrices[0], data?.info?.pricesByCurrency[0].currency)
+      const totalPrice = await fromEther(data?.info?.pricesByCurrency[0].priceComponents[0].value, data?.info?.pricesByCurrency[0].currency)
+      const additionalPrice = await fromEther(data?.info?.pricesByCurrency[0].additionalPrices[0].value, data?.info?.pricesByCurrency[0].currency)
       
       const service = {
         name: data?.info?.name,
@@ -152,9 +152,12 @@ export default {
         totalPrice,
         additionalPrice
       } = value
-      const price = toEther(totalPrice, currency)
+      // the value totalPrice here is an old artifact. It is actually service price.
+      // Name change could break some stuffs so it must be left as a task for another day.
+      // Delete this comment once it has been fixed. ~Alex
+      const servicePrice = toEther(totalPrice, currency)
       const qcPrice = toEther(additionalPrice, currency)
-      const servicePrice = toEther(Number(totalPrice) - Number(additionalPrice), currency)
+      const price = toEther(Number(totalPrice) + Number(additionalPrice), currency)
       const parsedDescription = this.ParseLinks(description)
 
       const dataToSend = {

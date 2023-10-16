@@ -229,6 +229,7 @@ export default {
       this.service = {
         name: newVal.name,
         totalPrice: newVal.totalPrice,
+        additionalPrice: newVal.additionalPrice,
         duration: newVal.duration,
         description: newVal.description,
         currency: formatUSDTE(newVal.currency)

@@ -170,7 +170,7 @@ export default {
         sortable: true
       },
       {
-        text: "Service Price",
+        text: "Total Price",
         value: "price",
         sortable: true
       },
@@ -246,31 +246,36 @@ export default {
       this.serviceList = analystDetail.services
 
       for (const serviceId of this.serviceList) {
-        const serviceDetail = await queryGeneticAnalystServicesByHashId(
-          this.api,
-          serviceId
-        )
-        const {
-          id,
-          info: {description, name: serviceName, testResultSample}
-        } = serviceDetail
+        try {
+          const serviceDetail = await queryGeneticAnalystServicesByHashId(
+            this.api,
+            serviceId
+          )
+          const {
+            id,
+            info: {description, name: serviceName, testResultSample}
+          } = serviceDetail
 
-        const currency = serviceDetail.info.pricesByCurrency[0].currency
-        const price = this.formatPrice(
-          serviceDetail.info.pricesByCurrency[0].totalPrice, currency
-        )
-        const duration = `${serviceDetail.info.expectedDuration.duration} ${serviceDetail.info.expectedDuration.durationType}`
+          const currency = serviceDetail.info.pricesByCurrency[0].currency
+          const price = this.formatPrice(
+            serviceDetail.info.pricesByCurrency[0].totalPrice, currency
+          )
+          const duration = `${serviceDetail.info.expectedDuration.duration} ${serviceDetail.info.expectedDuration.durationType}`
 
-        const service = {
-          id,
-          description,
-          serviceName,
-          testResultSample,
-          price,
-          duration,
-          currency
+          const service = {
+            id,
+            description,
+            serviceName,
+            testResultSample,
+            price,
+            duration,
+            currency
+          }
+          this.items.push(service)
         }
-        this.items.push(service)
+        catch(err) {
+          console.error(err)
+        }
       }
     },
 

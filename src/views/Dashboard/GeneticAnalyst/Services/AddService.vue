@@ -129,7 +129,6 @@ export default {
       } = value
 
       const parsedDescription = this.ParseLinks(description)
-      console.log(parsedDescription)
 
       const dataToSend = {
         name,
