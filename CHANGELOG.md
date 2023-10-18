@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.4.2](https://github.com/debionetwork/debio-genetic-analyst-ui/compare/1.4.1...1.4.2) (2023-10-18)
+
+
+### Bug Fixes
+
+* add link to description ([#333](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/333)) ([2f936f6](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/2f936f6c79fadefb2641198396631e808f48eee2))
+* add quality control price to genetic analysis service ([#324](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/324)) ([e9114e7](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/e9114e7c4aed2127fc121436456189233178dc4f))
+* add service name and description length ([#327](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/327)) ([7326d0a](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/7326d0aebde5066c416601feef87760a1264ec4d))
+* chunk size shown ([#335](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/335)) ([4e9fa7a](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/4e9fa7a8a074ea14bd7600054a7744974969f549))
+* Edit page show incorrect information ([#334](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/334)) ([a417c4c](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/a417c4cb70858d274b9adffaa77ba9c5af0e5de9))
+* Genetic Analyst upload ([#331](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/331)) ([cf66484](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/cf664848282952bd5ef86fb77978d95056b79d4a))
+* update size ([#332](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/332)) ([dc52057](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/dc52057b425eb16a17169fe2e73d296da200d00b))
+
 ## [1.4.1](https://github.com/debionetwork/debio-genetic-analyst-ui/compare/1.4.0...1.4.1) (2023-04-28)
 
 
