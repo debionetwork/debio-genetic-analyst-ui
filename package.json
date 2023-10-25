@@ -36,7 +36,7 @@
     "axios": "^0.21.2",
     "bignumber.js": "^9.0.1",
     "core-js": "^3.6.5",
-    "crypto-js": "^4.1.1",
+    "crypto-js": "^4.2.0",
     "date-fns": "^2.16.1",
     "eth-crypto": "^1.8.0",
     "ethereum-private-key-to-public-key": "0.0.5",
