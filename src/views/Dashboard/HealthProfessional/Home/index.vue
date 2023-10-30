@@ -291,7 +291,7 @@ export default {
 
     redirectMyriad() {
       const timelineId = this.account.info.category === "Physical Health" ? getEnv("VUE_APP_PHYSICAL_HEALTH_TIMELINE_ID") : getEnv("VUE_APP_MENTAL_HEALTH_TIMELINE_ID")
-      window.open(`${getEnv("VUE_APP_MYRIAD_URL")}/?type=experience&id=${timelineId}`)
+      window.open(`${getEnv("VUE_APP_MYRIAD_URL")}/?type=experience&id=${timelineId}`, "_blank")
     },
 
     async toContinue() {
