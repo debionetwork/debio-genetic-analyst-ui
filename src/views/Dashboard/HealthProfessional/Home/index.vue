@@ -126,6 +126,12 @@
               max-width="360px"
               max-height="72px"
             )
+            ui-debio-button(
+              width="304px"
+              block
+              color="secondary"
+              @click="redirectMyriad"
+            ) CONTINUE TO MYRIAD
 
 </template>
 
@@ -213,9 +219,7 @@ export default {
       if (!this.isNotInstalled) {
         this.showConnect = true
       }
-      const timelineId = this.account.info.category === "Physical Health" ? getEnv("VUE_APP_PHYSICAL_HEALTH_TIMELINE_ID") : getEnv("VUE_APP_MENTAL_HEALTH_TIMELINE_ID")
-      window.open(`${getEnv("VUE_APP_MYRIAD_URL")}/?type=experience&id=${timelineId}`)
-      this.$router.push({ name: "hp-dashboard"})
+      // this.$router.push({ name: "hp-dashboard"})
     },
 
     async checkMyriadAccount() {
@@ -285,6 +289,11 @@ export default {
       }
     },
 
+    redirectMyriad() {
+      const timelineId = this.account.info.category === "Physical Health" ? getEnv("VUE_APP_PHYSICAL_HEALTH_TIMELINE_ID") : getEnv("VUE_APP_MENTAL_HEALTH_TIMELINE_ID")
+      window.open(`${getEnv("VUE_APP_MYRIAD_URL")}/?type=experience&id=${timelineId}`)
+    },
+
     async toContinue() {
       const sender = this.wallet.address 
       const allInjected = await web3Enable("DeBio Network");
@@ -299,7 +308,7 @@ export default {
       const injector = await web3FromAddress(sender)
       if (injector) {
         this.showConnect = false
-        this.$router.push({ name: "connecting-page"})
+        this.isConnectToMyriad = true
       }
     }
   }
