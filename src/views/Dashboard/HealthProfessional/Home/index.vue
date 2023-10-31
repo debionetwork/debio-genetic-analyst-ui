@@ -133,6 +133,9 @@
               @click="redirectMyriad"
             ) CONTINUE TO MYRIAD
 
+            .hp-dashboard__subtitle
+              p Or click <a :href="url">here</a> to go
+
 </template>
 
 <script>
@@ -168,6 +171,7 @@ export default {
     opinionGiven:  0,
     totalIncome: 0,
     myriadAccountDetails: {},
+    url: "",
     items: [],
     headers: [
       { text: "User", value: "username", sortable: true },
@@ -216,6 +220,8 @@ export default {
     
     async toGiveOpinion() {
       this.isNotInstalled = !isWeb3Injected
+      const timelineId = this.account.info.category === "Physical Health" ? getEnv("VUE_APP_PHYSICAL_HEALTH_TIMELINE_ID") : getEnv("VUE_APP_MENTAL_HEALTH_TIMELINE_ID")
+      this.url = `${getEnv("VUE_APP_MYRIAD_URL")}/?type=experience&id=${timelineId}`
       if (!this.isNotInstalled) {
         this.showConnect = true
       }
@@ -289,9 +295,9 @@ export default {
       }
     },
 
-    redirectMyriad() {
-      const timelineId = this.account.info.category === "Physical Health" ? getEnv("VUE_APP_PHYSICAL_HEALTH_TIMELINE_ID") : getEnv("VUE_APP_MENTAL_HEALTH_TIMELINE_ID")
-      window.open(`${getEnv("VUE_APP_MYRIAD_URL")}/?type=experience&id=${timelineId}`, "_blank")
+    async redirectMyriad() {
+      const url = this.url
+      window.open(url, "_blank")
     },
 
     async toContinue() {
