@@ -217,6 +217,7 @@ describe("Genetic Analyst Services Dashboard", () => {
 
     // Assert
     expect(await gaServices.methods.getServiceList()).toBeUndefined()
+    console.log(gaServices.methods.items)
     expect(gaServices.methods.items).toEqual([
       {
         id: "ID",
