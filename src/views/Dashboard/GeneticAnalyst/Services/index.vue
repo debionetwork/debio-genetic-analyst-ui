@@ -264,18 +264,13 @@ export default {
           const regex = /^(https:\/\/ipfs.debio.network\/ipfs\/)/
           let newDescription = ""
           if (regex.test(description)) {
-            console.log("fetching description for link ", description)
             const response = await fetch(description)
             newDescription = await response.text()
-            console.log(newDescription)
 
           }
           else {
             newDescription = description
           }
-
-          const file = await fetch(description)
-          console.log(file)
 
           const service = {
             id,
