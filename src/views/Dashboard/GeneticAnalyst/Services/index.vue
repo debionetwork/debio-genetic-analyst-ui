@@ -261,10 +261,25 @@ export default {
             serviceDetail.info.pricesByCurrency[0].totalPrice, currency
           )
           const duration = `${serviceDetail.info.expectedDuration.duration} ${serviceDetail.info.expectedDuration.durationType}`
+          const regex = /^(https:\/\/ipfs.debio.network\/ipfs\/)/
+          let newDescription = ""
+          if (regex.test(description)) {
+            console.log("fetching description for link ", description)
+            const response = await fetch(description)
+            newDescription = await response.text()
+            console.log(newDescription)
+
+          }
+          else {
+            newDescription = description
+          }
+
+          const file = await fetch(description)
+          console.log(file)
 
           const service = {
             id,
-            description,
+            description: newDescription,
             serviceName,
             testResultSample,
             price,

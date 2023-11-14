@@ -70,6 +70,7 @@ import {pencilIcon, trashIcon} from "@debionetwork/ui-icons"
 import AddServiceForm from "@/common/components/Service/AddService"
 import DeleteDialog from "@/common/components/Dialog/DeleteServiceDialog"
 import { toEther, formatUSDTE } from "@/common/lib/balance-format.js"
+import {uploadFile, getFileUrl} from "@/common/lib/pinata-proxy"
 
 const stepData = [
   {label: "Set Up Account", active: false},
@@ -115,7 +116,7 @@ export default {
   },
 
   methods: {
-    onSubmitService(value) {
+    async onSubmitService(value) {
       const {
         currency,
         description,
@@ -128,13 +129,13 @@ export default {
         additionalPrice
       } = value
 
-      const parsedDescription = this.ParseLinks(description)
+      const descriptionLink = await this.DescriptionLink(description,name)
 
       const dataToSend = {
         name,
         pricesByCurrency: [{currency, totalPrice}],
         expectedDuration: {duration, durationType},
-        description: parsedDescription,
+        description: descriptionLink,
         testResultSample
       }
 
@@ -189,16 +190,18 @@ export default {
       this.modalDelete = null
     },
 
-    ParseLinks(description) {
-      const urlRegex = /(https?:\/\/[^\s]+)/g;
-      const parts = description.split(urlRegex);
-      return parts.map((part) => {
-        if (urlRegex.test(part)) {
-          return `<a href="${part}" target="_blank">${part}</a>`;
-        } else {
-          return part;
-        }
-      }).join("");
+    async DescriptionLink(description,name) {
+      let blob = new Blob([description] , {type: "text/plain"});
+      const result = await uploadFile({
+        title: `${name}DescriptionFile.txt`,
+        type: "txt",
+        size: blob.size,
+        file: blob
+      })
+      const link = getFileUrl(result.IpfsHash)
+      return link
+
+      
     },
 
     async onSubmit() {
