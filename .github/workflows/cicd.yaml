@@ -209,14 +209,6 @@ jobs:
             --set-string config.secretsStore.name=${{ github.event.repository.name }}-secrets-store \
             --set containerPort=80 \
             --set service.port=80 \
-            --set-string resources.requests.cpu=100m \
-            --set-string resources.requests.memory=128Mi \
-            --set-string resources.limits.cpu=300m \
-            --set-string resources.limits.memory=256Mi \
-            --set replicaCount=1 \
-            --set autoscaling.enabled=true \
-            --set autoscaling.minReplicas=1 \
-            --set autoscaling.maxReplicas=5 \
             --set-string nodeSelector.node_pool=general \
             --set-string nodeSelector.'iam\.gke\.io/gke-metadata-server-enabled'='true'
           HTTPS_PROXY=127.0.0.1:8888 kubectl rollout status deployment/${{ github.event.repository.name }}
