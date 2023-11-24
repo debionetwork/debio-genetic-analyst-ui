@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.4.3](https://github.com/debionetwork/debio-genetic-analyst-ui/compare/1.4.2...1.4.3) (2023-11-24)
+
+
+### Bug Fixes
+
+* add hyperlink in case button redirect failed ([#346](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/346)) ([e3ff2e8](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/e3ff2e8dfd566007a3e88c93acacfae46833aa31))
+* redirect to myriad button ([#343](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/343)) ([b76bf2e](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/b76bf2ec0dc0bbc5a85c1a214df86cb64cd073db))
+* turn string into ipfs txt file ([#349](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/349)) ([8f6994a](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/8f6994a770a36bae36898ad8fbe74ee34e159841))
+* window open not working ([#345](https://github.com/debionetwork/debio-genetic-analyst-ui/issues/345)) ([975d0b9](https://github.com/debionetwork/debio-genetic-analyst-ui/commit/975d0b9e90ba4c8fe36d929caca1cd552e3f25af))
+
 ## [1.4.2](https://github.com/debionetwork/debio-genetic-analyst-ui/compare/1.4.1...1.4.2) (2023-10-18)
 
 
